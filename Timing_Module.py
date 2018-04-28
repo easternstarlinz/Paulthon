@@ -10,7 +10,7 @@ from statistics import mean
 from paul_resources import InformationTable, tprint, rprint
 from decorators import my_time_decorator
 from py_vollib.black_scholes.implied_volatility import black_scholes, implied_volatility
-from Distribution_Module_2 import Distribution, float_to_distribution
+from Distribution_Module import Distribution, float_to_distribution
 from Option_Module import get_time_to_expiry
 from datetime import timedelta
 import datetime as dt

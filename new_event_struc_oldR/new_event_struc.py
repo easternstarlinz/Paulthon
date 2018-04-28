@@ -1,80 +1,137 @@
 import pandas as pd
-
+pd.options.mode.chained_assignment = None
+from collections import namedtuple
+from paul_resources import tprint
+import copy
+from decorators import my_time_decorator
+from Distribution_Module_2 import Distribution
 core_scenarios = pd.read_excel('CLVS_RiskScenarios.xlsx',
                          header = [0],
                          index_col = [0],
                          sheet_name = 'Core_Scenarios')
-#TimingMappings = TimingMappings.reset_index().set_index('level_1').loc[:, ['Start', 'End']]
 
-distribution_df = pd.read_excel('CLVS_RiskScenarios.xlsx',
+distribution_info = pd.read_excel('CLVS_RiskScenarios.xlsx',
                          header = [0],
                          index_col = [0,1],
                          sheet_name = 'Sub_States')
+distribution_dff = distribution_info.reset_index().set_index('State')
 
-distribution_df = distribution_df.reset_index().set_index('State')
-#print(distribution_df)
-"""
-#states = [i[1] for i in sub_states.index.values.tolist()]
-#probs = sub_states.loc[:, 'Prob']
-#pct_moves = sub_states.loc[:, 'Pct_Move']
-#relative_prices = probs + 1
+class Distribution_MultiIndex(Distribution):
+    def __init__(self, df):
+        self.input_df = df
+        self.positive_scenario = df.loc[['Positive']]
+        self.negative_scenario = df.loc[['Negative']]
+        self.new = self.positive_scenario.append(self.negative_scenario)
+        self.core_scenarios = df.index.levels[0].tolist()
+        self.all_states = df.loc[['Positive', 'Negative']].index.tolist()
+    @property
+    def core_scenario_dfs(self):
+        return [self.input_df.loc[i] for i in self.core_scenarios]
 
-distribution_info = {'State': states ,
-                     'Prob': probs,
-                     'Pct_Move': pct_moves,
-                     'Relative_Price': relative_prices}
+    @property
+    def positive_scenario_states(self):
+        return self.positive_scenario.index.tolist()
 
-#distribution_df = pd.DataFrame(distribution_info).set_index('State').loc[:, ['Prob', 'Pct_Move', 'Relative_Price']]
-"""
-# Create a Scenario where the Core Probability of Success is .90.
-def reset_scenario_prob(distribution_df, state, new_prob):
-    # Set the New Probabilities
-    old_prob = distribution_df.loc[state, 'Prob']
-    old_total_prob_other_states = 1 - old_prob
-    new_total_prob_other_states = 1 - new_prob
-    states = distribution_df.index.tolist()
-    other_states = [i for i in states if i != state]
+    @property
+    def negative_scenario_states(self):
+        return self.negative_scenario.index.tolist()
+
+    @property
+    def positive_scenario_wgt_move(self):
+        probs = self.positive_scenario.loc[:, 'Relative_Prob'].values.tolist()
+        pct_moves = self.positive_scenario.loc[:, 'Pct_Move'].values.tolist()
+        return sum([prob*pct_move for prob, pct_move in zip(probs, pct_moves)])
     
-    # Set new probabilities
-    distribution_df.loc[state, 'Prob'] = new_prob
-    for state in other_states:
-        distribution_df.loc[state, 'Prob'] *= new_total_prob_other_states / old_total_prob_other_states
-
-    center_shift = sum([state.Prob*state.Pct_Move for state in distribution_df.itertuples()])
+    @property
+    def negative_scenario_wgt_move(self):
+        probs = self.negative_scenario.loc[:, 'Relative_Prob'].values.tolist()
+        pct_moves = self.negative_scenario.loc[:, 'Pct_Move'].values.tolist()
+        return sum([prob*pct_move for prob, pct_move in zip(probs, pct_moves)])
     
-    for state in states:
-        distribution_df.loc[state, 'Pct_Move'] += -center_shift
-    new_valuation = sum([state.Prob*state.Pct_Move for state in distribution_df.itertuples()])
+    @property 
+    def prob_success(self):
+        return -self.negative_scenario_wgt_move / (self.positive_scenario_wgt_move - self.negative_scenario_wgt_move)
 
+    def set_positive_scenario_substate_prob(self, state, new_relative_prob):
+        all_states = self.positive_scenario_states
+        unchanged_states = [i for i in all_states if i[1] != state]
+        
+        old_relative_prob = self.positive_scenario.loc[('Positive', state), 'Relative_Prob']
+        old_total_prob_other_states = 1 - old_relative_prob
+        new_total_prob_other_states = 1 - new_relative_prob
+        adjustment_mult = new_total_prob_other_states / old_total_prob_other_states
 
-    print(new_valuation)
-    print(distribution_df.round(3))
-print(distribution_df.round(3)) 
-reset_scenario_prob(distribution_df, 'Clean Approval', .9)
-
-
-def reset_core_prob_success(distribution_df, new_core_prob_success):
-    core_up_pct_move = core_scenarios.loc['Elagolix Approved', 'Pct_Move']
-    core_down_pct_move = core_scenarios.loc['CRL', 'Pct_Move']
-    valuation_band = core_up_pct_move - core_down_pct_move
-    print(core_up_pct_move, core_down_pct_move, valuation_band)
-
-    core_prob_success = core_scenarios.loc['Elagolix Approved', 'Prob']
-
-    new_core_up_pct_move = valuation_band*(1 - new_core_prob_success)
-    new_core_down_pct_move = new_core_up_pct_move - valuation_band
-    up_pct_move_diff = new_core_up_pct_move - core_up_pct_move
-    down_pct_move_diff = new_core_down_pct_move - core_down_pct_move
-
-
-    distribution_df['Pct_Move'] += up_pct_move_diff*(distribution_df['Core_Scenario']== 'Elagolix Approved') + down_pct_move_diff*(distribution_df['Core_Scenario'] == 'CRL')
-    distribution_df['Prob'] = distribution_df['Relative_Prob']*(new_core_prob_success*(distribution_df['Core_Scenario']== 'Elagolix Approved') + (1 - new_core_prob_success)*(distribution_df['Core_Scenario'] == 'CRL'))
-    #distribution_df['Pct_Move'] = 3*(distribution_df['Core_Scenario']== 'Elagolix Approved') + 30*(distribution_df['Core_Scenario'] == 'CRL')
+        # Set New Probabilities
+        self.positive_scenario.loc[('Positive', state), 'Relative_Prob'] = new_relative_prob
+        for i in unchanged_states:
+            self.positive_scenario.loc[('Positive', i[1]), 'Relative_Prob'] *= adjustment_mult
     
-    print(distribution_df.round(3))
+    def set_substate_prob(self, state, new_relative_prob):
+        if state[0] == 'Positive':
+            all_states = self.positive_scenario_states
+            unchanged_states = [i for i in all_states if i != state]
+           
+            old_relative_prob = self.positive_scenario.loc[state, 'Relative_Prob']
+            old_total_prob_other_states = 1 - old_relative_prob
+            new_total_prob_other_states = 1 - new_relative_prob
+            adjustment_mult = new_total_prob_other_states / old_total_prob_other_states
 
-#reset_core_prob_success(distribution_df, .99)
+            # Set New Probabilities
+            self.positive_scenario.loc[state, 'Relative_Prob'] = new_relative_prob
+            for i in unchanged_states:
+                self.positive_scenario.loc[i, 'Relative_Prob'] *= adjustment_mult
+        elif state[0] == 'Negative':
+            all_states = self.negative_scenario_states
+            unchanged_states = [i for i in all_states if i != state]
+           
+            old_relative_prob = self.negative_scenario.loc[state, 'Relative_Prob']
+            old_total_prob_other_states = 1 - old_relative_prob
+            new_total_prob_other_states = 1 - new_relative_prob
+            adjustment_mult = new_total_prob_other_states / old_total_prob_other_states
 
+            # Set New Probabilities
+            self.negative_scenario.loc[state, 'Relative_Prob'] = new_relative_prob
+            for i in unchanged_states:
+                self.negative_scenario.loc[i, 'Relative_Prob'] *= adjustment_mult
+        else:
+            raise ValueError
+        
+        self.calc_absolute_probs()
 
+    def calc_absolute_probs(self):    
+        for state in self.positive_scenario_states:
+            self.positive_scenario.loc[state, 'Prob'] = self.positive_scenario.loc[state, 'Relative_Prob']*self.prob_success
+        for state in self.negative_scenario_states:
+            self.negative_scenario.loc[state, 'Prob'] = self.negative_scenario.loc[state, 'Relative_Prob']*(1-self.prob_success)
 
+    def set_prob_success(self, new_prob_success):
+        for state in self.positive_scenario_states:
+            self.positive_scenario.loc[state, 'Prob'] = self.positive_scenario.loc[state, 'Relative_Prob']*new_prob_success
+        for state in self.negative_scenario_states:
+            self.negative_scenario.loc[state, 'Prob'] = self.negative_scenario.loc[state, 'Relative_Prob']*(1-new_prob_success)
 
+        center_shift = sum([state.Prob*state.Pct_Move for state in self.distribution_df.itertuples()])
+        for state in self.positive_scenario_states:
+            self.positive_scenario.loc[state, 'Pct_Move'] += -center_shift
+            self.positive_scenario.loc[state, 'Relative_Price'] = self.positive_scenario.loc[state, 'Pct_Move'] + 1
+        for state in self.negative_scenario_states:
+            self.negative_scenario.loc[state, 'Pct_Move'] += -center_shift
+            self.negative_scenario.loc[state, 'Relative_Price'] = self.negative_scenario.loc[state, 'Pct_Move'] + 1
+
+    @property
+    def distribution_df(self):
+        return self.positive_scenario.append(self.negative_scenario)
+@my_time_decorator
+def run():
+    nbix = Distribution_MultiIndex(distribution_info)
+    #nbix.set_substate_prob(('Negative', 'CRL - No Hope'), .99)
+    #nbix.set_substate_prob(('Positive', 'Clean Approval'), .99)
+    nbix.set_prob_success(.90)
+    print(nbix.distribution_df.round(3))
+    print(nbix.positive_scenario_wgt_move, nbix.negative_scenario_wgt_move, nbix.prob_success)
+    #nbix = nbix.distribution_df.reset_index().set_index('State')
+    print(nbix)
+    print(nbix.mean_move, nbix.straddle, nbix.average_move)
+    nbix.get_histogram()
+
+#run()
