@@ -53,7 +53,7 @@ class Stock(object):
 
     
     def get_event_timeline(self):
-        get_event_timeline(self.events, self.stock)
+        get_event_timeline(self.events, self.stock, self.expiries)
 
     def get_term_structure(self):
         term_struc = term_structure(self.events, self.expiries, metric = 'IV', mc_iterations = 10**5)
@@ -82,13 +82,13 @@ class Stock(object):
 
 
 
-
-@my_time_decorator
-def run():
-    stock = Stock('VRTX')
-    #stock.get_event_timeline()
-    term_structure = stock.get_term_structure()
-    #print(stock.sorted_events)
-    print(term_structure)
-    #print(stock.expiries)
-run()
+if __name__ == '__main__':
+    @my_time_decorator
+    def run():
+        stock = Stock('VRTX')
+        stock.get_event_timeline()
+        term_structure = stock.get_term_structure()
+        #print(stock.sorted_events)
+        print(term_structure)
+        #print(stock.expiries)
+    run()
