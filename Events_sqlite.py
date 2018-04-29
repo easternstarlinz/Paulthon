@@ -1,13 +1,12 @@
-import sqlite3
 import pandas as pd
 import datetime as dt
 from datetime import timedelta
-from employee import Employee
-from Event_Module import Earnings
+import pickle
 import random
+import sqlite3
 from paul_resources import HealthcareSymbols, Symbols, to_pickle
 from decorators import my_time_decorator
-import pickle
+from Event_Module import Earnings
 
 #conn = sqlite3.connect('employee.db')
 conn = sqlite3.connect(':memory:')
@@ -55,20 +54,6 @@ def get_earnings_evts_from_pickle(symbol):
     earnings_evts = pickle.load(open('EarningsEvents.pkl', 'rb'))
     return [evt for evt in earnings_evts if evt.stock == symbol]
 
-
-def get_emps_by_name(lastname):
-    c.execute("SELECT * FROM employees WHERE last=:last", {'last': lastname})
-    return c.fetchall()
-
-def update_pay(emp, pay):
-    with conn:
-        c.execute("""UPDATE employees SET pay = :pay
-                    WHERE first = :first AND last = :last""",
-                    {'first': emp.first, 'last': emp.last, 'pay': pay})
-def remove_emp(emp):
-    with conn:
-        c.execute("DELETE from employees WHERE first = :first AND last = :last",
-                    {'first': emp.first, 'last': emp.last})
 
 @my_time_decorator
 def create_earnings_events(stocks: 'list of stocks'):
@@ -124,18 +109,7 @@ def instantiate_earnings_event_2(params):
 earnings_evts = pickle.load(open('EarningsEvents.pkl', 'rb'))
 insert_events_to_table(earnings_evts)
 
-"""
-emps = get_emps_by_name('Doe')
-print(emps)
-
-update_pay(emp_2, 95000)
-remove_emp(emp_1)
-
-emps = get_emps_by_name('Doe')
-print(emps)
-"""
 #conn.close()
-
 
 
 if __name__ == '__main__':

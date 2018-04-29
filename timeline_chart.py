@@ -1,12 +1,12 @@
-#from All_Events import sorted_events
-from Event_Module import IdiosyncraticVol, TakeoutEvent, Earnings
-from Timing_Module import Timing
-import matplotlib.pyplot as plt
-#plt.style.use('bmh')
 import pandas as pd
 import numpy as np
 import datetime as dt
+import matplotlib.pyplot as plt
+#plt.style.use('bmh')
 from datetime import timedelta
+from term_structure import term_structure
+from Timing_Module import Timing
+from Event_Module import IdiosyncraticVol, TakeoutEvent, Earnings
 
 def get_event_timeline(events: 'list of events', symbol: 'str' = ''):
     events = [evt for evt in events if not isinstance(evt, (IdiosyncraticVol, TakeoutEvent))]

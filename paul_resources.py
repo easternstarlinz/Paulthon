@@ -12,7 +12,7 @@ import pylab
 import scipy.stats as ss
 import statsmodels.api as sm
 from sklearn.linear_model import LinearRegression
-from time_decorator import my_time_decorator
+from decorators import my_time_decorator
 from ols import OLS
 from ols2 import OLS as MainOLS
 from scipy.interpolate import interp1d, UnivariateSpline
