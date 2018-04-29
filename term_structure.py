@@ -1,20 +1,18 @@
 import pandas as pd
+pd.options.mode.chained_assignment = None
 import datetime as dt
 from functools import reduce
 from pprint import pprint
-from biotech_class_run_9 import get_total_mc_distribution, get_option_sheet_from_mc_distribution, option_sheet
+from paul_resources import show_mc_distributions_as_line_chart
+from decorators import my_time_decorator
+from Option_Module import Option, OptionPriceMC
+from Timing_Module import Timing
 from Event_Module import Event, IdiosyncraticVol, Earnings, TakeoutEvent, ComplexEvent, SysEvt_PresElection
 from Distribution_Module import Distribution, Distribution_MultiIndex
-from paul_resources import show_mc_distributions_as_line_chart
-from Option_Module import Option, OptionPriceMC
-from decorators import my_time_decorator
-from Timing_Module import Timing
-from All_Events import sorted_events
-
-import logging
-pd.options.mode.chained_assignment = None
+from biotech_class_run import get_total_mc_distribution, get_option_sheet_from_mc_distribution, option_sheet
 
 # Logging Setup
+import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.CRITICAL)
 
@@ -26,6 +24,8 @@ stream_handler.setFormatter(formatter)
 
 logger.addHandler(stream_handler)
 
+
+sorted_events = [IdiosyncraticVol('CLVS', .1)]
 # Define Expiries
 expiry1 = dt.date(2018, 5, 21)
 expiry2 = dt.date(2018, 6, 21)
@@ -39,12 +39,19 @@ expiries = [expiry1, expiry2, expiry3, expiry4, expiry5, expiry6]
 expiries = [expiry1, expiry3, expiry5]
 expiries = [expiry3]
 
+elagolix_info = pd.read_excel('CLVS_RiskScenarios.xlsx',
+                         header = [0],
+                         index_col = [0,1],
+                         sheet_name = 'Sub_States')
+
+elagolix = ComplexEvent('CLVS', Distribution_MultiIndex(elagolix_info), dt.date(2018,6,1), 'Elagolix Approval')
+
 events = sorted_events
 events_bid = [event.event_bid for event in events]
 events_ask = [event.event_ask for event in events]
-events_high_POS = [idio, elagolix.event_high_prob_success]
-events_low_POS = [idio, elagolix.event_low_prob_success]
-events_max_optionality = [idio, elagolix.event_max_optionality]
+events_high_POS = [elagolix.event_high_prob_success]
+events_low_POS = [elagolix.event_low_prob_success]
+events_max_optionality = [elagolix.event_max_optionality]
 
 # Define Event Groupings
 event_groupings = {}
@@ -96,14 +103,6 @@ def get_bid_ask_sheet(event_groupings, event_grouping_names, expiry, metric = 'I
     return reduce(lambda x,y: pd.merge(x, y, left_index=True, right_index=True), implied_vols)
 
 
-expiry = dt.date(2018, 10, 1)
-bid_ask_sheet = get_bid_ask_sheet(event_groupings,
-                                  event_grouping_names,
-                                  expiry,
-                                  'IV',
-                                  mc_iterations=1*10**5)
-print(bid_ask_sheet.round(3).to_string())
-print("Takeout Assumptions-- Prob: {:2f}, Premium: {:2f}".format(takeout.takeout_prob, takeout.takeout_premium))
 
 
 def spread_pricing(options: 'list of options', quantities: 'list of quantities', events, description = None, mc_iterations=10**6):
@@ -132,24 +131,34 @@ def spread_pricing_bid_ask(options: 'list of options', quantities: 'list of quan
     info = pd.DataFrame(info).set_index('Level')
     return info
 
-option_type = 'Put'
-expiry = dt.date(2018, 8, 1)
+if __name__ == '__main__':
+    expiry = dt.date(2018, 10, 1)
+    bid_ask_sheet = get_bid_ask_sheet(event_groupings,
+                                      event_grouping_names,
+                                      expiry,
+                                      'IV',
+                                      mc_iterations=1*10**5)
+#print(bid_ask_sheet.round(3).to_string())
+#print("Takeout Assumptions-- Prob: {:2f}, Premium: {:2f}".format(takeout.takeout_prob, takeout.takeout_premium))
 
-option1 = Option(option_type, .975, expiry)
-option2 = Option(option_type, .925, expiry)
-option3 = Option(option_type, .95, expiry)
+    option_type = 'Put'
+    expiry = dt.date(2018, 8, 1)
 
-options = [option1, option2, option3]
-quantities = [1, -1, 0]
+    option1 = Option(option_type, .975, expiry)
+    option2 = Option(option_type, .925, expiry)
+    option3 = Option(option_type, .95, expiry)
 
-spread_prices = spread_pricing_bid_ask(options, quantities, event_groupings, event_grouping_names, mc_iterations = 10**6)
-print(spread_prices.round(3))
-print(events_bid, events, events_ask, end = "\n")
+    options = [option1, option2, option3]
+    quantities = [1, -1, 0]
 
-sorted_events = sorted(events, key=lambda evt: Timing(evt.timing_descriptor).center_date)
-pprint(sorted_events)
+    spread_prices = spread_pricing_bid_ask(options, quantities, event_groupings, event_grouping_names, mc_iterations = 10**6)
+    print(spread_prices.round(3))
+    print(events_bid, events, events_ask, end = "\n")
 
-timing_descriptors = [evt.timing_descriptor for evt in events]
-pprint(timing_descriptors)
-center_dates = [Timing(timing_descriptor).center_date for timing_descriptor in timing_descriptors]
-pprint(center_dates)
+    sorted_events = sorted(events, key=lambda evt: Timing(evt.timing_descriptor).center_date)
+    pprint(sorted_events)
+
+    timing_descriptors = [evt.timing_descriptor for evt in events]
+    pprint(timing_descriptors)
+    center_dates = [Timing(timing_descriptor).center_date for timing_descriptor in timing_descriptors]
+    pprint(center_dates)

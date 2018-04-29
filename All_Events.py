@@ -7,17 +7,18 @@ from Events_sqlite import get_earnings_events
 from paul_resources import TakeoutParams
 from decorators import my_time_decorator
 from timeline_chart import get_event_timeline
+from term_structure import term_structure
 # Define Events
 
 class Stock(object):
-    event8_info = pd.read_excel('CLVS_RiskScenarios.xlsx',
+    elagolix_info = pd.read_excel('CLVS_RiskScenarios.xlsx',
                              header = [0],
                              index_col = [0,1],
                              sheet_name = 'Sub_States')
 
     fda_meeting = Event('CLVS', .1, 'Q2_2018', 'FDA Meeting')
     data = Event('CLVS', Distribution(pd.read_csv('CLVS.csv')), 'Q2_2018', 'Ph3_Data')
-    elagolix = ComplexEvent('CLVS', Distribution_MultiIndex(event8_info), dt.date(2018,6,1), 'Elagolix Approval')
+    elagolix = ComplexEvent('CLVS', Distribution_MultiIndex(elagolix_info), dt.date(2018,6,1), 'Elagolix Approval')
     all_other_events = [data, fda_meeting, elagolix]
 
     def __init__(self, stock):
@@ -25,7 +26,7 @@ class Stock(object):
 
     @property
     def idio_vol(self):
-        return IdiosyncraticVol(self.stock, .05)
+        return IdiosyncraticVol(self.stock, .10)
 
     @property
     def earnings_events(self):
@@ -54,9 +55,40 @@ class Stock(object):
     def get_event_timeline(self):
         get_event_timeline(self.events, self.stock)
 
+    def get_term_structure(self):
+        term_struc = term_structure(self.events, self.expiries, metric = 'IV', mc_iterations = 10**5)
+        return term_struc.iloc[[term_struc.index.get_loc(1.00, method='nearest')], :]
+        #return term_structure(self.events, self.expiries, metric = 'IV', mc_iterations = 10**5)
+
+    @property
+    def expiries(self):
+        return [dt.date(2018, 5, 21), dt.date(2018, 6, 21), dt.date(2018, 7, 21), dt.date(2018, 8, 21), dt.date(2018, 9, 21), dt.date(2018, 10, 21), dt.date(2018, 11, 21), dt.date(2018, 12, 21)]
+    
+    @property
+    def best_index(self):
+        return 'SPY'
+
+    @property
+    def beta(self):
+        return 1.0
+
+    @property
+    def beta_to_SPY(self):
+        return 1.0
+
+    def get_beta(self, index: 'str'):
+        return 1.0
+
+
+
+
+
 @my_time_decorator
 def run():
     stock = Stock('VRTX')
-    print(stock.sorted_events)
-    stock.get_event_timeline()
+    #stock.get_event_timeline()
+    term_structure = stock.get_term_structure()
+    #print(stock.sorted_events)
+    print(term_structure)
+    #print(stock.expiries)
 run()

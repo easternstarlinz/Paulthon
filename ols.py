@@ -5,7 +5,7 @@ import decimal
 import pandas as pd
 import numpy as np
 import statsmodels.formula.api as sm
-from time_decorator import my_time_decorator
+from decorators import my_time_decorator
 import math
 import matplotlib.pyplot as plt
 import scipy.stats as ss
