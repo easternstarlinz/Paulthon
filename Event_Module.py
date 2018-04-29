@@ -299,7 +299,7 @@ class ComplexEvent(Event):
                                 self.timing_descriptor,
                                 self.event_name,
                                 self.idio_mult)
-        print(new_event.event_input_distribution_df.to_string())
+        #print(new_event.event_input_distribution_df.to_string())
         return new_event
     
     @property
@@ -327,7 +327,7 @@ class ComplexEvent(Event):
                                 self.timing_descriptor,
                                 self.event_name,
                                 self.idio_mult)
-        print(new_event.event_input_distribution_df.to_string())
+        #print(new_event.event_input_distribution_df.to_string())
         return new_event
         return self.event_prob_success(.05)
 

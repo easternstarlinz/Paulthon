@@ -8,18 +8,17 @@ from paul_resources import HealthcareSymbols, Symbols, to_pickle
 from decorators import my_time_decorator
 from Event_Module import Earnings
 
-#conn = sqlite3.connect('employee.db')
-conn = sqlite3.connect(':memory:')
+conn = sqlite3.connect('earnings.db')
+#conn = sqlite3.connect(':memory:')
 
 c = conn.cursor()
 
-
-c.execute("""CREATE TABLE earnings (
-            stock text,
-            event_input real,
-            timing_descriptor text,
-            event_name text
-            )""")
+#c.execute("""CREATE TABLE earnings (
+#            stock text,
+#            event_input real,
+#            timing_descriptor text,
+#            event_name text
+#            )""")
 
 def insert_earnings_event(earns):
     with conn:
@@ -41,7 +40,7 @@ def get_earnings_table(symbol=None):
                 conn,
                 params = (symbol, ))
 
-@my_time_decorator
+#@my_time_decorator
 def get_earnings_events(symbol=None):
     if symbol is None:
         c.execute("SELECT * FROM earnings")
@@ -49,10 +48,6 @@ def get_earnings_events(symbol=None):
         c.execute("SELECT * FROM earnings WHERE stock=:stock", {'stock': symbol})
     return [Earnings(*params) for params in c.fetchall()]
 
-@my_time_decorator
-def get_earnings_evts_from_pickle(symbol):
-    earnings_evts = pickle.load(open('EarningsEvents.pkl', 'rb'))
-    return [evt for evt in earnings_evts if evt.stock == symbol]
 
 
 @my_time_decorator
@@ -98,7 +93,7 @@ def run():
     return [evt for evt in earnings_evts if evt.stock == 'CLVS']
 
 @my_time_decorator
-def instantiate(n=1):
+def instantiate_timer(params, n=1):
     for i in range(n):
         evt = Earnings(*params)
 
@@ -106,18 +101,23 @@ def instantiate(n=1):
 def instantiate_earnings_event_2(params):
     return Earnings(*params)
 
-earnings_evts = pickle.load(open('EarningsEvents.pkl', 'rb'))
-insert_events_to_table(earnings_evts)
+@my_time_decorator
+def get_earnings_evts_from_pickle(symbol):
+    earnings_evts = pickle.load(open('EarningsEvents.pkl', 'rb'))
+    return [evt for evt in earnings_evts if evt.stock == symbol]
+
+#earnings_evts = pickle.load(open('EarningsEvents.pkl', 'rb'))
+#insert_events_to_table(earnings_evts)
 
 #conn.close()
 
 
 if __name__ == '__main__':
-    instantiate(1)
-    instantiate(10)
-    instantiate(100)
-    instantiate(1000)
-    #instantiate(10000)
+    instantiate_timer(1)
+    instantiate_timer(10)
+    instantiate_timer(100)
+    instantiate_timer(1000)
+    #instantiate_timer(10000)
 
     a = instantiate_earnings_event_2(params)
     print(a.timing_descriptor, type(a.timing_descriptor))
