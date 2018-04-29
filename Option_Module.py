@@ -86,3 +86,27 @@ def get_implied_volatility(Option,
     #print("Strike: {}{}, Underlying: {:.2f}, Option: {:.2f}".format(K, flag, S, price))
     #print(price, S, K, t, r, flag) 
     return implied_volatility(price, S, K, t, r, flag)
+
+def get_option_price(Option,
+                     implied_vol,
+                     underlying_price = None,
+                     interest_rate = None,
+                     reference_date = None):
+    
+    if underlying_price is None:
+        underlying_price = 1
+
+    if interest_rate is None:
+        interest_rate = 0
+
+    if reference_date is None:
+        reference_date = dt.date.today()
+    
+    S = underlying_price
+    K = Option.Strike
+    r = interest_rate
+    flag = Option.Option_Type.lower()[0]
+    t = get_time_to_expiry(Option.Expiry)
+    sigma = implied_vol
+
+    return black_scholes(flag, S, K, t, r, sigma)

@@ -12,6 +12,7 @@ from Event_Module import IdiosyncraticVol, Event, SysEvt_PresElection, TakeoutEv
 from functools import reduce
 import copy
 import pylab
+from scipy.interpolate import interp1d, UnivariateSpline
 
 
 """------------------------------Calculations----------------------------------------"""
@@ -25,7 +26,7 @@ def get_total_mc_distribution(events, expiry = None, symbol = None, mc_iteration
 #@my_time_decorator
 def get_option_sheet_from_mc_distribution(mc_distribution, expiry = None, strikes = None):
     if strikes is None:
-        strikes = np.arange(.75, 1.25, .05)
+        strikes = np.arange(.5, 2, .005)
 
     call_options = [Option('Call', strike, expiry) for strike in strikes]
     call_prices = list(map(lambda option: OptionPriceMC(option, mc_distribution), call_options))
@@ -66,16 +67,28 @@ def get_option_sheet_by_event_groupings(event_groupings, expiry):
 #            i += 1
 #        return prices_df
     mc_distributions = list(map(lambda event_grouping: get_total_mc_distribution(event_grouping, expiry), event_groupings))
+    option_sheets = list(map(lambda dist: get_option_sheet_from_mc_distribution(dist, expiry).loc[:, [(expiry,'IV')]], mc_distributions))
+    
     #[get_histogram_from_array(mc_distribution) for mc_distribution in mc_distributions]
     #show_term_structure(mc_distributions)
-
-    option_sheets = list(map(lambda dist: get_option_sheet_from_mc_distribution(dist, expiry).loc[:, ['IV']], mc_distributions))
-    return reduce(lambda x, y: pd.merge(x, y, left_index=True, right_index=True), option_sheets)
+    if len(option_sheets) >=2:
+        return reduce(lambda x, y: pd.merge(x, y, left_index=True, right_index=True), option_sheets)
+    else:
+        return option_sheets[0]
 
 #@my_time_decorator
 def option_sheet(event_groupings,
                   expiry = None,
                   mc_iterations = 10**5):
     option_sheet_by_groupings = get_option_sheet_by_event_groupings(event_groupings, expiry)
-    #print(option_sheet_by_groupings)
     return option_sheet_by_groupings
+
+
+def get_vol_surface(events, expiry):
+    return get_option_sheet_by_event_groupings([events], expiry)
+
+def get_vol_surface_spline(vol_surface):
+    strikes = vol_surface.index.values.tolist()
+    vols = vol_surface.iloc[:, 0].values.tolist()
+    return interp1d(strikes, vols, kind='cubic')
+
