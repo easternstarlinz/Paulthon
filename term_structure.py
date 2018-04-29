@@ -65,7 +65,7 @@ event_grouping_names = ['Bid', 'Mid', 'Ask', 'Elagolix - High P.O.S.', 'Elagolix
 def term_structure(events, expiries, metric = 'IV', mc_iterations = 10**5):
     mc_distributions = list(map(lambda expiry: get_total_mc_distribution(events, expiry, mc_iterations=mc_iterations), expiries))
     implied_vols = list(map(lambda dist, expiry: get_option_sheet_from_mc_distribution(dist, expiry).loc[:, [(expiry, metric)]], mc_distributions, expiries))
-    show_mc_distributions_as_line_chart(mc_distributions, labels = expiries)
+    #show_mc_distributions_as_line_chart(mc_distributions, labels = expiries)
     return reduce(lambda x,y: pd.merge(x, y, left_index=True, right_index=True), implied_vols)
 
 #term_structure = term_structure(events, expiries, 'IV', mc_iterations=10**6)
