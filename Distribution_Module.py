@@ -55,10 +55,17 @@ class Distribution(object):
     def mean_move(self):
         return math.sqrt(sum([state.Prob*state.Pct_Move**2 for state in self.distribution_df.itertuples()]))
 
+    #@my_time_decorator
     def mc_simulation(self, iterations = 10**6):
         relative_prices = self.distribution_df.loc[:, 'Relative_Price'].values.tolist()
         weights = self.distribution_df.loc[:, 'Prob'].values.tolist()
-        results = random.choices(relative_prices, weights=weights, k=iterations)
+        
+        #@my_time_decorator
+        def random_generator():
+            results = random.choices(relative_prices, weights=weights, k=iterations)
+            return results
+        results = random_generator()
+        #print('MC Results Type:', type(results))
         results = np.array(results)
         return results
 
