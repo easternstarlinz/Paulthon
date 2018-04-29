@@ -2,3 +2,6 @@
 *.ipynb
 *.py!
 *.log
+*.swo
+*.swn
+*.csv#
