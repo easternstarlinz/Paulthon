@@ -201,6 +201,34 @@ def get_vol_surface_from_mc_distribution(mc_distribution, expiry = None, strikes
         strikes = np.arange(.5, 1.5, .01)
         #strikes = np.arange(.5, 1.5, .005)
 
+    #@my_time_decorator
+    def establish_call_options(expiry, strikes):
+        return [Option('Call', strike, expiry) for strike in strikes]
+    
+    #@my_time_decorator
+    def get_call_prices(mc_distribution, call_options):
+        return list(map(lambda option: OptionPriceMC(option, mc_distribution), call_options))
+    
+    #@my_time_decorator
+    def get_call_IVs(call_options, call_prices):
+        return list(map(lambda option, option_price: get_implied_volatility(option, option_price), call_options, call_prices))
+    
+    #@my_time_decorator
+    def get_vol_surface_df(expiry, strikes, call_IVs):
+        vol_surface_info = list(call_IVs)
+        index_r = pd.Index(strikes, name = 'Strike')
+        iterables_c = [[expiry], ['IV']]
+        index_c = pd.MultiIndex.from_product(iterables_c, names = ['Expiry', 'Option_Info'])
+        vol_surface = pd.DataFrame(vol_surface_info, index = index_r, columns = index_c)
+        return vol_surface
+    
+    call_options = establish_call_options(expiry, strikes)
+    call_prices = get_call_prices(mc_distribution, call_options)
+    call_IVs = get_call_IVs(call_options, call_prices)
+   
+    #return get_vol_surface_df(expiry, strikes, call_IVs)
+    return [strikes, call_IVs]
+    """
     call_options = [Option('Call', strike, expiry) for strike in strikes]
     call_prices = list(map(lambda option: OptionPriceMC(option, mc_distribution), call_options))
     call_IVs = list(map(lambda option, option_price: get_implied_volatility(option, option_price), call_options, call_prices))
@@ -211,6 +239,7 @@ def get_vol_surface_from_mc_distribution(mc_distribution, expiry = None, strikes
     index_c = pd.MultiIndex.from_product(iterables_c, names = ['Expiry', 'Option_Info'])
     vol_surface = pd.DataFrame(vol_surface_info, index = index_r, columns = index_c)
     return vol_surface
+    """
     #return [strikes, call_IVs]
 
 #@my_time_decorator
@@ -224,8 +253,8 @@ def get_vol_surface(events, expiry):
 
 #@my_time_decorator
 def get_vol_surface_spline(vol_surface):
-    strikes = vol_surface.index.values.tolist()
-    vols = vol_surface.iloc[:, 0].values.tolist()
-    #strikes = vol_surface[0]
-    #vols = vol_surface[1]
+    #strikes = vol_surface.index.values.tolist()
+    #vols = vol_surface.iloc[:, 0].values.tolist()
+    strikes = vol_surface[0]
+    vols = vol_surface[1]
     return interp1d(strikes, vols, kind='cubic')

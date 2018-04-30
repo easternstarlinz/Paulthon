@@ -42,7 +42,7 @@ def get_earnings_table(symbol=None):
                 conn,
                 params = (symbol, ))
 
-@my_time_decorator
+#@my_time_decorator
 def get_earnings_events(symbol=None):
     conn = sqlite3.connect('earnings.db', check_same_thread=False)
     c = conn.cursor()
