@@ -180,12 +180,21 @@ class IdiosyncraticVol(Event):
             self.event_input = event_input
         logger.info("{} {} Instantiated Successfully".format(self.stock, self.name))
         
+        self.event_input_float = event_input
+
     def get_distribution(self, expiry):
         time_to_expiry = get_time_to_expiry(expiry)
         distribution_df = copy.deepcopy(self.event_input_distribution_df)
         distribution_df.loc[:, 'Pct_Move'] *= self.mult*self.idio_mult*math.sqrt(time_to_expiry)
         distribution_df.loc[:, 'Relative_Price'] = distribution_df.loc[:, 'Pct_Move'] + 1
         return Distribution(distribution_df)
+
+    def __str__(self):
+        return "{} ({:.2f}% IV)".format(self.name, self.at_the_money_vol*100)
+    
+    @property
+    def at_the_money_vol(self):
+        return self.event_input_float*IdiosyncraticVol.mult*self.idio_mult
 
     @property
     def event_bid(self):
@@ -251,7 +260,7 @@ class Earnings(Event):
         return self.event_name[0:2]
     
     @property
-    def mean_move_float(self):
+    def mean_move(self):
         return self.event_input_float*Earnings.mult*self.idio_mult
 
     @property
