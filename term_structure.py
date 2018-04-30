@@ -9,7 +9,8 @@ from Option_Module import Option, OptionPriceMC
 from Timing_Module import Timing
 from Event_Module import Event, IdiosyncraticVol, Earnings, TakeoutEvent, ComplexEvent, SysEvt_PresElection
 from Distribution_Module import Distribution, Distribution_MultiIndex
-from biotech_class_run import get_total_mc_distribution, get_option_sheet_from_mc_distribution, option_sheet
+#from biotech_class_run import get_total_mc_distribution, get_option_sheet_from_mc_distribution, option_sheet
+from biotech_class_run import get_total_mc_distribution, get_option_sheet_from_mc_distribution
 
 # Logging Setup
 import logging

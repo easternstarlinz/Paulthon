@@ -1,21 +1,22 @@
-import datetime as dt
 import pandas as pd
-import math
 import numpy as np
+import datetime as dt
+import math
 import random
+import copy
+import pylab
+from functools import reduce
+from scipy.interpolate import interp1d, UnivariateSpline
 from collections import namedtuple
 from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array
 from decorators import my_time_decorator
-from Distribution_Module import Distribution, float_to_event_distribution, float_to_bs_distribution
 from Option_Module import Option, OptionPrice, OptionPriceMC, get_implied_volatility
-from Event_Module import IdiosyncraticVol, Event, SysEvt_PresElection, TakeoutEvent
-from functools import reduce
-import copy
-import pylab
-from scipy.interpolate import interp1d, UnivariateSpline
-
+from Timing_Module import event_prob_by_expiry
+from Event_Module import IdiosyncraticVol, Earnings, TakeoutEvent, Event, SysEvt_PresElection
+from Distribution_Module import Distribution, float_to_event_distribution, float_to_bs_distribution
 
 """------------------------------Calculations----------------------------------------"""
+#-------------------------------------------Original Formulas-----------------------------------------------#
 #@my_time_decorator
 def get_total_mc_distribution(events, expiry = None, symbol = None, mc_iterations = 10**4):
     """Add the simulation results of individual events to return the total simulated distribution."""
@@ -75,14 +76,15 @@ def get_option_sheet_by_event_groupings(event_groupings, expiry):
         return reduce(lambda x, y: pd.merge(x, y, left_index=True, right_index=True), option_sheets)
     else:
         return option_sheets[0]
-
+"""
 #@my_time_decorator
+# I don't think I need this function.
 def option_sheet(event_groupings,
                   expiry = None,
                   mc_iterations = 10**5):
     option_sheet_by_groupings = get_option_sheet_by_event_groupings(event_groupings, expiry)
     return option_sheet_by_groupings
-
+"""
 
 def get_vol_surface(events, expiry):
     return get_option_sheet_by_event_groupings([events], expiry)
@@ -92,3 +94,141 @@ def get_vol_surface_spline(vol_surface):
     vols = vol_surface.iloc[:, 0].values.tolist()
     return interp1d(strikes, vols, kind='cubic')
 
+
+#---------------------------------I optimize for speed below here---------------------------------------------#
+#@my_time_decorator
+def get_total_mc_distribution(events, expiry = None, symbol = None, mc_iterations = 10**4):
+    """Add the simulation results of individual events to return the total simulated distribution."""
+    distributions = map(lambda evt: evt.get_distribution(expiry), events)
+    mc_distributions = map(lambda dist: dist.mc_simulation(mc_iterations), distributions)
+    return reduce(lambda x, y: np.multiply(x,y), mc_distributions)
+
+#@my_time_decorator
+def get_vol_surface_from_mc_distribution(mc_distribution, expiry = None, strikes = None):
+    if strikes is None:
+        strikes = np.arange(.5, 1.5, .01)
+        #strikes = np.arange(.5, 1.5, .005)
+
+    call_options = [Option('Call', strike, expiry) for strike in strikes]
+    call_prices = list(map(lambda option: OptionPriceMC(option, mc_distribution), call_options))
+    call_IVs = list(map(lambda option, option_price: get_implied_volatility(option, option_price), call_options, call_prices))
+    
+    option_sheet_info = list(call_IVs)
+    index_r = pd.Index(strikes, name = 'Strike')
+    iterables_c = [[expiry], ['IV']]
+    index_c = pd.MultiIndex.from_product(iterables_c, names = ['Expiry', 'Option_Info'])
+    option_sheet = pd.DataFrame(option_sheet_info, index = index_r, columns = index_c)
+    return option_sheet
+
+def get_vol_surface_from_event_grouping(event_grouping, expiry):
+    mc_distribution = get_total_mc_distribution(event_grouping, expiry)
+    return get_vol_surface_from_mc_distribution(mc_distribution, expiry)
+
+def get_vol_surface(events, expiry):
+    return get_vol_surface_from_event_grouping(events, expiry)
+
+def get_vol_surface_spline(vol_surface):
+    strikes = vol_surface.index.values.tolist()
+    vols = vol_surface.iloc[:, 0].values.tolist()
+    return interp1d(strikes, vols, kind='cubic')
+
+
+
+#---------------------------------I optimize for speed again below here---------------------------------------------#
+@my_time_decorator
+def get_total_mc_distribution(events, expiry = None, symbol = None, mc_iterations = 10**4):
+    """Add the simulation results of individual events to return the total simulated distribution."""
+    """
+    events = [evt for evt in events if event_prob_by_expiry(evt.timing_descriptor, expiry) > 0]
+    distributions = map(lambda evt: evt.get_distribution(expiry), events)
+    mc_distributions = map(lambda dist: dist.mc_simulation(mc_iterations), distributions)
+    """
+    
+    #@my_time_decorator
+    def establish_events(events):
+        return [evt for evt in events if event_prob_by_expiry(evt.timing_descriptor, expiry) > 0]
+    
+    @my_time_decorator
+    def get_distributions(events):
+        return [evt.get_distribution(expiry) for evt in events if event_prob_by_expiry(evt.timing_descriptor, expiry) >0]
+        #return list(map(lambda evt: evt.get_distribution(expiry), events))
+        #return list(map(lambda evt: evt.get_distribution(expiry), events))
+    
+    #@my_time_decorator
+    def get_mc_distributions(distributions):
+        mc_distributions = list(map(lambda dist: dist.mc_simulation(mc_iterations), distributions))
+        return mc_distributions
+        #return map(lambda dist: dist.mc_simulation(mc_iterations), distributions)
+    
+    #@my_time_decorator
+    def get_tot_mc_distribution(mc_distributions):
+        return reduce(lambda x, y: np.multiply(x,y), mc_distributions)
+
+
+
+    EarningsDist = Earnings('CRBP', .05, 'Q2_2018').get_distribution(dt.date(2018, 7, 1)).mc_simulation(mc_iterations)
+    print(EarningsDist)
+    
+    @my_time_decorator
+    def new_methodology(events, mc_iterations):
+        for evt in events:
+            if isinstance(evt, Earnings):
+                mc_distribution = EarningsDist*evt.get_distribution(expiry).mean_move
+                mc_distribution = EarningsDist*evt.mean_move_float
+                
+                @my_time_decorator
+                def get_mc1():
+                    for i in range(1000):
+                        EarningsDist*evt.get_distribution(expiry).mean_move
+                
+                @my_time_decorator
+                def get_mc2():
+                    for i in range(1000):
+                        EarningsDist*evt.mean_move_float
+
+                get_mc1()
+                get_mc2()
+    new_methodology(events, mc_iterations)
+
+
+    #events = establish_events(events)
+    distributions = get_distributions(events)
+    mc_distributions = get_mc_distributions(distributions)
+    total_mc_distribution = get_tot_mc_distribution(mc_distributions)
+    return total_mc_distribution
+    #return reduce(lambda x, y: np.multiply(x,y), mc_distributions)
+
+@my_time_decorator
+def get_vol_surface_from_mc_distribution(mc_distribution, expiry = None, strikes = None):
+    if strikes is None:
+        strikes = np.arange(.5, 1.5, .01)
+        #strikes = np.arange(.5, 1.5, .005)
+
+    call_options = [Option('Call', strike, expiry) for strike in strikes]
+    call_prices = list(map(lambda option: OptionPriceMC(option, mc_distribution), call_options))
+    call_IVs = list(map(lambda option, option_price: get_implied_volatility(option, option_price), call_options, call_prices))
+    
+    vol_surface_info = list(call_IVs)
+    index_r = pd.Index(strikes, name = 'Strike')
+    iterables_c = [[expiry], ['IV']]
+    index_c = pd.MultiIndex.from_product(iterables_c, names = ['Expiry', 'Option_Info'])
+    vol_surface = pd.DataFrame(vol_surface_info, index = index_r, columns = index_c)
+    return vol_surface
+    #return [strikes, call_IVs]
+
+@my_time_decorator
+def get_vol_surface_from_event_grouping(event_grouping, expiry):
+    mc_distribution = get_total_mc_distribution(event_grouping, expiry)
+    return get_vol_surface_from_mc_distribution(mc_distribution, expiry)
+
+@my_time_decorator
+def get_vol_surface(events, expiry):
+    return get_vol_surface_from_event_grouping(events, expiry)
+
+@my_time_decorator
+def get_vol_surface_spline(vol_surface):
+    strikes = vol_surface.index.values.tolist()
+    vols = vol_surface.iloc[:, 0].values.tolist()
+    #strikes = vol_surface[0]
+    #vols = vol_surface[1]
+    return interp1d(strikes, vols, kind='cubic')

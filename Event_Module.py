@@ -11,7 +11,7 @@ from py_vollib.black_scholes.implied_volatility import black_scholes, implied_vo
 
 from decorators import my_time_decorator
 from paul_resources import InformationTable, tprint, rprint
-from Distribution_Module import Distribution, Distribution_MultiIndex, float_to_event_distribution, float_to_bs_distribution, float_to_volbeta_distribution
+from Distribution_Module import Distribution, Distribution_MultiIndex, float_to_event_distribution, float_to_bs_distribution, float_to_volbeta_distribution, get_no_event_distribution
 from Option_Module import get_time_to_expiry
 from Timing_Module import Timing, event_prob_by_expiry
 import logging
@@ -110,25 +110,37 @@ class Event(GeneralEvent):
 
     def set_move_input(self, new_value):
         self.event_input = new_value
-
+    
+    #@my_time_decorator
     def get_distribution(self, expiry = None, *args, **kwargs):
         event_by_expiry = event_prob_by_expiry(self.timing_descriptor, expiry)
         event_not_by_expiry = 1 - event_by_expiry
+        
+        if event_by_expiry == 0:
+            return get_no_event_distribution()
+       
+        elif event_by_expiry == 1:
+            distribution_df = copy.deepcopy(self.event_input_distribution_df)
+            distribution_df.loc[:, 'Pct_Move'] *= self.mult*self.idio_mult
+            distribution_df.loc[:, 'Relative_Price'] = distribution_df.loc[:, 'Pct_Move'] + 1
+            return Distribution(distribution_df)
+            
+        else:
+            no_event_scenario_info = {'State': ['No_Event'],
+                                      'Prob': [event_not_by_expiry],
+                                      'Pct_Move': [0],
+                                      'Relative_Price': [1.0]}
+            
+            no_event_scenario_df = pd.DataFrame(no_event_scenario_info).set_index('State').loc[:, ['Prob', 'Pct_Move', 'Relative_Price']]
+            
 
-        distribution_df = copy.deepcopy(self.event_input_distribution_df)
-        distribution_df.loc[:, 'Pct_Move'] *= self.mult*self.idio_mult
-        distribution_df.loc[:, 'Relative_Price'] = distribution_df.loc[:, 'Pct_Move'] + 1
-        distribution_df.loc[:, 'Prob'] *= event_by_expiry
-        
-        no_event_scenario = {'State': ['No_Event'],
-                             'Prob': [event_not_by_expiry],
-                             'Pct_Move': [0],
-                             'Relative_Price': [1.0]}
-        
-        no_event_scenario = pd.DataFrame(no_event_scenario).set_index('State').loc[:, ['Prob', 'Pct_Move', 'Relative_Price']]
-        
-        distribution_df = distribution_df.append(no_event_scenario)
-        return Distribution(distribution_df)
+            distribution_df = copy.deepcopy(self.event_input_distribution_df)
+            distribution_df.loc[:, 'Pct_Move'] *= self.mult*self.idio_mult
+            distribution_df.loc[:, 'Relative_Price'] = distribution_df.loc[:, 'Pct_Move'] + 1
+            distribution_df.loc[:, 'Prob'] *= event_by_expiry
+            distribution_df = distribution_df.append(no_event_scenario_df)
+            
+            return Distribution(distribution_df)
 
     @property
     def event_bid(self):
@@ -226,6 +238,8 @@ class Earnings(Event):
                          )
         
         logger.info("{} {} Earnings Event Instantiated Successfully".format(self.stock, self.quarter))
+        
+        self.event_input_float = event_input 
     
     def __repr__(self):
         return "{} ({})".format(self.abbrev_name, self.quarter)
@@ -236,6 +250,10 @@ class Earnings(Event):
     def quarter(self):
         return self.event_name[0:2]
     
+    @property
+    def mean_move_float(self):
+        return self.event_input_float*Earnings.mult*self.idio_mult
+
     @property
     def event_bid(self):
         return Earnings(self.stock,
