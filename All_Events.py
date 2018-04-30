@@ -1,10 +1,12 @@
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter("ignore", category=RuntimeWarning)
 import pandas as pd
 import datetime as dt
 from pprint import pprint
 from multiprocessing import Pool
 from multiprocessing.dummy import Pool as ThreadPool
 import warnings
-warnings.simplefilter("ignore", category=RuntimeWarning)
 
 from Option_Module import Option, get_option_price, get_implied_volatility, get_option_price
 from Timing_Module import Timing
@@ -17,7 +19,6 @@ from term_structure import term_structure
 
 from paul_resources import TakeoutParams, Symbols
 from decorators import my_time_decorator
-# Define Events
 
 EarningsEvents = get_earnings_events()
 
@@ -44,8 +45,8 @@ class Stock(object):
 
     @property
     def earnings_events(self):
-        return get_earnings_events(self.stock)
-        #return [evt for evt in EarningsEvents if evt.stock == self.stock]
+        #return get_earnings_events(self.stock)
+        return [evt for evt in EarningsEvents if evt.stock == self.stock]
 
     @property
     def takeout_event(self):
@@ -57,7 +58,12 @@ class Stock(object):
             return self.all_other_events
         else:
             return []
-
+    
+    # Think about how to use a cache for events
+    @property
+    def events_cache(self):
+        return self.earnings_events
+    
     @property
     def events(self):
         #return self.earnings_events + [self.takeout_event] + [self.idio_vol] + self.other_events
@@ -95,6 +101,8 @@ class Stock(object):
 
     def get_beta(self, index: 'str'):
         return 1.0
+
+    #events_cache = {}
 
     def get_vol_surface(self, expiry):
         return get_vol_surface(self.events, expiry)
@@ -203,7 +211,7 @@ if __name__ == '__main__':
         print(option_price)
         """
         #symbols = ['CRBP', 'CLVS', 'NBIX']
-        symbols = Symbols[0:10]
+        symbols = Symbols[0:120]
         stocks = get_stock_objects(symbols)
         instantiate_expiries_multiple_stocks(stocks)
         

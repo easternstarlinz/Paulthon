@@ -71,32 +71,36 @@ class Event(GeneralEvent):
         self.stock = stock
         self.event_input_value = event_input
         
-        
-        if type(event_input) is int or type(event_input) is float:
-            self.event_input = float_to_event_distribution(event_input)
-        else:
-            self.event_input = event_input
-       
-        #if timing_descriptor is None:
-        #    self.timing_descriptor = self.timing
-        #self.timing_descriptor = timing_descriptor
         if event_name is None:
             self.event_name = self.abbrev_name
         else:
             self.event_name = event_name
         self.idio_mult = idio_mult
-
+        
+        #if timing_descriptor is None:
+        #    self.timing_descriptor = self.timing
+        #self.timing_descriptor = timing_descriptor
+        
         logger.info("{} {} Instantiated Successfully".format(self.stock, self.name))
         
         if type(self).__name__ == 'Event':
             logger.info("{} Systematic Event Instantiated Successfully".format(self.stock))
-        
+    
     def __str__(self):
         return "{} ({:.2f}% move)".format(self.name, self.modeled_move*100)
 
     def __repr__(self):
         return "{}".format(self.event_name)
         #return "{} ({})".format(self.abbrev_name, self.stock)
+
+    @property
+    def event_input(self):
+        if type(self.event_input_value) is int or type(self.event_input_value) is float:
+            print('HELLO THERE DIAMOND', self.event_input_value, type(self.event_input_value))
+            return float_to_event_distribution(self.event_input_value)
+        else:
+            return self.event_input_value
+
 
     @property
     def event_input_distribution_df(self):
@@ -175,13 +179,17 @@ class IdiosyncraticVol(Event):
                  idio_mult = 1.0):
         super().__init__(stock, idio_mult = idio_mult)
         
-        if type(event_input) is int or type(event_input) is float:
-            self.event_input = float_to_volbeta_distribution(event_input)
-        else:
-            self.event_input = event_input
         logger.info("{} {} Instantiated Successfully".format(self.stock, self.name))
         
-        self.event_input_float = event_input
+        self.event_input_value = event_input
+
+    @property
+    def event_input(self):
+        if type(self.event_input_value) is int or type(self.event_input_value) is float:
+            return float_to_volbeta_distribution(self.event_input_value)
+        else:
+            return self.event_input_value
+
 
     def get_distribution(self, expiry):
         time_to_expiry = get_time_to_expiry(expiry)
