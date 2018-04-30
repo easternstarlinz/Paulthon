@@ -8,10 +8,10 @@ from paul_resources import HealthcareSymbols, Symbols, to_pickle
 from decorators import my_time_decorator
 from Event_Module import Earnings
 
-conn = sqlite3.connect('earnings.db')
+#conn = sqlite3.connect('earnings.db', check_same_thread=False)
 #conn = sqlite3.connect(':memory:')
 
-c = conn.cursor()
+#c = conn.cursor()
 
 #c.execute("""CREATE TABLE earnings (
 #            stock text,
@@ -33,6 +33,8 @@ def instantiate_earnings_event(params: 'tuple of Earnings params from sqlite db'
 
 @my_time_decorator
 def get_earnings_table(symbol=None):
+    conn = sqlite3.connect('earnings.db', check_same_thread=False)
+    c = conn.cursor()
     if symbol is None:
         return pd.read_sql_query("SELECT * FROM earnings", conn)
     else:
@@ -40,13 +42,17 @@ def get_earnings_table(symbol=None):
                 conn,
                 params = (symbol, ))
 
-#@my_time_decorator
+@my_time_decorator
 def get_earnings_events(symbol=None):
-    if symbol is None:
-        c.execute("SELECT * FROM earnings")
-    else:
-        c.execute("SELECT * FROM earnings WHERE stock=:stock", {'stock': symbol})
-    return [Earnings(*params) for params in c.fetchall()]
+    conn = sqlite3.connect('earnings.db', check_same_thread=False)
+    c = conn.cursor()
+    with conn:
+        if symbol is None:
+            c.execute("SELECT * FROM earnings")
+        else:
+            c.execute("SELECT * FROM earnings WHERE stock=:stock", {'stock': symbol})
+        return [Earnings(*params) for params in c.fetchall()]
+        #return c.fetchall()
 
 
 
@@ -90,7 +96,8 @@ def get_specific_symbol(symbol, earnings_evts):
 
 @my_time_decorator
 def run():
-    return [evt for evt in earnings_evts if evt.stock == 'CLVS']
+    pass
+    #return [evt for evt in earnings_evts if evt.stock == 'CLVS']
 
 @my_time_decorator
 def instantiate_timer(params, n=1):
@@ -113,11 +120,12 @@ def get_earnings_evts_from_pickle(symbol):
 
 
 if __name__ == '__main__':
-    instantiate_timer(1)
-    instantiate_timer(10)
-    instantiate_timer(100)
-    instantiate_timer(1000)
-    #instantiate_timer(10000)
+    params = ('CRBP', .05, dt.date(2018, 6, 5), 'Q2_2018')
+    instantiate_timer(params, 1)
+    instantiate_timer(params, 10)
+    instantiate_timer(params, 100)
+    instantiate_timer(params, 1000)
+    #instantiate_timer(params, 10000)
 
     a = instantiate_earnings_event_2(params)
     print(a.timing_descriptor, type(a.timing_descriptor))
@@ -126,19 +134,16 @@ if __name__ == '__main__':
 
     #earnings_evts = create_earnings_events(Symbols)
     #to_pickle(earnings_evts, 'EarningsEvents')
+    
+    """ 
+    conn = sqlite3.connect('earnings.db', check_same_thread=False)
+    c = conn.cursor()
 
     clvs = get_earnings_evts_from_pickle('CLVS')
-    print(clvs)
-
-    heya = run()
-    print('SUP DIAMOND', heya)
-
     clvs = get_earnings_events('CLVS')
-    print(clvs)
-
     table = get_earnings_table('CLVS')
-    print(table)
-
+    
     c.execute("SELECT * FROM earnings WHERE stock=:stock", {'stock': 'CLVS'})
     params = c.fetchone()
     print(params)
+    """

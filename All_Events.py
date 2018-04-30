@@ -1,16 +1,25 @@
 import pandas as pd
 import datetime as dt
+from pprint import pprint
+from multiprocessing import Pool
+from multiprocessing.dummy import Pool as ThreadPool
+import warnings
+warnings.simplefilter("ignore", category=RuntimeWarning)
+
 from Option_Module import Option, get_option_price, get_implied_volatility, get_option_price
+from Timing_Module import Timing
 from Event_Module import IdiosyncraticVol, TakeoutEvent, Earnings, Event, ComplexEvent, SysEvt_PresElection
 from Distribution_Module import Distribution, Distribution_MultiIndex
-from Timing_Module import Timing
 from Events_sqlite import get_earnings_events
-from paul_resources import TakeoutParams, Symbols
-from decorators import my_time_decorator
+from biotech_class_run import get_total_mc_distribution, get_vol_surface, get_vol_surface_spline
 from timeline_chart import get_event_timeline
 from term_structure import term_structure
-from biotech_class_run import get_total_mc_distribution, get_vol_surface, get_vol_surface_spline
+
+from paul_resources import TakeoutParams, Symbols
+from decorators import my_time_decorator
 # Define Events
+
+EarningsEvents = get_earnings_events()
 
 class Stock(object):
     elagolix_info = pd.read_excel('CLVS_RiskScenarios.xlsx',
@@ -36,6 +45,7 @@ class Stock(object):
     @property
     def earnings_events(self):
         return get_earnings_events(self.stock)
+        #return [evt for evt in EarningsEvents if evt.stock == self.stock]
 
     @property
     def takeout_event(self):
@@ -50,7 +60,9 @@ class Stock(object):
 
     @property
     def events(self):
-        return self.earnings_events + [self.takeout_event] + [self.idio_vol] + self.other_events
+        #return self.earnings_events + [self.takeout_event] + [self.idio_vol] + self.other_events
+        return self.earnings_events
+        #return [self.takeout_event]
     
     @property
     def sorted_events(self):
@@ -130,11 +142,42 @@ if __name__ == '__main__':
         
         @my_time_decorator
         def instantiate_expiries_multiple_stocks(stocks):
+            instantiation_list = []
+            for stock in stocks:
+                my_list = (stock, stock.expiries)
+                my_list = [(my_list[0], my_list[1][i])  for i in range(len(my_list[1]))]
+                instantiation_list.extend(my_list)
+            for stock, expiry in instantiation_list:
+                stock.get_vol_surface_spline(expiry)
+
+            stocks = [i[0] for i in instantiation_list]
+            expiries = [i[1] for i in instantiation_list]
+            
+            pool = ThreadPool(8)
+            #map(lambda stock, expiry: stock.get_vol_surface_spline(expiry), stocks, expiries)
+            
+            stock = Stock('VRTX')
+            expiries = stock.expiries
+            
+            @my_time_decorator
+            def pool_isolated():
+                pool.map(lambda expiry: stock.get_vol_surface_spline(expiry), expiries)
+            #pool_isolated()
+            #list(map(lambda expiry: stock.get_vol_surface_spline(expiry), expiries))
+            
+            expiry = dt.date(2018, 12, 3)
+            #pool.map(lambda stock: stock.get_vol_surface_spline(expiry), stocks)
+            #list(map(lambda stock: stock.get_vol_surface_spline(expiry), stocks))
+            
+            
+            """
             for stock in stocks:
                 for expiry in stock.expiries:
                     stock.get_vol_surface_spline(expiry)
                 #get_option_price_first_time(stock, option)
                 #stock.earnings_events[0].timing_descriptor
+            """
+
         @my_time_decorator
         def get_stock_objects(symbols: 'list of symbols'):
             return [Stock(symbol) for symbol in symbols]
@@ -159,9 +202,8 @@ if __name__ == '__main__':
         option_price = get_option_price_fast(stock, option2)
         print(option_price)
         """
-        
         #symbols = ['CRBP', 'CLVS', 'NBIX']
-        symbols = Symbols[0]
+        symbols = Symbols[0:10]
         stocks = get_stock_objects(symbols)
         instantiate_expiries_multiple_stocks(stocks)
         
