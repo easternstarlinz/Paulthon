@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import datetime as dt
+from datetime import timedelta
 import math
 import random
 import copy
@@ -10,7 +11,7 @@ from scipy.interpolate import interp1d, UnivariateSpline
 from collections import namedtuple
 from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array
 from decorators import my_time_decorator
-from Option_Module import Option, OptionPrice, OptionPriceMC, get_implied_volatility
+from Option_Module import Option, OptionPrice, OptionPriceMC, get_implied_volatility, get_time_to_expiry
 from Timing_Module import event_prob_by_expiry
 from Event_Module import IdiosyncraticVol, Earnings, TakeoutEvent, Event, SysEvt_PresElection
 from Distribution_Module import Distribution, float_to_event_distribution, float_to_bs_distribution
@@ -135,6 +136,9 @@ def get_vol_surface_spline(vol_surface):
 
 
 #---------------------------------I optimize for speed again below here---------------------------------------------#
+EarningsDist = Earnings('CRBP', .05, 'Q2_2018').get_distribution(dt.date(2018, 7, 1)).mc_simulation(10**4)
+IdiosyncraticVolDist = IdiosyncraticVol('CRBP', .10).get_distribution(dt.date.today() + timedelta(365)).mc_simulation(10**4)
+
 @my_time_decorator
 def get_total_mc_distribution(events, expiry = None, symbol = None, mc_iterations = 10**4):
     """Add the simulation results of individual events to return the total simulated distribution."""
@@ -148,7 +152,7 @@ def get_total_mc_distribution(events, expiry = None, symbol = None, mc_iteration
     def establish_events(events):
         return [evt for evt in events if event_prob_by_expiry(evt.timing_descriptor, expiry) > 0]
     
-    @my_time_decorator
+    #@my_time_decorator
     def get_distributions(events):
         return [evt.get_distribution(expiry) for evt in events if event_prob_by_expiry(evt.timing_descriptor, expiry) >0]
         #return list(map(lambda evt: evt.get_distribution(expiry), events))
@@ -164,37 +168,26 @@ def get_total_mc_distribution(events, expiry = None, symbol = None, mc_iteration
     def get_tot_mc_distribution(mc_distributions):
         return reduce(lambda x, y: np.multiply(x,y), mc_distributions)
 
-
-
-    EarningsDist = Earnings('CRBP', .05, 'Q2_2018').get_distribution(dt.date(2018, 7, 1)).mc_simulation(mc_iterations)
-    print(EarningsDist)
-    
-    @my_time_decorator
-    def new_methodology(events, mc_iterations):
+    #@my_time_decorator
+    def new_methodology(events, expiry, mc_iterations = 10**4):
+        mc_distributions = []
         for evt in events:
-            if isinstance(evt, Earnings):
-                mc_distribution = EarningsDist*evt.get_distribution(expiry).mean_move
-                mc_distribution = EarningsDist*evt.mean_move_float
-                
-                @my_time_decorator
-                def get_mc1():
-                    for i in range(1000):
-                        EarningsDist*evt.get_distribution(expiry).mean_move
-                
-                @my_time_decorator
-                def get_mc2():
-                    for i in range(1000):
-                        EarningsDist*evt.mean_move_float
-
-                get_mc1()
-                get_mc2()
-    new_methodology(events, mc_iterations)
+            if isinstance(evt, IdiosyncraticVol):
+                mc_distribution = IdiosyncraticVolDist*evt.at_the_money_vol/.10*math.sqrt(get_time_to_expiry(expiry))
+            elif isinstance(evt, Earnings):
+                mc_distribution = EarningsDist*evt.mean_move/.05
+            else:
+                mc_distribution = evt.get_distribution(expiry).mc_simulation(mc_iterations)
+            mc_distributions.append(mc_distribution)
+        return get_tot_mc_distribution(mc_distributions)
+    
 
 
     #events = establish_events(events)
-    distributions = get_distributions(events)
-    mc_distributions = get_mc_distributions(distributions)
-    total_mc_distribution = get_tot_mc_distribution(mc_distributions)
+    #distributions = get_distributions(events)
+    #mc_distributions = get_mc_distributions(distributions)
+    #total_mc_distribution = get_tot_mc_distribution(mc_distributions)
+    total_mc_distribution = new_methodology(events, expiry)
     return total_mc_distribution
     #return reduce(lambda x, y: np.multiply(x,y), mc_distributions)
 
@@ -216,16 +209,16 @@ def get_vol_surface_from_mc_distribution(mc_distribution, expiry = None, strikes
     return vol_surface
     #return [strikes, call_IVs]
 
-@my_time_decorator
+#@my_time_decorator
 def get_vol_surface_from_event_grouping(event_grouping, expiry):
     mc_distribution = get_total_mc_distribution(event_grouping, expiry)
     return get_vol_surface_from_mc_distribution(mc_distribution, expiry)
 
-@my_time_decorator
+#@my_time_decorator
 def get_vol_surface(events, expiry):
     return get_vol_surface_from_event_grouping(events, expiry)
 
-@my_time_decorator
+#@my_time_decorator
 def get_vol_surface_spline(vol_surface):
     strikes = vol_surface.index.values.tolist()
     vols = vol_surface.iloc[:, 0].values.tolist()
