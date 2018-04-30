@@ -40,12 +40,13 @@ class GeneralEvent(object):
 
     def __init__(self, timing_descriptor = timing):
         self.timing_descriptor = timing_descriptor
-
+        
         for cls in type(self).__mro__[0:-1]:
             cls.instances.append(self)
         
         if type(self).__name__ == 'GeneralEvent':
             logger.info("General Event Instantiated Successfully")
+
 
     def __str__(self):
         return "{}".format(self.abbrev_name)
@@ -67,9 +68,9 @@ class Event(GeneralEvent):
                  event_name = None,
                  idio_mult = 1.0):
         super().__init__(timing_descriptor = timing_descriptor)
+        self.stock = stock
         self.event_input_value = event_input
         
-        self.stock = stock
         
         if type(event_input) is int or type(event_input) is float:
             self.event_input = float_to_event_distribution(event_input)

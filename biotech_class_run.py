@@ -139,7 +139,7 @@ def get_vol_surface_spline(vol_surface):
 EarningsDist = Earnings('CRBP', .05, 'Q2_2018').get_distribution(dt.date(2018, 7, 1)).mc_simulation(10**4)
 IdiosyncraticVolDist = IdiosyncraticVol('CRBP', .10).get_distribution(dt.date.today() + timedelta(365)).mc_simulation(10**4)
 
-@my_time_decorator
+#@my_time_decorator
 def get_total_mc_distribution(events, expiry = None, symbol = None, mc_iterations = 10**4):
     """Add the simulation results of individual events to return the total simulated distribution."""
     """
@@ -149,11 +149,11 @@ def get_total_mc_distribution(events, expiry = None, symbol = None, mc_iteration
     """
     
     #@my_time_decorator
-    def establish_events(events):
+    def establish_events(events, expiry):
         return [evt for evt in events if event_prob_by_expiry(evt.timing_descriptor, expiry) > 0]
     
     #@my_time_decorator
-    def get_distributions(events):
+    def get_distributions(events, expiry):
         return [evt.get_distribution(expiry) for evt in events if event_prob_by_expiry(evt.timing_descriptor, expiry) >0]
         #return list(map(lambda evt: evt.get_distribution(expiry), events))
         #return list(map(lambda evt: evt.get_distribution(expiry), events))
@@ -166,11 +166,15 @@ def get_total_mc_distribution(events, expiry = None, symbol = None, mc_iteration
     
     #@my_time_decorator
     def get_tot_mc_distribution(mc_distributions):
-        return reduce(lambda x, y: np.multiply(x,y), mc_distributions)
+        if len(mc_distributions) > 1:
+            return reduce(lambda x, y: np.multiply(x,y), mc_distributions)
+        else:
+            return mc_distributions
 
     #@my_time_decorator
     def new_methodology(events, expiry, mc_iterations = 10**4):
         mc_distributions = []
+        events = establish_events(events, expiry)
         for evt in events:
             if isinstance(evt, IdiosyncraticVol):
                 mc_distribution = IdiosyncraticVolDist*evt.at_the_money_vol/.10*math.sqrt(get_time_to_expiry(expiry))
@@ -191,7 +195,7 @@ def get_total_mc_distribution(events, expiry = None, symbol = None, mc_iteration
     return total_mc_distribution
     #return reduce(lambda x, y: np.multiply(x,y), mc_distributions)
 
-@my_time_decorator
+#@my_time_decorator
 def get_vol_surface_from_mc_distribution(mc_distribution, expiry = None, strikes = None):
     if strikes is None:
         strikes = np.arange(.5, 1.5, .01)
