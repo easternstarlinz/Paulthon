@@ -36,6 +36,7 @@ def OptionPrice(Option, Distribution):
     if Option.Option_Type == 'Put':
         return sum([state.Prob*max(Option.Strike - state.Relative_Price, 0) for state in Distribution.distribution_df.itertuples()])
 
+#@my_time_decorator
 def OptionPriceMC(Option, MC_Results):
     if Option.Option_Type == 'Call':
         return np.average(np.maximum(MC_Results - Option.Strike, np.zeros(len(MC_Results))))
@@ -48,6 +49,7 @@ def get_time_to_expiry(expiry: 'dt.date', ref_date = dt.date.today()):
         expiry = expiry.date()
     return  max((expiry - ref_date).days/365, 0)
 
+#@my_time_decorator
 def get_implied_volatility(Option,
                            option_price,
                            underlying_price = None,

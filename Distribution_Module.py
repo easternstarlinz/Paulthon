@@ -56,7 +56,7 @@ class Distribution(object):
         return math.sqrt(sum([state.Prob*state.Pct_Move**2 for state in self.distribution_df.itertuples()]))
 
     #@my_time_decorator
-    def mc_simulation(self, iterations = 10**6):
+    def mc_simulation(self, iterations = 10**5):
         relative_prices = self.distribution_df.loc[:, 'Relative_Price'].values.tolist()
         weights = self.distribution_df.loc[:, 'Prob'].values.tolist()
         
@@ -134,6 +134,7 @@ class Distribution_MultiIndex(Distribution):
         self.new = self.positive_scenario.append(self.negative_scenario)
         self.core_scenarios = df.index.levels[0].tolist()
         self.all_states = df.loc[['Positive', 'Negative']].index.tolist()
+    
     @property
     def core_scenario_dfs(self):
         return [self.input_df.loc[i] for i in self.core_scenarios]
@@ -306,6 +307,16 @@ def float_to_histogram(move_input: 'float'):
     bs_distribution_created = mc_distribution_to_distribution(mc_distribution)
     #logger.info("Created: {.2f}".format(bs_distribution_created.mean_move))
     
+def get_no_event_distribution():
+    no_event_info = {'State': ['No_Event'],
+                              'Prob': [1.0],
+                              'Pct_Move': [0],
+                              'Relative_Price': [1.0]}
+
+    no_event_df = pd.DataFrame(no_event_info).set_index('State').loc[:, ['Prob', 'Pct_Move', 'Relative_Price']]
+    return Distribution(no_event_df)
+
+
 if __name__ == '__main__':
     bs_distribution_original = float_to_bs_distribution(.3)
     print("Original: {:.2f}".format(bs_distribution_original.mean_move))

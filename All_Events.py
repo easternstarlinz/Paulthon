@@ -107,7 +107,7 @@ class Stock(object):
 
 if __name__ == '__main__':
     @my_time_decorator
-    def run_timing_tests():
+    def run():
         #@my_time_decorator
         def get_option_price_first_time(stock, option):
             option_price = stock.get_option_price(option)
@@ -160,8 +160,8 @@ if __name__ == '__main__':
         print(option_price)
         """
         
-        symbols = ['CRBP', 'CLVS', 'NBIX']
-        symbols = Symbols[0:3]
+        #symbols = ['CRBP', 'CLVS', 'NBIX']
+        symbols = Symbols[0]
         stocks = get_stock_objects(symbols)
         instantiate_expiries_multiple_stocks(stocks)
         
@@ -170,7 +170,7 @@ if __name__ == '__main__':
             #print(stock.vol_surface_spline_cache)
             #print(stock.events)
             total_num_expiries += len(stock.vol_surface_spline_cache)
-        get_option_price_fast(stocks[0], option2)
+        #get_option_price_fast(stocks[3], option2)
         
         
         #print(Symbols, stocks)
@@ -185,4 +185,4 @@ if __name__ == '__main__':
         #print(vol_surface_spline)
         #print(implied_vol)
         #print(option_price)
-    run_timing_tests()
+    run()
