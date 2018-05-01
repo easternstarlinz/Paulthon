@@ -142,6 +142,7 @@ IdiosyncraticVolDist = IdiosyncraticVol('CRBP', .10).get_distribution(dt.date.to
 #@my_time_decorator
 def get_total_mc_distribution(events, expiry = None, symbol = None, mc_iterations = 10**4):
     """Add the simulation results of individual events to return the total simulated distribution."""
+    
     """
     events = [evt for evt in events if event_prob_by_expiry(evt.timing_descriptor, expiry) > 0]
     distributions = map(lambda evt: evt.get_distribution(expiry), events)
@@ -167,22 +168,23 @@ def get_total_mc_distribution(events, expiry = None, symbol = None, mc_iteration
     #@my_time_decorator
     def get_tot_mc_distribution(mc_distributions):
         if len(mc_distributions) > 1:
-            print("HELLO BETTY",type(mc_distributions))
             return reduce(lambda x, y: np.multiply(x,y), mc_distributions)
         else:
-            print("HELLO BETTY",type(mc_distributions))
             return np.array(mc_distributions)
 
     #@my_time_decorator
     def new_methodology(events, expiry, mc_iterations = 10**4):
-        mc_distributions = []
         events = establish_events(events, expiry)
-        print('HELLO MARTHA', events, expiry)
+        
+        if not events:
+            return np.ones(mc_iterations)
+        
+        mc_distributions = []
         for evt in events:
             if isinstance(evt, IdiosyncraticVol):
                 mc_distribution = IdiosyncraticVolDist*evt.at_the_money_vol/.10*math.sqrt(get_time_to_expiry(expiry))
             elif isinstance(evt, Earnings):
-                mc_distribution = EarningsDist*evt.mean_move/.05
+                mc_distribution = EarningsDist*(1+evt.mean_move)/(1.0504)
             else:
                 mc_distribution = evt.get_distribution(expiry).mc_simulation(mc_iterations)
             mc_distributions.append(mc_distribution)
@@ -194,7 +196,6 @@ def get_total_mc_distribution(events, expiry = None, symbol = None, mc_iteration
     #distributions = get_distributions(events)
     #mc_distributions = get_mc_distributions(distributions)
     #total_mc_distribution = get_tot_mc_distribution(mc_distributions)
-    print('HELLO MARTHA', events, expiry)
     total_mc_distribution = new_methodology(events, expiry)
     return total_mc_distribution
     #return reduce(lambda x, y: np.multiply(x,y), mc_distributions)
@@ -202,41 +203,30 @@ def get_total_mc_distribution(events, expiry = None, symbol = None, mc_iteration
 #@my_time_decorator
 def get_vol_surface_from_mc_distribution(mc_distribution, expiry = None, strikes = None):
     if strikes is None:
-        strikes = np.arange(.5, 1.5, .01)
         strikes = pd.Series(np.arange(.5, 1.5, .01))
-        #strikes = np.arange(.5, 1.5, .005)
+        #strikes = np.arange(.5, 1.5, .01)
 
-    @my_time_decorator
+    #@my_time_decorator
     def establish_call_options(expiry, strikes):
         Option_Map = lambda strike: Option('Call', strike, expiry)
-        call_options = strikes.apply(Option_Map)
-        return call_options
+        return strikes.apply(Option_Map)
         #return [Option('Call', strike, expiry) for strike in strikes]
     
     #@my_time_decorator
     def get_call_prices(call_options, mc_distribution):
-        print('SUP SWEETIE', type(mc_distribution))
         OptionPriceMC_Map = lambda option: OptionPriceMC(option, mc_distribution)
-        call_prices = call_options.apply(OptionPriceMC_Map)
-        print('CALL PRICES ARE HERE')
-        print(call_prices)
-        return call_prices
+        return call_options.apply(OptionPriceMC_Map)
         #return list(map(lambda option: OptionPriceMC(option, mc_distribution), call_options))
     
     #@my_time_decorator
     def get_call_IVs(call_options, call_prices):
-        CallOption_CallPrice_pairs = pd.concat([call_options, call_prices], axis=1)
-        print(CallOption_CallPrice_pairs)
-        CallOption_CallPrice_pairs = CallOption_CallPrice_pairs.loc[:, [0, 1]].apply(tuple, axis=1)
-        print(CallOption_CallPrice_pairs)
-        CallIV_Map = lambda option, call_price: get_implied_volatility(option, call_price)
-        call_IVs = call_prices.apply(CallIV_Map)
-        print(call_IVs)
+        tuples = pd.concat([call_options, call_prices], axis=1).loc[:, [0,1]].apply(tuple, axis=1)
+        IV_Map = lambda tup: get_implied_volatility(tup[0], tup[1])
+        call_IVs = tuples.apply(IV_Map)
         return call_IVs
         #return list(map(lambda option, option_price: get_implied_volatility(option, option_price), call_options, call_prices))
-        #return list(map(lambda option, option_price: get_implied_volatility(option, option_price), call_options, call_prices))
     
-    #@my_time_decorator
+    @my_time_decorator
     def get_vol_surface_df(expiry, strikes, call_IVs):
         vol_surface_info = list(call_IVs)
         index_r = pd.Index(strikes, name = 'Strike')
@@ -248,7 +238,8 @@ def get_vol_surface_from_mc_distribution(mc_distribution, expiry = None, strikes
     call_options = establish_call_options(expiry, strikes)
     call_prices = get_call_prices(call_options, mc_distribution)
     call_IVs = get_call_IVs(call_options, call_prices)
-   
+    #print(strikes)
+    #print(call_IVs.to_string())
     #return get_vol_surface_df(expiry, strikes, call_IVs)
     return [strikes, call_IVs]
     """
@@ -268,8 +259,8 @@ def get_vol_surface_from_mc_distribution(mc_distribution, expiry = None, strikes
 #@my_time_decorator
 def get_vol_surface_from_event_grouping(event_grouping, expiry):
     mc_distribution = get_total_mc_distribution(event_grouping, expiry)
-    print('HELLO THERE SUZANNE', mc_distribution)
-    print(event_grouping)
+    #print(np.average(mc_distribution))
+    #print('Expiry:', expiry, 'Event Grouping:', event_grouping)
     return get_vol_surface_from_mc_distribution(mc_distribution, expiry)
 
 #@my_time_decorator
