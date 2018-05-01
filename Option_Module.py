@@ -39,9 +39,6 @@ def OptionPrice(Option, Distribution):
 #@my_time_decorator
 def OptionPriceMC(Option, MC_Results):
     if Option.Option_Type == 'Call':
-        print(MC_Results)
-        a = np.maximum(MC_Results - Option.Strike, np.zeros(len(MC_Results)))
-        #print(a, 'Sup Aaon')
         return np.average(np.maximum(MC_Results - Option.Strike, np.zeros(len(MC_Results))))
     
     if Option.Option_Type == 'Put':
