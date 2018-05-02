@@ -70,7 +70,7 @@ class Stock(object):
     
     @property
     def events(self):
-        #return self.earnings_events + [self.takeout_event] + [self.idio_vol] + self.other_events
+        return self.earnings_events + [self.takeout_event] + [self.idio_vol] + self.other_events
         return self.earnings_events + [self.idio_vol]
         #return [self.takeout_event]
     
