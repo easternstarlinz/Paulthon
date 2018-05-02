@@ -71,8 +71,6 @@ class Stock(object):
     @property
     def events(self):
         return self.earnings_events + [self.takeout_event] + [self.idio_vol] + self.other_events
-        return self.earnings_events + [self.idio_vol]
-        #return [self.takeout_event]
     
     @property
     def sorted_events(self):
@@ -83,9 +81,8 @@ class Stock(object):
         get_event_timeline(self.events, self.stock, self.expiries)
 
     def get_term_structure(self):
-        term_struc = term_structure(self.events, self.expiries, metric = 'IV', mc_iterations = 10**5)
+        term_struc = term_structure(self.events, self.expiries, metric = 'IV', mc_iterations = 10**6)
         return term_struc.iloc[[term_struc.index.get_loc(1.00, method='nearest')], :]
-        #return term_structure(self.events, self.expiries, metric = 'IV', mc_iterations = 10**5)
 
     @property
     def expiries(self):
@@ -126,6 +123,7 @@ class Stock(object):
         vol_surface_spline = self.get_vol_surface_spline(Option.Expiry)
         return vol_surface_spline(Option.Strike)
     
+    #@my_time_decorator    
     def get_option_price(self, Option):
         implied_vol = self.get_implied_vol(Option)
         return get_option_price(Option, implied_vol)
