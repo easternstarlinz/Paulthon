@@ -9,7 +9,7 @@ from multiprocessing.dummy import Pool as ThreadPool
 import warnings
 
 from Option_Module import Option, get_option_price, get_implied_volatility, get_option_price
-from Timing_Module import Timing
+from Timing_Module import Timing, event_prob_by_expiry
 from Event_Module import IdiosyncraticVol, TakeoutEvent, Earnings, Event, ComplexEvent, SysEvt_PresElection
 from Distribution_Module import Distribution, Distribution_MultiIndex
 from Events_sqlite import get_earnings_events
@@ -21,6 +21,10 @@ from paul_resources import TakeoutParams, Symbols
 from decorators import my_time_decorator
 
 EarningsEvents = get_earnings_events()
+
+#@my_time_decorator
+def establish_events_by_expiry(events, expiry):
+    return [evt for evt in events if event_prob_by_expiry(evt.timing_descriptor, expiry) > 0]
 
 class Stock(object):
     elagolix_info = pd.read_excel('CLVS_RiskScenarios.xlsx',
@@ -67,7 +71,7 @@ class Stock(object):
     @property
     def events(self):
         #return self.earnings_events + [self.takeout_event] + [self.idio_vol] + self.other_events
-        return self.earnings_events
+        return self.earnings_events + [self.idio_vol]
         #return [self.takeout_event]
     
     @property
@@ -105,6 +109,8 @@ class Stock(object):
     #events_cache = {}
 
     def get_vol_surface(self, expiry):
+        if establish_events_by_expiry(self.events, expiry) is None:
+            return None
         return get_vol_surface(self.events, expiry)
 
     def get_vol_surface_spline(self, expiry):
