@@ -3,26 +3,42 @@ import pandas as pd
 import math
 import numpy as np
 import random
+import copy
+import pylab
 from collections import namedtuple
 from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array
 from decorators import my_time_decorator
 from Distribution_Module import Distribution, float_to_event_distribution, float_to_bs_distribution
 from Option_Module import Option, OptionPrice, OptionPriceMC, get_implied_volatility
-from Event_Module import IdiosyncraticVol, Event, SysEvt_PresElection, TakeoutEvent
+from Event_Module import IdiosyncraticVol, Event, SysEvt_PresElection, TakeoutEvent, Earnings
 from functools import reduce
-import copy
-import pylab
 
 
 #----------------------------------------------Module Tests---------------------------------------------------#
 """
-    -timing_test_for_mc_simulation_by_iteration_size
     -timing_test_for_distribution_addition
+    -timing_test_for_mc_simulation_by_iteration_size
     -timing_test_for_distribution_addition_2
     -run_takeout_by_expiry
     -systematic_params_for_all_symbols
 """
+@my_time_decorator
+def timing_test_for_distribution_addition_2():
+    # Define Events
+    event1 = TakeoutEvent('CLVS', 1)
+    event2 = SysEvt_PresElection('CLVS', .2)
+    event3 = Earnings('CLVS', .2, 'Q2_2018')
+    event4 = Earnings('CLVS', .005, 'Q3_2018')
+    event5 = Earnings('CLVS', .3, 'Q4_2018')
 
+    expiry = dt.date(2018, 5, 1)
+    events = [event2, event3]
+    added_distribution = event1.get_distribution(expiry)
+    for event in events:
+        added_distribution += event.get_distribution()
+    rprint(added_distribution.mean_move)
+
+timing_test_for_distribution_addition_2()
 
 def timing_test_for_mc_simulation_by_iteration_size():
     event = SystematicEvent('CLVS', .00, 'Ph3_Data')
@@ -66,23 +82,6 @@ def timing_test_for_distribution_addition():
     print(added_distribution.distribution_df)
     rprint(distribution1.mean_move, distribution2.mean_move, distribution3.mean_move, distribution4.mean_move, distribution5.mean_move, added_distribution.mean_move)
 
-@my_time_decorator
-def timing_test_for_distribution_addition_2():
-    # Define Events
-    event1 = TakeoutEvent('CLVS', 1)
-    event2 = SysEvt_PresElection('CLVS', .02)
-    event3 = SystematicEvent('CLVS', .1, 'Ph3_Data')
-    event4 = SystematicEvent('CLVS', .05, 'Investor_Day')
-    event5 = SystematicEvent('CLVS', .3, 'FDA_Approval')
-    event6 = SystematicEvent('CLVS', .05, 'Q1_Earnings')
-    event7 = SystematicEvent('CLVS', .05, 'Q2_Earnings')
-
-    expiry = dt.date(2018, 5, 1)
-    events = [event2, event3, event4]
-    added_distribution = event1.get_distribution(expiry)
-    for event in events:
-        added_distribution += event.get_distribution()
-    rprint(added_distribution.mean_move)
 
 
 @my_time_decorator

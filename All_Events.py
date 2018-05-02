@@ -211,7 +211,7 @@ if __name__ == '__main__':
         print(option_price)
         """
         #symbols = ['CRBP', 'CLVS', 'NBIX']
-        symbols = Symbols[0:120]
+        symbols = Symbols[0:20]
         stocks = get_stock_objects(symbols)
         instantiate_expiries_multiple_stocks(stocks)
         

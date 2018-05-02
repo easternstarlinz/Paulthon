@@ -203,30 +203,31 @@ def get_total_mc_distribution(events, expiry = None, symbol = None, mc_iteration
 #@my_time_decorator
 def get_vol_surface_from_mc_distribution(mc_distribution, expiry = None, strikes = None):
     if strikes is None:
+        strikes = np.arange(.5, 1.5, .01)
         strikes = pd.Series(np.arange(.5, 1.5, .01))
-        #strikes = np.arange(.5, 1.5, .01)
 
     #@my_time_decorator
     def establish_call_options(expiry, strikes):
+        return [Option('Call', strike, expiry) for strike in strikes]
         Option_Map = lambda strike: Option('Call', strike, expiry)
         return strikes.apply(Option_Map)
-        #return [Option('Call', strike, expiry) for strike in strikes]
     
     #@my_time_decorator
     def get_call_prices(call_options, mc_distribution):
+        return list(map(lambda option: OptionPriceMC(option, mc_distribution), call_options))
         OptionPriceMC_Map = lambda option: OptionPriceMC(option, mc_distribution)
-        return call_options.apply(OptionPriceMC_Map)
-        #return list(map(lambda option: OptionPriceMC(option, mc_distribution), call_options))
+        #return call_options.apply(OptionPriceMC_Map)
     
     #@my_time_decorator
     def get_call_IVs(call_options, call_prices):
+        return list(map(lambda option, option_price: get_implied_volatility(option, option_price), call_options, call_prices))
         tuples = pd.concat([call_options, call_prices], axis=1).loc[:, [0,1]].apply(tuple, axis=1)
         IV_Map = lambda tup: get_implied_volatility(tup[0], tup[1])
         call_IVs = tuples.apply(IV_Map)
+        #df = pd.concat([call_options, call_prices, call_IVs], axis=1).round(3)
         return call_IVs
-        #return list(map(lambda option, option_price: get_implied_volatility(option, option_price), call_options, call_prices))
     
-    @my_time_decorator
+    #@my_time_decorator
     def get_vol_surface_df(expiry, strikes, call_IVs):
         vol_surface_info = list(call_IVs)
         index_r = pd.Index(strikes, name = 'Strike')
