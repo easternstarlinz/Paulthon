@@ -13,9 +13,10 @@ from Timing_Module import Timing, event_prob_by_expiry
 from Event_Module import IdiosyncraticVol, TakeoutEvent, Earnings, Event, ComplexEvent, SysEvt_PresElection
 from Distribution_Module import Distribution, Distribution_MultiIndex
 from Events_sqlite import get_earnings_events
-from biotech_class_run import get_total_mc_distribution, get_vol_surface, get_vol_surface_spline
 from timeline_chart import get_event_timeline
 from term_structure import term_structure
+from GetVolMC import get_vol_surface_from_events, get_vol_surface_spline, get_call_prices_from_events
+from CreateMC import get_total_mc_distribution_from_events
 
 from paul_resources import TakeoutParams, Symbols
 from decorators import my_time_decorator
@@ -104,11 +105,11 @@ class Stock(object):
         return 1.0
 
     #events_cache = {}
+    def get_call_prices(self, expiry, pretty = False):
+        return get_call_prices_from_events(self.events, expiry, pretty = pretty)
 
-    def get_vol_surface(self, expiry):
-        if establish_events_by_expiry(self.events, expiry) is None:
-            return None
-        return get_vol_surface(self.events, expiry)
+    def get_vol_surface(self, expiry, pretty = False):
+        return get_vol_surface_from_events(self.events, expiry, pretty = pretty)
 
     def get_vol_surface_spline(self, expiry):
         if expiry in self.vol_surface_spline_cache:
