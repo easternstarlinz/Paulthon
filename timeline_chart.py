@@ -1,13 +1,13 @@
 import pandas as pd
 import numpy as np
 import datetime as dt
+from datetime import timedelta
 from collections import OrderedDict
 import matplotlib.pyplot as plt
 #plt.style.use('bmh')
-from datetime import timedelta
-from term_structure import term_structure
 from Timing_Module import Timing
 from Event_Module import IdiosyncraticVol, TakeoutEvent, Earnings, Event
+from term_structure import term_structure
 
 def filter_discrete_events(events):
     return [evt for evt in events if not isinstance(evt, (IdiosyncraticVol, TakeoutEvent))]
@@ -17,6 +17,7 @@ def get_event_center_dates(events):
 
 def get_event_mean_moves(events):
     return [evt.get_distribution().mean_move for evt in events]
+
 
 def get_event_timeline(events: 'list of events' = None, symbol: 'str' = '', expiries = None):
     """Get the Event Timeline in the form of a graph for a list of events. Symbol is an optional parameters to display in the Graph Title"""
@@ -102,10 +103,9 @@ def get_event_timeline(events: 'list of events' = None, symbol: 'str' = '', expi
     plt.xticks(rotation=45, fontsize = ticks_fontsize)
     plt.yticks(fontsize = ticks_fontsize)
     ax1.xaxis.set_ticks_position('bottom')
-    #ax1.tick_params(axis ='y', direction = 'in', pad = -35)
     ax1.yaxis.tick_right()
 
-    # Set x-axis min and max dates.
+    # Set X-Axis Min and Max Dates.
     min_date = min([Timing(evt.timing_descriptor).event_start_date for evt in events])
     max_date = max([Timing(evt.timing_descriptor).event_end_date for evt in events])
     timeD = timedelta(20)
@@ -115,7 +115,6 @@ def get_event_timeline(events: 'list of events' = None, symbol: 'str' = '', expi
     axis_label_fontsize = 12
     plt.xlabel('Date', fontsize = axis_label_fontsize, fontweight = 'bold')
     plt.ylabel('Event Magnitude', fontsize = axis_label_fontsize, fontweight = 'bold')
-    #plt.yticks(np.arange(0, .3, .025))
     plt.title('{} Event Calendar'.format(symbol), fontsize = axis_label_fontsize*1.5, fontweight = 'bold' )
     
     # Potential options I do not want to use for now. These commands turn off default features.

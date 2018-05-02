@@ -10,10 +10,11 @@ from statistics import mean
 from py_vollib.black_scholes.implied_volatility import black_scholes, implied_volatility
 
 from decorators import my_time_decorator
-from paul_resources import InformationTable, tprint, rprint
-from Distribution_Module import Distribution, Distribution_MultiIndex, float_to_event_distribution, float_to_bs_distribution, float_to_volbeta_distribution, get_no_event_distribution
 from Option_Module import get_time_to_expiry
 from Timing_Module import Timing, event_prob_by_expiry
+from Distribution_Module import Distribution, Distribution_MultiIndex, float_to_event_distribution, float_to_bs_distribution, float_to_volbeta_distribution, get_no_event_distribution
+from paul_resources import InformationTable, tprint, rprint
+
 import logging
 
 # Logging Setup
@@ -95,8 +96,7 @@ class Event(GeneralEvent):
 
     @property
     def event_input(self):
-        if type(self.event_input_value) is int or type(self.event_input_value) is float:
-            print('HELLO THERE DIAMOND', self.event_input_value, type(self.event_input_value))
+        if isinstance(self.event_input_value, (int, float)):
             return float_to_event_distribution(self.event_input_value)
         else:
             return self.event_input_value
