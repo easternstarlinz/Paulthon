@@ -10,7 +10,7 @@ from statistics import mean
 from paul_resources import InformationTable, tprint, rprint
 from decorators import my_time_decorator
 from py_vollib.black_scholes.implied_volatility import black_scholes, implied_volatility
-
+from statistics import mean
 """
 -Option: NamedTuple
     -Params:
@@ -39,6 +39,7 @@ def OptionPrice(Option, Distribution):
 #@my_time_decorator
 def OptionPriceMC(Option, MC_Results):
     if Option.Option_Type == 'Call':
+        return np.mean(np.maximum(MC_Results - Option.Strike, np.zeros(len(MC_Results))))
         return np.average(np.maximum(MC_Results - Option.Strike, np.zeros(len(MC_Results))))
     
     if Option.Option_Type == 'Put':
