@@ -13,7 +13,7 @@ call_price = crbp.get_option_price(call_option)
 put_price =  crbp.get_option_price(put_option)
 print("Call: {:.5f}, Put: {:.5f}".format(call_price, put_price))
 
-term_structure = crbp.get_term_structure()
-vol_surface = crbp.get_vol_surface(expiry)
-print(vol_surface)
+#term_structure = crbp.get_term_structure()
+#vol_surface = crbp.get_vol_surface(expiry)
+#print(vol_surface)
 

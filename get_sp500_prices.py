@@ -28,7 +28,6 @@ stream_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 
-
 """
 --------------------------------------------------------------------
 The functions in this module are web scraping functions.
