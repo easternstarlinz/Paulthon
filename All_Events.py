@@ -196,27 +196,6 @@ if __name__ == '__main__':
         def get_stock_objects(symbols: 'list of symbols'):
             return [Stock(symbol) for symbol in symbols]
         
-        stock = Stock('VRTX')
-        option = Option('Call', 1.0, dt.date(2018, 6, 1))
-        option2 = Option('Call', 1.0, dt.date(2018, 12, 21))
-        #vol_surface = stock.get_vol_surface(dt.date(2018, 12, 1))
-        #vol_surface_spline = stock.get_vol_surface_spline(dt.date(2018, 6, 1))
-        #implied_vol = stock.get_implied_vol(option)
-        #option_price = stock.get_option_price(option)
-        
-        #get_option_price_first_time(stock, option)
-        
-        """
-        get_option_price_second_time(stock, option)
-        print(stock.vol_surface_spline_cache)
-        
-        instantiate_expiries(stock, stock.expiries)
-        print(stock.vol_surface_spline_cache)
-        
-        option_price = get_option_price_fast(stock, option2)
-        print(option_price)
-        """
-        #symbols = ['CRBP', 'CLVS', 'NBIX']
         symbols = Symbols[0:20]
         stocks = get_stock_objects(symbols)
         instantiate_expiries_multiple_stocks(stocks)
@@ -227,18 +206,5 @@ if __name__ == '__main__':
             #print(stock.events)
             total_num_expiries += len(stock.vol_surface_spline_cache)
         #get_option_price_fast(stocks[3], option2)
-        
-        
-        #print(Symbols, stocks)
         print('Num Stocks:', len(stocks), 'Num Expiries:', total_num_expiries)
-        
-        #stock.get_event_timeline()
-        #term_structure = stock.get_term_structure()
-        #print(stock.sorted_events)
-        #print(term_structure)
-        #print(stock.expiries)
-        #print(vol_surface.to_string())
-        #print(vol_surface_spline)
-        #print(implied_vol)
-        #print(option_price)
     run()

@@ -213,16 +213,12 @@ def get_vol_surface_from_mc_distribution(mc_distribution, expiry = None, strikes
         strikeMax = mc_distribution.max()
     #establish_strike_range(mc_distribution)
     
-    """
     if strikes is None:
-        strikes = np.arange(.5, 1.5, .01)
-        strikes = pd.Series(np.arange(.5, 1.5, .01))
-    """
-    strikeMin = mc_distribution.min()
-    strikeMax = mc_distribution.max()
-    #strikes = pd.Series(np.arange(strikeMin, strikeMax, .01))
-    strikes = np.arange(strikeMin, strikeMax, .01)
-    #strikes = np.arange(.5, 1.5, .01)
+        strikeMin = mc_distribution.min()
+        strikeMax = mc_distribution.max()
+        strikeInterval = (strikeMax - strikeMin) / 50
+        strikes = pd.Series(np.arange(strikeMin, strikeMax, .01))
+        #strikes = np.arange(strikeMin, strikeMax, strikeInterval)
 
     #@my_time_decorator
     def establish_call_options(expiry, strikes):

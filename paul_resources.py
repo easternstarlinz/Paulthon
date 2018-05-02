@@ -36,7 +36,7 @@ Symbols = info.index.tolist()
 BestBetas = pickle.load(open('best_betas.pkl', 'rb'))
 
 VolBeta = pd.read_csv('VolbetaDistribution.csv')
-#EarningsEvents = pickle.load(open('EarningsEvents.pkl', 'rb'))
+#EarningsEvents = pickle.load(open('EarningsEvents.pkl', 'rb')) # Can't include here because of circular imports.
 
 TakeoutParams = pd.read_csv('TakeoutParams.csv').set_index('Stock')
 
@@ -80,6 +80,7 @@ def get_histogram_from_array(results: 'array of numbers', bins = 10**2):
     plt.ylabel('Relative Frequency')
     plt.legend()
     plt.show()
+
 
 def show_mc_distributions_as_line_chart(mc_distributions, labels = None):
     i = 0

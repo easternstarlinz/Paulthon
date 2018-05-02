@@ -64,17 +64,14 @@ def date_string_to_date(date_text):
 
 
 def get_date_from_timing_descriptor(timing_descriptor, which = 'Start'):
-    
-    #This logger statement produced an error.
-    #logger.info('Timing Descriptor:', timing_descriptor)
-
     if timing_descriptor is None:
         return dt.date.today()
     elif validate_date_string(timing_descriptor):
         return date_string_to_date(timing_descriptor)
-        #return dt.datetime.strptime(timing_descriptor, '%Y-%m-%d').date()
-    elif isinstance(timing_descriptor, (dt.date, dt.datetime)):
+    elif isinstance(timing_descriptor, dt.date):
         return timing_descriptor
+    elif isinstance(timing_descriptor, dt.datetime):
+        return timing_descriptor.date()
     else:
         try:
             timing_period = timing_descriptor[0:-5]
@@ -89,48 +86,51 @@ def get_date_from_timing_descriptor(timing_descriptor, which = 'Start'):
             raise ValueError('Incorrect data format for timing_descriptor')
 
 
+def event_prob_by_expiry_vanilla(event_date, expiry, reference_date = dt.date.today()):
+    if event_date < reference_date:
+        return 0
+    elif event_date <= expiry:
+        return 1.0
+    else:
+        return 0.0
+
+event_prob_by_expiry_cache = {}
 #@my_time_decorator
 def event_prob_by_expiry(timing_descriptor = None,
                          expiry = None,
                          reference_date = dt.date.today()):
-    """I need to optimze this function for accuracy and speed"""
-    if timing_descriptor is None:
-        return 1.0
+    """Continue to optimze this function"""
     
-    if expiry is None:
+    if (timing_descriptor, expiry) in event_prob_by_expiry_cache:
+        print(event_prob_by_expiry_cache)
+        return event_prob_by_expiry_cache[(timing_descriptor, expiry)]
+
+    if timing_descriptor is None or expiry is None:
         return 1.0
     
     if isinstance(expiry, dt.datetime):
         expiry = expiry.date()
     
     if validate_date_string(timing_descriptor):
-        timing_descriptor = date_string_to_date(timing_descriptor)
+        return event_prob_by_expiry_vanilla(date_string_to_date(timing_descriptor), expiry)
 
     if isinstance(timing_descriptor, dt.datetime):
-        timing_descriptor = timing_descriptor.date()
+        return event_prob_by_expiry_vanilla(timing_descriptor.date(), expiry)
 
     if isinstance(timing_descriptor, dt.date):
-        if timing_descriptor < reference_date:
-            return 0
-        elif  timing_descriptor <= expiry:
-            return 1.0
-        else:
-            return 0.0
+        return event_prob_by_expiry_vanilla(timing_descriptor, expiry)
             
     else:
         event_start_date = get_date_from_timing_descriptor(timing_descriptor, 'Start')
-        
         if event_start_date > expiry:
             return 0
         
         event_end_date = get_date_from_timing_descriptor(timing_descriptor, 'End')
-        
         if event_end_date < reference_date:
             return 0
 
         else:
             current_event_start_date = max(reference_date, event_start_date)
-            #days_to_expiry = max((expiry - reference_date).days, 0) + 1
             event_days_before_expiry = (expiry - current_event_start_date).days + 1
             total_event_days = (event_end_date - current_event_start_date).days + 1
             
@@ -145,16 +145,9 @@ def event_prob_by_expiry(timing_descriptor = None,
                                                 total_event_days))
             """
 
-        """
-        event_days_before_expiry = total_event_days - (expiry - evvent_start_date
-        event_days_before_expiry = 0
-        date = max(reference_date, event_start_date)
-        while date <= event_end_date and date <= expiry:
-           event_days_before_expiry += 1
-           date += timedelta(1)
-        """
-        return event_days_before_expiry / total_event_days
-    
+        event_by_expiry = event_days_before_expiry / total_event_days
+        event_prob_by_expiry_cache[(timing_descriptor, expiry)] = event_by_expiry
+        return event_by_expiry
 """
 if __name__ == '__main__':
     prob = event_prob_by_expiry('2H_2018', dt.date(2018, 9, 25))
