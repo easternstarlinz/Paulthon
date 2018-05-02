@@ -45,6 +45,11 @@ def to_pickle(content, file_name):
     pickle.dump(content, pickle_file, pickle.HIGHEST_PROTOCOL)
     pickle_file.close()
 
+def to_pickle_and_CSV(content, file_name):
+    to_pickle(content, file_name)
+    content.to_csv("{}.csv".format(file_name))
+    
+
 def daily_returns(price_table: 'df of prices') -> 'df of daily_returns':
     return price_table / price_table.shift(-1) - 1
 
