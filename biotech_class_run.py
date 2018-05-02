@@ -182,11 +182,14 @@ def get_total_mc_distribution(events, expiry = None, symbol = None, mc_iteration
         mc_distributions = []
         for evt in events:
             if isinstance(evt, IdiosyncraticVol):
-                mc_distribution = IdiosyncraticVolDist*evt.at_the_money_vol/.10*math.sqrt(get_time_to_expiry(expiry))
+                mc_distribution = (IdiosyncraticVolDist - 1)*(evt.at_the_money_vol/.10)*math.sqrt(get_time_to_expiry(expiry)) + 1
+                #print('IdioVol: {}'.format(np.average(mc_distribution)))
             elif isinstance(evt, Earnings):
-                mc_distribution = EarningsDist*(1+evt.mean_move)/(1.0504)
+                mc_distribution = (EarningsDist - 1)*(evt.mean_move/1.0504) + 1
+                #print('Earnings: {}'.format(np.average(mc_distribution)))
             else:
                 mc_distribution = evt.get_distribution(expiry).mc_simulation(mc_iterations)
+                #print('Other: {}'.format(np.average(mc_distribution)))
             mc_distributions.append(mc_distribution)
         return get_tot_mc_distribution(mc_distributions)
     
@@ -202,9 +205,24 @@ def get_total_mc_distribution(events, expiry = None, symbol = None, mc_iteration
 
 #@my_time_decorator
 def get_vol_surface_from_mc_distribution(mc_distribution, expiry = None, strikes = None):
+    
+    @my_time_decorator
+    def establish_strike_range(mc_distribution: 'numpy array'):
+        """array.min() seems to be >70x faster than min(mc_distribution)"""
+        strikeMin = mc_distribution.min()
+        strikeMax = mc_distribution.max()
+    #establish_strike_range(mc_distribution)
+    
+    """
     if strikes is None:
         strikes = np.arange(.5, 1.5, .01)
         strikes = pd.Series(np.arange(.5, 1.5, .01))
+    """
+    strikeMin = mc_distribution.min()
+    strikeMax = mc_distribution.max()
+    #strikes = pd.Series(np.arange(strikeMin, strikeMax, .01))
+    strikes = np.arange(strikeMin, strikeMax, .01)
+    #strikes = np.arange(.5, 1.5, .01)
 
     #@my_time_decorator
     def establish_call_options(expiry, strikes):
@@ -266,12 +284,16 @@ def get_vol_surface_from_event_grouping(event_grouping, expiry):
 
 #@my_time_decorator
 def get_vol_surface(events, expiry):
+    if not events:
+        return None
     return get_vol_surface_from_event_grouping(events, expiry)
 
 #@my_time_decorator
 def get_vol_surface_spline(vol_surface):
     #strikes = vol_surface.index.values.tolist()
     #vols = vol_surface.iloc[:, 0].values.tolist()
+    if vol_surface is None:
+        return None
     strikes = vol_surface[0]
     vols = vol_surface[1]
     return interp1d(strikes, vols, kind='cubic')

@@ -203,7 +203,7 @@ class IdiosyncraticVol(Event):
     
     @property
     def at_the_money_vol(self):
-        return self.event_input_float*IdiosyncraticVol.mult*self.idio_mult
+        return self.event_input_value*IdiosyncraticVol.mult*self.idio_mult
 
     @property
     def event_bid(self):
