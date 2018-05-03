@@ -11,12 +11,17 @@ from scipy.interpolate import interp1d, UnivariateSpline
 from collections import namedtuple
 import logging
 from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array
-from decorators import my_time_decorator
+from decorators import my_time_decorator, empty_decorator
 from Option_Module import Option, OptionPrice, OptionPriceMC, get_implied_volatility, get_time_to_expiry
 from Timing_Module import event_prob_by_expiry
 from Event_Module import IdiosyncraticVol, Earnings, TakeoutEvent, Event, SysEvt_PresElection
 from Distribution_Module import Distribution, float_to_event_distribution, float_to_bs_distribution
 from OptimalMC import optimally_get_mc_distribution_for_event
+
+NO_USE_TIMING_DECORATOR = True
+if NO_USE_TIMING_DECORATOR:
+    my_time_decorator = empty_decorator
+
 # Logging Setup
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -33,13 +38,6 @@ logger.addHandler(file_handler)
 def filter_events_before_expiry(events, expiry):
     return [evt for evt in events if event_prob_by_expiry(evt.timing_descriptor, expiry) > 0]
 
-#@my_time_decorator
-def get_distributions_from_events(events, expiry):
-    return [evt.get_distribution(expiry) for evt in events]
-    
-#@my_time_decorator
-def get_mc_distributions(distributions, mc_iterations):
-    return [dist.mc_simulation(mc_iterations) for dist in distributions]
 
 @my_time_decorator
 def sum_mc_distributions(mc_distributions: 'list of mc_distributions'):
@@ -60,6 +58,23 @@ def get_total_mc_distribution_from_events(events, expiry = None, symbol = None, 
     events = filter_events_before_expiry(events, expiry)
     mc_distributions = [optimally_get_mc_distribution_for_event(evt, expiry) for evt in events]
     return sum_mc_distributions(mc_distributions)
+
+
+
+
+
+
+
+
+
+"""Functionality that I am not currently using but may prove useful later"""
+#@my_time_decorator
+def get_distributions_from_events(events, expiry):
+    return [evt.get_distribution(expiry) for evt in events]
+    
+#@my_time_decorator
+def get_mc_distributions(distributions, mc_iterations):
+    return [dist.mc_simulation(mc_iterations) for dist in distributions]
 
 @my_time_decorator
 def get_total_mc_distribution_from_events_vanilla(events, expiry = None, symbol = None, mc_iterations = 10**6):

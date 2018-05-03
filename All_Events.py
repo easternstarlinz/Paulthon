@@ -82,8 +82,9 @@ class Stock(object):
     def get_event_timeline(self):
         get_event_timeline(self.events, self.stock, self.expiries)
 
-    def get_term_structure(self, strikes = None):
-        term_struc = get_term_structure(self.events, self.expiries, strikes = None, mc_iterations = 10**6)
+    def get_term_structure(self, strikes = None, mc_iterations = 10**6):
+        term_struc = get_term_structure(self.events, self.expiries, strikes = strikes, mc_iterations = mc_iterations)
+        return term_struc.round(2)
         return term_struc.iloc[[term_struc.index.get_loc(1.00, method='nearest')], :]
 
     @property

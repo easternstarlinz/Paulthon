@@ -11,12 +11,18 @@ from scipy.interpolate import interp1d, UnivariateSpline
 from collections import namedtuple
 import logging
 from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array
-from decorators import my_time_decorator
+from decorators import my_time_decorator, empty_decorator
 from Option_Module import Option, OptionPrice, OptionPriceMC, get_implied_volatility, get_time_to_expiry
 from Timing_Module import event_prob_by_expiry
 from Event_Module import IdiosyncraticVol, Earnings, TakeoutEvent, Event, SysEvt_PresElection
 from Distribution_Module import Distribution, float_to_event_distribution, float_to_bs_distribution
 from CreateMC import get_total_mc_distribution_from_events, filter_events_before_expiry
+
+NO_USE_TIMING_DECORATOR = True
+if NO_USE_TIMING_DECORATOR:
+    my_time_decorator = empty_decorator
+
+
 # Logging Setup
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

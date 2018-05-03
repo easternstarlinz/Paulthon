@@ -15,6 +15,8 @@ def my_time_decorator(original_function):
 #Decorator that automatically assigns the parameters in the init function
 #def initializer(func):
 
+def empty_decorator(func):
+    return func
     
 def initializer(func):
     names, varargs, keywords, defaults = inspect.getargspec(func)

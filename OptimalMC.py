@@ -6,7 +6,11 @@ import math
 
 from Timing_Module import get_time_to_expiry
 from Event_Module import Earnings, IdiosyncraticVol
-from decorators import my_time_decorator
+from decorators import my_time_decorator, empty_decorator
+
+NO_USE_TIMING_DECORATOR = True
+if NO_USE_TIMING_DECORATOR:
+    my_time_decorator = empty_decorator
 
 # Logging Setup
 logger = logging.getLogger(__name__)
@@ -19,19 +23,29 @@ file_handler.setFormatter(formatter)
 
 logger.addHandler(file_handler)
 
-mc_iterations = 10**6
+# For now, I define the Default Events outside of the functions so that they are only run once, in the beginning. I could consider creating a cache, to be able to include the Default Events in the functions.
+mc_iterations = 10**5
 EarningsDist = Earnings('CRBP', .05, 'Q2_2018').get_distribution(dt.date(2018, 7, 1)).mc_simulation(mc_iterations)
 IdiosyncraticVolDist = IdiosyncraticVol('CRBP', .10).get_distribution(dt.date.today() + timedelta(365)).mc_simulation(mc_iterations)
 
 @my_time_decorator
 def optimally_get_mc_distribution_for_IdiosyncraticVol(event, expiry):
-    mc_distribution = (IdiosyncraticVolDist - 1)*(event.at_the_money_vol/.10)*math.sqrt(get_time_to_expiry(expiry)) + 1
+    default_vol = .10
+    magnitude_mult = event.at_the_money_vol / default_vol
+    time_mult = math.sqrt(get_time_to_expiry(expiry))
+    
+    mc_distribution = (IdiosyncraticVolDist - 1)*magnitude_mult*time_mult + 1
+
     logger.info('IdioVol: {}'.format(np.average(mc_distribution)))
     return mc_distribution
 
 @my_time_decorator
 def optimally_get_mc_distribution_for_Earnings(event, expiry):
-    mc_distribution = (EarningsDist - 1)*(event.mean_move/.0504) + 1
+    default_mean_move = .0504
+    magnitude_mult = event.mean_move / default_mean_move
+    
+    mc_distribution = (EarningsDist - 1)*magnitude_mult + 1
+    
     logger.info('Earnings: {}'.format(np.average(mc_distribution)))
     return mc_distribution
 
