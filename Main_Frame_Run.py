@@ -6,7 +6,7 @@ import numpy as np
 
 @my_time_decorator
 def run_all():
-    stock = Stock('CLVS')
+    stock = Stock('NBIX')
     expiry = dt.date(2018, 10, 1)
 
     """
@@ -25,9 +25,9 @@ def run_all():
     #term_structure = crbp.get_term_structure()
     """
     strikes = np.arange(.8, 1.25, .05)
-    option_sheet = stock.get_option_sheet(expiry, strikes = strikes)
-    term_structure = stock.get_term_structure()
-    print(option_sheet)
+    #option_sheet = stock.get_option_sheet(expiry, strikes = strikes)
+    term_structure = stock.get_term_structure(strikes = strikes)
+    #print(option_sheet)
     print(stock.events)
-    print(term_structure)
+    print(term_structure.to_string())
 run_all()

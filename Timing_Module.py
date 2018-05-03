@@ -62,16 +62,25 @@ def validate_date_string(date_text):
 def date_string_to_date(date_text):
     return dt.datetime.strptime(date_text, '%Y-%m-%d').date()
 
-
 def get_date_from_timing_descriptor(timing_descriptor, which = 'Start'):
-    if timing_descriptor is None:
-        return dt.date.today()
+    """Managing for Five Cases (ordered by most likely): Date Object, String Formatted Date, None, Datetime Object,  Qualitative Descriptor"""
+    # Date Object
+    if isinstance(timing_descriptor, dt.date):
+        return timing_descriptor
+    
+    # String Formatted Date
     elif validate_date_string(timing_descriptor):
         return date_string_to_date(timing_descriptor)
-    elif isinstance(timing_descriptor, dt.date):
-        return timing_descriptor
+    
+    # None
+    elif timing_descriptor is None:
+        return dt.date.today()
+    
+    # Datetime Object
     elif isinstance(timing_descriptor, dt.datetime):
         return timing_descriptor.date()
+    
+    # Qualitative Descriptor
     else:
         try:
             timing_period = timing_descriptor[0:-5]
@@ -84,7 +93,6 @@ def get_date_from_timing_descriptor(timing_descriptor, which = 'Start'):
 
         except:
             raise ValueError('Incorrect data format for timing_descriptor')
-
 
 def event_prob_by_expiry_vanilla(event_date, expiry, reference_date = dt.date.today()):
     if event_date < reference_date:
@@ -102,7 +110,7 @@ def event_prob_by_expiry(timing_descriptor = None,
     """Continue to optimze this function"""
     
     if (timing_descriptor, expiry) in event_prob_by_expiry_cache:
-        print(event_prob_by_expiry_cache)
+        #print(event_prob_by_expiry_cache)
         return event_prob_by_expiry_cache[(timing_descriptor, expiry)]
 
     if timing_descriptor is None or expiry is None:
