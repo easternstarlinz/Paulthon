@@ -15,7 +15,7 @@ from Distribution_Module import Distribution, Distribution_MultiIndex
 from Events_sqlite import get_earnings_events
 from timeline_chart import get_event_timeline
 from term_structure import term_structure
-from GetVolMC import get_vol_surface_from_events, get_vol_surface_spline, get_call_prices_from_events
+from GetVolMC import get_vol_surface_from_events, get_vol_surface_spline, get_call_prices_from_events, get_option_sheet_from_events
 from CreateMC import get_total_mc_distribution_from_events
 
 from paul_resources import TakeoutParams, Symbols
@@ -71,7 +71,8 @@ class Stock(object):
     
     @property
     def events(self):
-        return self.earnings_events + [self.takeout_event] + [self.idio_vol] + self.other_events
+        #return tuple(self.earnings_events + [self.idio_vol] + self.other_events)
+        return tuple(self.earnings_events + [self.takeout_event] + [self.idio_vol] + self.other_events)
     
     @property
     def sorted_events(self):
@@ -105,17 +106,20 @@ class Stock(object):
         return 1.0
 
     #events_cache = {}
-    def get_call_prices(self, expiry, pretty = False):
-        return get_call_prices_from_events(self.events, expiry, pretty = pretty)
+    def get_call_prices(self, expiry, strikes = None, pretty = True):
+        return get_call_prices_from_events(self.events, expiry, strikes = strikes, pretty = pretty, symbol = self.stock)
 
-    def get_vol_surface(self, expiry, pretty = False):
-        return get_vol_surface_from_events(self.events, expiry, pretty = pretty)
+    def get_vol_surface(self, expiry, strikes = None, pretty = True):
+        return get_vol_surface_from_events(self.events, expiry, strikes = strikes, pretty = pretty)
+    
+    def get_option_sheet(self, expiry, strikes = None, pretty = True):
+        return get_option_sheet_from_events(self.events, expiry, strikes = strikes, pretty = pretty)
 
     def get_vol_surface_spline(self, expiry):
         if expiry in self.vol_surface_spline_cache:
             vol_surface_spline = self.vol_surface_spline_cache[expiry]
         else:
-            vol_surface = self.get_vol_surface(expiry)
+            vol_surface = self.get_vol_surface(expiry, pretty = False)
             vol_surface_spline = get_vol_surface_spline(vol_surface)
             self.vol_surface_spline_cache[expiry] = vol_surface_spline
         return vol_surface_spline
