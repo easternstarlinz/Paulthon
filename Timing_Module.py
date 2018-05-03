@@ -63,7 +63,7 @@ def date_string_to_date(date_text):
     return dt.datetime.strptime(date_text, '%Y-%m-%d').date()
 
 def get_date_from_timing_descriptor(timing_descriptor, which = 'Start'):
-    """Managing for Five Cases (ordered by most likely): Date Object, String Formatted Date, None, Datetime Object,  Qualitative Descriptor"""
+    """Managing for Five Input Cases (ordered by most likely): Date Object, String Formatted Date, None, Datetime Object,  Qualitative Descriptor"""
     # Date Object
     if isinstance(timing_descriptor, dt.date):
         return timing_descriptor

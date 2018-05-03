@@ -16,6 +16,7 @@ from decorators import my_time_decorator
 from ols import OLS
 from ols2 import OLS as MainOLS
 from scipy.interpolate import interp1d, UnivariateSpline
+import logging
 
 PriceTable = pickle.load(open('sp500_3_price_table.pkl', 'rb'))
 PriceTable.index = pd.to_datetime(PriceTable.index)
@@ -48,7 +49,19 @@ def to_pickle(content, file_name):
 def to_pickle_and_CSV(content, file_name):
     to_pickle(content, file_name)
     content.to_csv("{}.csv".format(file_name))
-    
+
+def setup_standard_logger(file_name):
+    # Logging Setup
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s;%(levelname)s;%(message)s', "%m/%d/%Y %H:%M")
+
+    file_handler = logging.FileHandler('{}.log'.format(file_name))
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(formatter)
+
+    logger.addHandler(file_handler)
+    return logger
 
 def daily_returns(price_table: 'df of prices') -> 'df of daily_returns':
     return price_table / price_table.shift(-1) - 1
