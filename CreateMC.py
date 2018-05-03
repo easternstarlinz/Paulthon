@@ -10,7 +10,7 @@ from functools import reduce
 from scipy.interpolate import interp1d, UnivariateSpline
 from collections import namedtuple
 import logging
-from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array
+from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array, setup_standard_logger
 from decorators import my_time_decorator, empty_decorator
 from Option_Module import Option, OptionPrice, OptionPriceMC, get_implied_volatility, get_time_to_expiry
 from Timing_Module import event_prob_by_expiry
@@ -22,16 +22,7 @@ NO_USE_TIMING_DECORATOR = True
 if NO_USE_TIMING_DECORATOR:
     my_time_decorator = empty_decorator
 
-# Logging Setup
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s;%(levelname)s;%(message)s', "%m/%d/%Y %H:%M")
-
-file_handler = logging.FileHandler('MC_Distributions.log')
-file_handler.setLevel(logging.INFO)
-file_handler.setFormatter(formatter)
-
-logger.addHandler(file_handler)
+logger = setup_standard_logger('MC_Distributions.log')
 
 """"------------------Calculations: The goal is to optimze for speed.---------------------------"""
 #@my_time_decorator
