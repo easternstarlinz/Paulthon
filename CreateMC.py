@@ -46,7 +46,7 @@ def get_distributions_from_events(events, expiry):
 def get_mc_distributions(distributions, mc_iterations):
     return [dist.mc_simulation(mc_iterations) for dist in distributions]
 
-#@my_time_decorator
+@my_time_decorator
 def sum_mc_distributions(mc_distributions: 'list of mc_distributions'):
     try:
         if len(mc_distributions) > 1:
@@ -56,6 +56,7 @@ def sum_mc_distributions(mc_distributions: 'list of mc_distributions'):
     except Exception:
         print("MC Simulations have different iteration sizes.")
 
+@my_time_decorator
 def optimally_get_mc_distribution_for_event(event, expiry):
     if isinstance(event, IdiosyncraticVol):
         mc_distribution = (IdiosyncraticVolDist - 1)*(event.at_the_money_vol/.10)*math.sqrt(get_time_to_expiry(expiry)) + 1
