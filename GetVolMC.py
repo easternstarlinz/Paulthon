@@ -16,7 +16,7 @@ from Option_Module import Option, OptionPrice, OptionPriceMC, get_implied_volati
 from Timing_Module import event_prob_by_expiry
 from Event_Module import IdiosyncraticVol, Earnings, TakeoutEvent, Event, SysEvt_PresElection
 from Distribution_Module import Distribution, float_to_event_distribution, float_to_bs_distribution
-from CreateMC import get_total_mc_distribution_from_events
+from CreateMC import get_total_mc_distribution_from_events, filter_events_before_expiry
 # Logging Setup
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -166,6 +166,17 @@ def get_vol_surface_spline(vol_surface):
     strikes = [option.Strike for option in vol_surface[0]]
     vols = vol_surface[1]
     return interp1d(strikes, vols, kind='cubic')
+
+@my_time_decorator
+def get_term_structure(events, expiries, strikes, mc_iterations = 10**5):
+    """Events -> Event Groupings by Expiry -> Vol_Surfaces by Expiry"""
+    if strikes is None:
+        strikes = np.arange(.5, 1.5, .025)
+    
+    event_groupings = [filter_events_before_expiry(events, expiry) for expiry in expiries]
+    implied_vols = [get_vol_surface_from_events(event_grouping, expiry, strikes = strikes, pretty = True) for event_grouping, expiry in zip(event_groupings, expiries)]
+    
+    return reduce(lambda x,y: pd.merge(x, y, left_index=True, right_index=True), implied_vols)
 
 """
 @my_time_decorator

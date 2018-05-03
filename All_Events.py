@@ -15,7 +15,7 @@ from Distribution_Module import Distribution, Distribution_MultiIndex
 from Events_sqlite import get_earnings_events
 from timeline_chart import get_event_timeline
 from term_structure import term_structure
-from GetVolMC import get_vol_surface_from_events, get_vol_surface_spline, get_call_prices_from_events, get_option_sheet_from_events
+from GetVolMC import get_vol_surface_from_events, get_vol_surface_spline, get_call_prices_from_events, get_option_sheet_from_events, get_term_structure
 from CreateMC import get_total_mc_distribution_from_events
 
 from paul_resources import TakeoutParams, Symbols
@@ -82,8 +82,8 @@ class Stock(object):
     def get_event_timeline(self):
         get_event_timeline(self.events, self.stock, self.expiries)
 
-    def get_term_structure(self):
-        term_struc = term_structure(self.events, self.expiries, metric = 'IV', mc_iterations = 10**6)
+    def get_term_structure(self, strikes = None):
+        term_struc = get_term_structure(self.events, self.expiries, strikes = None, mc_iterations = 10**6)
         return term_struc.iloc[[term_struc.index.get_loc(1.00, method='nearest')], :]
 
     @property
