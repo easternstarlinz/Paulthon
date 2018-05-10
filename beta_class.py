@@ -17,7 +17,7 @@ import statsmodels.api as sm
 from ols import OLS
 from ols2 import OLS as MainOLS
 from paul_resources import PriceTable, daily_returns, tprint
-from time_decorator import my_time_decorator
+from decorators import my_time_decorator
 
 class ScrubParams(object):
     """Three Parameters for Scrubbing Process; Sequentially Optional"""
@@ -30,7 +30,7 @@ class ScrubParams(object):
         self.percentile_cutoff = percentile_cutoff
 
     def __repr__(self):
-        return "ScrubParams({}, {}, {})".format(self.stock_cutoff, self.index_cutoff, self.percentile_cutoff)
+        return "ScrubParams({:2f}, {:2f}, {:0f})".format(self.stock_cutoff, self.index_cutoff, self.percentile_cutoff)
 
 def OLS_df(df: 'DataFrame of (stock, index) daily returns') -> 'DataFrame of (stock, index) daily returns with y_hat, error, error_squared':
     stock = df.columns[0]

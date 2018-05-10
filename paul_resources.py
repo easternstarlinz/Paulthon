@@ -53,11 +53,11 @@ def to_pickle_and_CSV(content, file_name):
 def setup_standard_logger(file_name):
     # Logging Setup
     logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s;%(levelname)s;%(message)s', "%m/%d/%Y %H:%M")
 
     file_handler = logging.FileHandler('{}.log'.format(file_name))
-    file_handler.setLevel(logging.INFO)
+    file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
 
     logger.addHandler(file_handler)

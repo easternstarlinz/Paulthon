@@ -1,30 +1,21 @@
 import datetime as dt
 from datetime import timedelta
 import numpy as np
-import logging
 import math
 from Timing_Module import get_time_to_expiry
 from Event_Module import Earnings, IdiosyncraticVol
 from decorators import my_time_decorator, empty_decorator
+from paul_resources import setup_standard_logger
 
 NO_USE_TIMING_DECORATOR = True
 if NO_USE_TIMING_DECORATOR:
     my_time_decorator = empty_decorator
 
-# Logging Setup
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s;%(levelname)s;%(message)s', "%m/%d/%Y %H:%M")
-
-file_handler = logging.FileHandler('MC_Distributions.log')
-file_handler.setLevel(logging.INFO)
-file_handler.setFormatter(formatter)
-
-logger.addHandler(file_handler)
+logger = setup_standard_logger('MC_Distributions')
 
 # For now, I define the Default Events outside of the functions so that they are only run once, in the beginning.
 #I could consider creating a cache, to be able to include the Default Events in the functions.
-mc_iterations = 10**5
+mc_iterations = 1*10**5
 EarningsDist = Earnings('CRBP', .05, 'Q2_2018').get_distribution(dt.date(2018, 7, 1)).mc_simulation(mc_iterations)
 IdiosyncraticVolDist = IdiosyncraticVol('CRBP', .10).get_distribution(dt.date.today() + timedelta(365)).mc_simulation(mc_iterations)
 

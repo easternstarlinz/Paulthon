@@ -82,41 +82,63 @@ def get_scrub_params_from_cutoff_params(stock, index, lookback, cutoff_params, p
     return ScrubParams(stock_cutoff, index_cutoff, percentile_cutoff)
 
 @my_time_decorator
-def get_beta(stock,
+def get_beta_info(stocks,
              index,
              lookback,
              cutoff_params = cutoff_params,
              percentile_cutoff = .80):
-    scrub_params =  get_scrub_params_from_cutoff_params(stock, index, lookback, cutoff_params, percentile_cutoff) 
-    beta = Beta(stock, index, lookback, scrub_params)
-    beta_value = beta.beta
-    corr = beta.corr
     
-    #logger.info(stock, index, lookback)
-    #logger.info('Symbol: {}, Beta: {:.2f}, Corr: {:.2f}'.format(stock, beta_value, corr))
-    return Beta(stock, index, lookback, scrub_params).beta
+    # Log Run
+    logger.info(stocks, index, lookback)
+    
+    # Calculate ScrubParams
+    scrub_params_all =  [get_scrub_params_from_cutoff_params(stock, index, lookback, cutoff_params, percentile_cutoff) for stock in stocks]
+    
+    # Establish Table Info
+    betas = [Beta(stock, index, lookback, scrub_params) for stock, scrub_params in zip(stocks, scrub_params_all)]
+    beta_values= [beta.beta for beta in betas]
+    corrs = [beta.corr for beta in betas]
+    stock_cutoffs = [scrub_params.stock_cutoff for scrub_params in scrub_params_all]
+    index_cutoffs = [scrub_params.index_cutoff for scrub_params in scrub_params_all]
+    percentile_cutoffs = [percentile_cutoff for stock in range(len(stocks))]
+
+    # Create DataFrame
+    table_info = list(zip(beta_values, corrs, stock_cutoffs, index_cutoffs, percentile_cutoffs))
+    InfoLabels = ['Beta', 'Corr', 'Stock_Cutoff', 'Index_Cutoff', 'Percentile_Cutoff']
+    index_row = pd.Index(stocks, name = 'Stock')
+    iterables_columns = [[index], InfoLabels]
+    index_column = pd.MultiIndex.from_product(iterables_columns, names = [index, 'Beta_Info'])
+    
+    return pd.DataFrame(table_info, index = index_row, columns = index_column)
+
+
+
+
+beta_df = get_beta_info(['AAPL', 'GOOG', 'FB'], 'SPY', 400, cutoff_params,percentile_cutoff)
+
+print(beta_df.round(4))
+
+def get_beta_info_multiple_stocks(stocks, index, lookback, cutoff_params, percentile_cutoff):
+    return [get_beta_info(stock, index, lookback, cutoff_params, percentile_cutoff) for stock in stocks]
+
 
 @my_time_decorator
-def get_corr(stock,
-             index,
-             lookback,
-             cutoff_params = cutoff_params,
-             percentile_cutoff = .80):
-    scrub_params =  get_scrub_params_from_cutoff_params(stock, index, lookback, cutoff_params, percentile_cutoff) 
-    beta = Beta(stock, index, lookback, scrub_params)
-    beta_value = beta.beta
-    corr = beta.corr
-    return Beta(stock, index, lookback, scrub_params).corr
+def get_MultiIndex_from_info(index_values = None,
+                             index_label = None,
+                             info = None,
+                             column_labels = None,
+                             column_top_label = None,
+                             column_level_names = None):
+    index_r = pd.Index(index_values, index_label)
+    iterables_c = [column_top_label, [columns_bottom_labels]]
+    index_c = pd.MultiIndex.from_product(iterables_c, columns_level_names)
+    df = pd.DataFrame(info, index = index_r, columns = index_c)
+    return df
+    return df[df[(expiry, content_label)] > .0025].round(4)
 
-
-def get_betas(stocks, index, lookback):
-    return [get_beta(stock, index, lookback) for stock in stocks]
-
-def get_corrs(stocks, index, lookback):
-    return [get_corr(stock, index, lookback) for stock in stocks]
 
 @my_time_decorator
-def get_betas_df(stocks, betas, corrs, index):
+def get_best_beta_results(stocks, index):
     content_label = index
     index_r = pd.Index(stocks, name = 'Strike')
     iterables_c = [[index], ['Beta']]
@@ -136,18 +158,9 @@ def get_betas_df(stocks, betas, corrs, index):
     return df
     return df[df[(expiry, content_label)] > .0025].round(4)
 
-@my_time_decorator
-def get_corrs_df(stocks, betas, corrs, index):
-    content_label = index
-    index_r = pd.Index(stocks, name = 'Strike')
-    iterables_c = [[index], ['Corr']]
-    index_c = pd.MultiIndex.from_product(iterables_c, names = [index, 'Beta_Info'])
-    df = pd.DataFrame(corrs, index = index_r, columns = index_c)
-    return df
 
-def get_both(beta_df, corrs_df):
-    return beta_df.join(corrs_df)
-
+    
+    
 def get_multiple_indices(stocks, indices):
     for index in indices:
         df = get_both(stocks, index)
