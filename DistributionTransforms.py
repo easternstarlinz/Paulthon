@@ -7,24 +7,12 @@ import copy
 import matplotlib.pyplot as plt
 from collections import namedtuple
 from statistics import mean
-from paul_resources import InformationTable, tprint, rprint
+from paul_resources import InformationTable, tprint, rprint, setup_standard_logger
 from decorators import my_time_decorator
 from py_vollib.black_scholes.implied_volatility import black_scholes, implied_volatility
 from Option_Module import get_time_to_expiry
-import logging
 
-# Logging Setup
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-formatter = logging.Formatter('%(levelname)s:%(message)s')
-
-file_handler = logging.FileHandler('mc_transform.log')
-file_handler.setLevel(logging.INFO)
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
-
-#logging.disable(logging.CRITICAL)
+logger = setup_standard_logger('Distribution_Transforms')
 
 def float_to_distribution(move_input: 'float', csv_file):
     distribution_df = pd.read_csv(csv_file).set_index('State')
@@ -39,8 +27,6 @@ def float_to_event_distribution(move_input: 'float'):
     return float_to_distribution(move_input, 'Event.csv')
 
 def float_to_volbeta_distribution(move_input: 'float'):
-    #time_to_expiry = get_time_to_expiry(expiry)
-    #return float_to_distribution(move_input*math.sqrt(time_to_expiry), 'VolbetaDistribution.csv')
     return float_to_distribution(move_input, 'VolbetaDistribution.csv')
 
 def float_to_bs_distribution(move_input: 'float'):
@@ -85,4 +71,3 @@ if __name__ == '__main__':
     mc_distribution = bs_distribution_original.mc_simulation(10**6)
     bs_distribution_created = mc_distribution_to_distribution(mc_distribution)
     #print(bs_distribution_created.mean_move)
-

@@ -9,8 +9,7 @@ import pylab
 from functools import reduce
 from scipy.interpolate import interp1d, UnivariateSpline
 from collections import namedtuple
-import logging
-from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array
+from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array, setup_standard_logger
 from decorators import my_time_decorator, empty_decorator
 from Option_Module import Option, OptionPrice, OptionPriceMC, get_implied_volatility, get_time_to_expiry
 from Timing_Module import event_prob_by_expiry
@@ -22,17 +21,7 @@ NO_USE_TIMING_DECORATOR = True
 if NO_USE_TIMING_DECORATOR:
     my_time_decorator = empty_decorator
 
-
-# Logging Setup
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s;%(levelname)s;%(message)s', "%m/%d/%Y %H:%M")
-
-file_handler = logging.FileHandler('MC_Distributions.log')
-file_handler.setLevel(logging.INFO)
-file_handler.setFormatter(formatter)
-
-logger.addHandler(file_handler)
+logger = setup_standard_logger('MC_Vol_Calcs')
 
 """"---------------Calculations: The goal is to optimze for speed (and organization)------------------"""
 @my_time_decorator
@@ -41,6 +30,7 @@ def establish_strikes_from_mc_distribution(mc_distribution: 'numpy array', num_s
     strikeMin = mc_distribution.min()
     strikeMax = mc_distribution.max()
     strikeInterval = (strikeMax - strikeMin) / num_strikes
+    logger.debug('Min Value: {:.3f}, Max Value: {:.3f}, Interval: {:.3f}'.format(strikeMin, strikeMax, strikeInterval))
     return np.arange(strikeMin, strikeMax, strikeInterval)
     return pd.Series(np.arange(strikeMin, strikeMax, strikeInterval))
 
@@ -182,6 +172,7 @@ def get_term_structure(events, expiries, strikes, mc_iterations = 10**5):
     event_groupings = [filter_events_before_expiry(events, expiry) for expiry in expiries]
     implied_vols = [get_vol_surface_from_events(event_grouping, expiry, strikes = strikes, pretty = True) for event_grouping, expiry in zip(event_groupings, expiries)]
     
+    logger.debug('Term Structure ran successfully.')
     return reduce(lambda x,y: pd.merge(x, y, left_index=True, right_index=True), implied_vols)
 
 """

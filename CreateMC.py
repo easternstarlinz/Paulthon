@@ -32,6 +32,7 @@ def filter_events_before_expiry(events, expiry):
 
 @my_time_decorator
 def sum_mc_distributions(mc_distributions: 'list of mc_distributions'):
+    """Mathematically combine MC Simulation Results"""
     try:
         if len(mc_distributions) > 1:
             return reduce(lambda x, y: np.multiply(x,y), mc_distributions)
