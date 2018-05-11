@@ -121,12 +121,12 @@ def lprint(*args):
     for arg in args:
         print("Len: ", len(arg), "\n", sep='')
 
-def get_histogram_from_array(results: 'array of numbers', bins = 10**2):
+def get_histogram_from_array(results: 'array of numbers', bins = 10**2, title = 'Monte Carlo Simulation\n Simulated Distribution'):
     #start, end, interval = -.5, .5, .025
     #bins = np.arange(start - interval/2, end + interval/2, interval)
     
     plt.hist(results, bins, histtype='bar', rwidth=1.0, color = 'blue', label = 'Rel. Frequency')
-    plt.title('Monte Carlo Simulation\n Simulated Distribution')
+    plt.title(title)
     plt.xlabel('Relative Price')
     plt.ylabel('Relative Frequency')
     plt.legend()

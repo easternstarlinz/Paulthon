@@ -18,13 +18,14 @@ from ols import OLS
 from ols2 import OLS as MainOLS
 from paul_resources import PriceTable, daily_returns, tprint
 from decorators import my_time_decorator
+from beta_class import Beta
 
 class ScrubParams(object):
     """Three Parameters for Scrubbing Process; Sequentially Optional"""
     def __init__(self,
-                 stock_cutoff: 'float' = None,
-                 index_cutoff: 'float' = None,
-                 percentile_cutoff: 'float' = None):
+                    stock_cutoff: 'float' = None,
+                    index_cutoff: 'float' = None,
+                    percentile_cutoff: 'float' = None):
         self.stock_cutoff = stock_cutoff
         self.index_cutoff = index_cutoff
         self.percentile_cutoff = percentile_cutoff
@@ -44,122 +45,6 @@ def OLS_df(df: 'DataFrame of (stock, index) daily returns') -> 'DataFrame of (st
     df['error_squared'] = df['error']*df['error']
     return df
 
-class Beta(object):
-    def __init__(self,
-                 stock: 'str',
-                 index: 'str',
-                 lookback: 'int',
-                 ScrubParams: 'obj'):
-        self.stock = stock
-        self.index = index
-        self.lookback = lookback
-        self.ScrubParams = ScrubParams
-        
-        self.price_table = PriceTable.head(self.lookback)[[self.stock, self.index]]
-        self.daily_returns = daily_returns(self.price_table)
-
-    @property
-    def initial_scrub(self):
-        if self.ScrubParams.stock_cutoff:
-            return self.daily_returns[abs(self.daily_returns[self.stock]) <= self.ScrubParams.stock_cutoff]
-        else:
-            return None
-    
-    @property
-    def second_scrub(self):
-        if self.ScrubParams.stock_cutoff and self.ScrubParams.index_cutoff:
-            df = self.initial_scrub[abs(self.initial_scrub[self.index]) >= self.ScrubParams.index_cutoff]
-            df = OLS_df(df)
-            return df
-        else:
-            return None
-
-    @property
-    def third_scrub(self):
-        if self.ScrubParams.stock_cutoff and self.ScrubParams.index_cutoff and self.ScrubParams.percentile_cutoff:
-            cutoff = self.second_scrub['error_squared'].quantile(self.ScrubParams.percentile_cutoff)
-            return self.second_scrub[self.second_scrub['error_squared'] < cutoff].loc[:, [self.stock, self.index]]
-        else:
-            return None
-    
-    @property
-    def main(self):
-        if self.ScrubParams.percentile_cutoff:
-            return self.third_scrub
-        elif self.ScrubParams.index_cutoff:
-            return self.second_scrub
-        elif self.ScrubParams.stock_cutoff:
-            return self.initial_scrub
-        else:
-            return self.daily_returns
-
-    @property
-    def OLS_model_results(self):
-        model = sm.OLS(self.main[self.stock], self.main[self.index], missing='drop')
-        results = model.fit()
-        return results
-    
-    @property
-    def OLS_object(self):
-        stock_returns = list(self.main[self.stock])
-        index_returns = list(self.main[self.index])
-        dates = list(self.main.index.values)
-        return MainOLS(list(zip(index_returns, stock_returns, dates)))
-
-    @property
-    def beta(self):
-        return self.OLS_model_results.params[self.index]
-
-    @property
-    def beta1(self):
-        return self.OLS_object.beta1
-    
-    @property
-    def corr(self):
-        return self.OLS_object.corr
-
-    @property
-    def rsquared(self):
-        return self.OLS_model_results.rsquared
-
-    @property
-    def degrees_of_freedom(self):
-        return self.OLS_model_results.df_resid
-
-    @property
-    def scrub_type(self):
-        if self.ScrubParams.percentile_cutoff:
-            return "Third_Scrub"
-        elif self.ScrubParams.index_cutoff:
-            return "Second_Scrub"
-        elif self.ScrubParams.stock_cutoff:
-            return "Initial_Scrub"
-        else:
-            return "Raw_Returns"
-
-    def describe(self):
-        """Scrub Type: Beta, Corr., n"""
-        pprint("{}-> Beta: {:.2f}, Corr.: {:.2f}, n = {:.0f}".format(self.scrub_type, self.beta1, self.corr, self.degrees_of_freedom))
-        
-    def show_scrub_trajectory(self):
-        """Beta at Each Stage of the Scrubbing Process: Raw_Returns, Initial_Scrub, Second_Scrub, Third_Scrub"""
-        print("{} (Index: {}), n = {}, {}".format(self.stock, self.index, self.lookback, self.ScrubParams))
-        
-        # This is an alternative comparaison order which is not currently in use
-        ScrubParams1 = ScrubParams()
-        ScrubParams2 = ScrubParams(2, self.ScrubParams.index_cutoff, 1.0)
-        ScrubParams3 = ScrubParams(self.ScrubParams.stock_cutoff, self.ScrubParams.index_cutoff, 1.0)
-        ScrubParams4 = ScrubParams(self.ScrubParams.stock_cutoff, self.ScrubParams.index_cutoff, self.ScrubParams.percentile_cutoff)
-        
-        ScrubParams1 = ScrubParams()
-        ScrubParams2 = ScrubParams(self.ScrubParams.stock_cutoff)
-        ScrubParams3 = ScrubParams(self.ScrubParams.stock_cutoff, self.ScrubParams.index_cutoff)
-        ScrubParams4 = ScrubParams(self.ScrubParams.stock_cutoff, self.ScrubParams.index_cutoff, self.ScrubParams.percentile_cutoff)
-
-        ScrubParamsList= [ScrubParams1, ScrubParams2, ScrubParams3, ScrubParams4]
-        
-        for paramset in ScrubParamsList:
-            Beta(self.stock, self.index, self.lookback, paramset).describe()
 
 class StockLineSimple(object):
     def __init__(self, stock: 'str', lookback: 'int', base = None):
