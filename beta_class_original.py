@@ -22,9 +22,9 @@ from decorators import my_time_decorator
 class ScrubParams(object):
     """Three Parameters for Scrubbing Process; Sequentially Optional"""
     def __init__(self,
-                 stock_cutoff: 'float' = None,
-                 index_cutoff: 'float' = None,
-                 percentile_cutoff: 'float' = None):
+                    stock_cutoff: 'float' = None,
+                    index_cutoff: 'float' = None,
+                    percentile_cutoff: 'float' = None):
         self.stock_cutoff = stock_cutoff
         self.index_cutoff = index_cutoff
         self.percentile_cutoff = percentile_cutoff

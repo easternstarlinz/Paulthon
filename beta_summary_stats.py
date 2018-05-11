@@ -16,14 +16,17 @@ sorted_df= Best_Betas.loc[:, ('Best', 'Beta_to_SPY')].sort_index()
 print(sorted_df)
 SPY_betas_raw = np.array(SPY_Betas_Raw.loc[:, ('SPY', 'Beta')].sort_index().tolist())
 SPY_betas_scrubbed = np.array(SPY_Betas_Scrubbed.loc[:, ('SPY', 'Beta')].sort_index().tolist())
-#diffs = 
+diffs = SPY_betas_scrubbed - SPY_betas_raw
 betas = SPY_betas_scrubbed
 
+get_histogram_from_array(SPY_betas_raw, 20, title = 'Raw SPY Betas')
+get_histogram_from_array(SPY_betas_scrubbed, 20, title = 'Scrubbed SPY Betas')
+get_histogram_from_array(diffs, 20, title = 'Diffs')
 
-#get_histogram_from_array(betas, 20)
+get_histogram_from_array(diffs, 20, title = 'Diffs')
 print(mean(best_betas), mean(SPY_betas_raw), mean(SPY_betas_scrubbed))
 
 beta_groupings = [BetaGrouping('Best', best_betas), BetaGrouping('Raw', SPY_betas_raw), BetaGrouping('Scrubbed',SPY_betas_scrubbed)]
 for grouping in beta_groupings:
     print(" * {} {} Mean: {:.2f}, STD: {:.2f}".format(grouping.Name, " "*(9 - len(grouping.Name)), mean(grouping.Values), np.nanstd(grouping.Values)))
-    print(len(grouping.Values))
+    #print(len(grouping.Values))
