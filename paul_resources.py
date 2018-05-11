@@ -5,6 +5,7 @@ import pickle
 import math
 import decimal
 import copy
+from functools import reduce
 import pprint
 import matplotlib.pyplot as plt
 import statsmodels.formula.api as sm
@@ -23,6 +24,13 @@ PriceTable.index = pd.to_datetime(PriceTable.index)
 stocks = PriceTable.columns.values.tolist()
 stocks = [i for i in stocks if i not in  {'BHH', 'CBRE', 'WELL', 'BKNG', 'BHF', 'FTV', 'UA'}]
 PriceTable = PriceTable.loc[:, stocks]
+
+
+ETF_PriceTable = pickle.load(open('ETF_prices.pkl', 'rb'))
+ETF_PriceTable.index = pd.to_datetime(ETF_PriceTable.index)
+
+# Temporary Fix to use ETF_PriceTable in the Beta Module
+#PriceTable = ETF_PriceTable
 
 InformationTable = pd.read_csv('information_table.csv')
 InformationTable.rename(columns = {'Last Close': 'Price', 'Ticker': 'Stock', 'Market Cap ': 'Market Cap'}, inplace=True)
@@ -62,6 +70,31 @@ def setup_standard_logger(file_name):
 
     logger.addHandler(file_handler)
     return logger
+
+def get_ETF_beta_to_SPY(ETF):
+    ETF_betas = pickle.load(open('ETF_betas.pkl', 'rb'))
+    try:
+        beta = ETF_betas.loc[ETF, ('SPY', 'Beta')]
+        return beta
+    except:
+        print("{} is not in the ETF beta table".format(ETF))
+        return 1.0
+
+Best_Betas = pickle.load(open('Best_Betas.pkl', 'rb'))
+SPY_Betas_Raw = pickle.load(open('SPY_Betas_Raw.pkl', 'rb'))
+SPY_Betas_Scrubbed = pickle.load(open('SPY_Betas_Scrubbed.pkl', 'rb'))
+
+def merge_dfs_horizontally(dfs: 'list of dfs'):
+    if len(dfs) == 1:
+        return dfs[0]
+    else:
+        return reduce(lambda x, y: pd.merge(x, y, left_index=True, right_index=True), dfs)
+
+def append_dfs_vertically(dfs: 'list of dfs'):
+    if len(dfs) == 1:
+        return dfs[0]
+    else:
+        return reduce(lambda x, y: x.append(y), dfs)
 
 def daily_returns(price_table: 'df of prices') -> 'df of daily_returns':
     return price_table / price_table.shift(-1) - 1

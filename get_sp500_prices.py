@@ -13,6 +13,7 @@ from paul_resources import HealthcareSymbols, to_pickle_and_CSV
 from multiprocessing import Pool
 from multiprocessing.dummy import Pool as ThreadPool
 import logging
+from ETFs import indices
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -88,6 +89,9 @@ def make_price_table(symbols: 'list',
     
     pool = ThreadPool(4)
     price_tables = pool.map(lambda stock: get_prices(stock, start, end), symbols)
+    
+    shapes = sorted([(df.columns.values.tolist(), df.shape) for df in price_tables], key=lambda x: x[1][0])
+    print(shapes)
     price_table = pd.concat(price_tables, axis=1)
     
     to_pickle_and_CSV(price_table, file_name)
@@ -104,10 +108,11 @@ def test_yahoo_reader():
 @my_time_decorator
 def fetch_price_table():
     if __name__ == '__main__':
-        symbols = get_sp500_symbols_from_wiki()
-        file_name = 'sp500_fresh'
+        #symbols = get_sp500_symbols_from_wiki()
+        symbols = indices
+        file_name = 'ETF_prices'
         price_table = make_price_table(symbols,
-                                       start = dt.datetime(2016,1,1),
+                                       start = dt.datetime(2015,1,1),
                                        end = dt.datetime.today(),
                                        file_name = file_name)
        
