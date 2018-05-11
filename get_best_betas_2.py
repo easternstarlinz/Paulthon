@@ -1,15 +1,15 @@
 import pandas as pd
 import numpy as np
 import math
-from paul_resources import HealthcareSymbols, Symbols, tprint, PriceTable, daily_returns, setup_standard_logger
+import pickle
+from functools import reduce
+import itertools
+from paul_resources import HealthcareSymbols, Symbols, tprint, PriceTable, daily_returns, setup_standard_logger, ETF_PriceTable, merge_dfs_horizontally, append_dfs_vertically, to_pickle_and_CSV, get_ETF_beta_to_SPY
 from beta_class import ScrubParams, Beta
 from decorators import my_time_decorator, empty_decorator
-import pickle
 from collections import namedtuple
-from functools import reduce
 from multiprocessing import Pool
 from multiprocessing.dummy import Pool as ThreadPool
-import itertools
 from ETFs import indices as ETFs
 
 # Standard Module Setup
@@ -19,13 +19,12 @@ if NO_USE_TIMING_DECORATOR:
 
 logger = setup_standard_logger('Get_Best_Beta')
 
-#Option = namedtuple('Option', ['Option_Type', 'Strike', 'Expiry'])
 
 CutoffParams = namedtuple('CutoffParams', ['Stock_STD_Cutoff', 'Index_STD_Cutoff', 'Percentile_Cutoff'])
 
-
-STOCK_STD_CUTOFF = 4.0
+STOCK_STD_CUTOFF = 8.0
 INDEX_STD_CUTOFF = 1.75
+LOOKBACK_DEFAULT = 400
 cutoff_params = CutoffParams(STOCK_STD_CUTOFF, INDEX_STD_CUTOFF, 95)
 
 def get_stock_prices(stock, lookback):
@@ -53,8 +52,6 @@ def scrub_returns(returns, percentile_cutoff = 90, reverse_scrub = False):
     #returns.apply(scrub_func, cutoff=scrub_cutoff, reverse_scrub=reverse_scrub)
     return returns
 
-
-
 def get_HV_from_returns(returns):
     return np.nanstd(returns)*math.sqrt(252)
 
@@ -63,30 +60,34 @@ def get_scrubbed_HV_for_stock(stock, lookback, percentile_cutoff = 90):
     daily_returns_scrubbed = scrub_returns(daily_returns, percentile_cutoff)
     return get_HV_from_returns(daily_returns_scrubbed)
 
-def get_cutoff(stock, lookback = 400, percentile_cutoff = 90, std_dev_cutoff = 2):
+def get_cutoff(stock, lookback = LOOKBACK_DEFAULT, percentile_cutoff = 90, std_dev_cutoff = 2):
     HV = get_scrubbed_HV_for_stock(stock, lookback, percentile_cutoff)
     return HV / math.sqrt(252) * std_dev_cutoff
 
-def get_stock_cutoff(stock, lookback = 400, percentile_cutoff = 90, std_dev_cutoff = STOCK_STD_CUTOFF):
+def get_stock_cutoff(stock, lookback = LOOKBACK_DEFAULT, percentile_cutoff = 90, std_dev_cutoff = STOCK_STD_CUTOFF):
     return get_cutoff(stock, lookback, percentile_cutoff, std_dev_cutoff)
 
-def get_index_cutoff(index, lookback = 400, percentile_cutoff = 90, std_dev_cutoff = INDEX_STD_CUTOFF):
+def get_index_cutoff(index, lookback = LOOKBACK_DEFAULT, percentile_cutoff = 90, std_dev_cutoff = INDEX_STD_CUTOFF):
     return get_cutoff(index, lookback, percentile_cutoff, std_dev_cutoff)
 
 
 def get_scrub_params_from_cutoff_params(stock, index, lookback, cutoff_params, percentile_cutoff):
-    stock_cutoff = get_stock_cutoff(stock, lookback, cutoff_params.Percentile_Cutoff, cutoff_params.Stock_STD_Cutoff)
     index_cutoff = get_index_cutoff(index, lookback, cutoff_params.Percentile_Cutoff, cutoff_params.Index_STD_Cutoff)
+    
+    stock_cutoff_raw = get_stock_cutoff(stock, lookback, cutoff_params.Percentile_Cutoff, cutoff_params.Stock_STD_Cutoff)
+    stock_cutoff = max(index_cutoff*2.25, stock_cutoff_raw)
     return ScrubParams(stock_cutoff, index_cutoff, percentile_cutoff)
 
 @my_time_decorator
-def get_beta_info(stocks,
+def get_betas_multiple_stocks(stocks,
              index,
              lookback,
              cutoff_params = cutoff_params,
-             percentile_cutoff = .80):
+             percentile_cutoff = .85,
+             to_file = False,
+             file_name = 'default'):
     
-    # Log Run
+    # Log
     #logger.info(stocks, index, lookback)
     
     # Calculate ScrubParams
@@ -99,35 +100,44 @@ def get_beta_info(stocks,
     stock_cutoffs = [scrub_params.stock_cutoff for scrub_params in scrub_params_all]
     index_cutoffs = [scrub_params.index_cutoff for scrub_params in scrub_params_all]
     percentile_cutoffs = [percentile_cutoff for stock in range(len(stocks))]
+    index_betas_to_SPY = [get_ETF_beta_to_SPY(index) for stock in range(len(stocks))]
+    betas_to_SPY = [get_ETF_beta_to_SPY(index)*beta_values[i] for i in range(len(stocks))]
 
     # Create DataFrame
-    table_info = list(zip(beta_values, corrs, stock_cutoffs, index_cutoffs, percentile_cutoffs))
-    InfoLabels = ['Beta', 'Corr', 'Stock_Cutoff', 'Index_Cutoff', 'Percentile_Cutoff']
+    table_info = list(zip(beta_values, corrs, stock_cutoffs, index_cutoffs, percentile_cutoffs, index_betas_to_SPY, betas_to_SPY))
+    InfoLabels = ['Beta', 'Corr', 'Stock_Cutoff', 'Index_Cutoff', 'Percentile_Cutoff', 'Index_Beta_to_SPY', 'Beta_to_SPY']
     index_row = pd.Index(stocks, name = 'Stock')
     iterables_columns = [[index], InfoLabels]
     index_column = pd.MultiIndex.from_product(iterables_columns, names = ['Index', 'Beta_Info'])
+    df = pd.DataFrame(table_info, index = index_row, columns = index_column)
     
-    return pd.DataFrame(table_info, index = index_row, columns = index_column)
+    if to_file:
+        to_pickle_and_CSV(df, file_name)
+    
+    return df
 
-def merge_dfs_horizontally(dfs: 'list of dfs'):
-    if len(dfs) == 1:
-        return dfs[0]
-    else:
-        return reduce(lambda x, y: pd.merge(x, y, left_index=True, right_index=True), dfs)
-
-def append_dfs_vertically(dfs: 'list of dfs'):
-    if len(dfs) == 1:
-        return dfs[0]
-    else:
-        return reduce(lambda x, y: x.append(y), dfs)
 
 @my_time_decorator
-def get_best_beta_results(stocks, indices, lookback, cutoff_params, percentile_cutoff):
-        beta_info_by_index = [get_beta_info(stocks, index, lookback, cutoff_params, percentile_cutoff) for index in indices]
-        return merge_dfs_horizontally(beta_info_by_index)
+def get_betas_for_multiple_stocks_and_indices(stocks,
+                                              indices,
+                                              lookback,
+                                              cutoff_params,
+                                              percentile_cutoff,
+                                              to_file = False,
+                                              file_name = 'default'):
+    beta_info_by_index = [get_betas_multiple_stocks(stocks, index, lookback, cutoff_params, percentile_cutoff) for index in indices]
+    return merge_dfs_horizontally(beta_info_by_index)
 
-def get_best(stocks, indices, lookback, cutoff_params, percentile_cutoff):
-    df = get_best_beta_results(stocks, indices, lookback, cutoff_params, percentile_cutoff)
+def get_best_betas(stocks,
+                   indices,
+                   lookback,
+                   cutoff_params,
+                   percentile_cutoff,
+                   to_file = False,
+                   file_name = 'default'):
+    """Returns a DataFrame of best betas based on highest correlation for a set of symbols and ETFs."""
+
+    df = get_betas_for_multiple_stocks_and_indices(stocks, indices, lookback, cutoff_params, percentile_cutoff)
     combinations = list(itertools.product(indices, ['Corr']))
     corr_df = df.loc[:, combinations].round(2)
     df['Best'] = corr_df.idxmax(axis=1)
@@ -136,38 +146,53 @@ def get_best(stocks, indices, lookback, cutoff_params, percentile_cutoff):
     pairs = list(zip(stocks, best))
     info = []
     for stock, index in pairs:
-        b = get_beta_info([stock], index, lookback, cutoff_params, percentile_cutoff)
+        b = get_betas_multiple_stocks([stock], index, lookback, cutoff_params, percentile_cutoff)
         b.columns.set_levels(['Best'], level=0, inplace=True)
-        b['Index'] = index
+        b[('Best', 'Index')] = index
         info.append(b)
     
     df = append_dfs_vertically(info)
     a = df.loc[:, [('Best', 'Beta'), ('Best', 'Corr'), ('Best', 'Stock_Cutoff'), ('Best', 'Index_Cutoff')]]
-    b = df.loc[:, ['Index']]
-    df = merge_dfs_horizontally([b, a]).sort_values(['Index', ('Best', 'Corr')], ascending=[True, False], inplace=False)
+    a = df.loc[:, [('Best', column) for column in ['Beta', 'Corr', 'Stock_Cutoff', 'Index_Cutoff', 'Index_Beta_to_SPY', 'Beta_to_SPY']]]
+    b = df.loc[:, [('Best', 'Index')]]
+    df = merge_dfs_horizontally([b, a]).sort_values([('Best', 'Index'), ('Best', 'Corr')], ascending=[True, False], inplace=False)
     print(df.round(2).to_string())
+    
+    if to_file:
+        to_pickle_and_CSV(df, file_name)
     return df
 
-lookback = 400
+lookback = 450
 #stock_cutoff = .0875
 #index_cutoff = .0125
 percentile_cutoff = 1.00
-cutoff_params = CutoffParams(4.25, 1.75, 90)
+cutoff_params = CutoffParams(2.75, 1.5, 95)
 
 
 stocks = ['AAPL', 'GOOG', 'FB']
 indices = ['SPY', 'QQQ']
 stocks = ['AAPL', 'GOOG', 'FB', 'AMZN', 'ALNY', 'CRBP', 'NBIX', 'SRPT']
 indices = ['SPY', 'QQQ', 'XLV', 'IBB', 'XBI']
-stocks = HealthcareSymbols[0:50]
+stocks = HealthcareSymbols
 
-#indices = [etf for etf in ETFs if etf in Symbols]
-#beta_df = get_beta_info(['AAPL', 'GOOG', 'FB'], 'SPY', 400, cutoff_params,percentile_cutoff)
-best_beta_results = get_best_beta_results(stocks, indices, lookback, cutoff_params, percentile_cutoff)
-best = get_best(stocks, indices, lookback, cutoff_params, percentile_cutoff)
-#print(best)
-df = best.round(2).sort_values([('Best', 'Corr')], ascending=False, inplace=False)
-print(df.to_string())
+#best_betas = get_best_betas(stocks, indices, lookback, cutoff_params, percentile_cutoff, to_file = True, file_name = 'Best_Betas')
+#df = best_betas.round(2).sort_values([('Best', 'Corr')], ascending=False)
+#print(df.to_string())
+
+def calculate_ETF_betas_to_SPY():
+    indices = ['SPY']
+    stocks = [etf for etf in ETFs if etf != 'SPY']
+    #stocks = ['XLV', 'XBI', 'XLI', 'XLF', 'XRT', 'XLP']
+    stocks = HealthcareSymbols
+    #cutoff_params = CutoffParams(10, .01, 100)
+    #percentile_cutoff = 1.0
+    betas = get_betas_multiple_stocks(stocks, indices[0], lookback, cutoff_params, percentile_cutoff, to_file=True, file_name = 'SPY_Betas_Scrubbed')
+    df = betas.round(2).sort_values([(indices[0],'Corr')], ascending=False)
+    print(df.to_string())
+    return df
+
+calculate_ETF_betas_to_SPY()
+
 
 columns = ['Beta', 'Corr']
 columns = ['Corr']
