@@ -49,6 +49,7 @@ def get_sp500_symbols_from_wiki():
     discretionary_stocks = HealthcareSymbols
     discretionary_indices = ['SPY', 'IWM', 'QQQ', 'IBB', 'XBI', 'XLP', 'XRT'] + ['XLV', 'XLF', 'XLE', 'AMLP', 'VFH', 'GDX', 'XLU']
     discretionary_symbols = discretionary_stocks + discretionary_indices
+    discretionary_symbols = ['SPY']
 
     # All Symbols for Output
     all_symbols = sorted(list(set(sp500_symbols + discretionary_symbols)))
@@ -90,8 +91,8 @@ def make_price_table(symbols: 'list',
     pool = ThreadPool(4)
     price_tables = pool.map(lambda stock: get_prices(stock, start, end), symbols)
     
-    shapes = sorted([(df.columns.values.tolist(), df.shape) for df in price_tables], key=lambda x: x[1][0])
-    print(shapes)
+    #shapes = sorted([(df.columns.values.tolist(), df.shape) for df in price_tables], key=lambda x: x[1][0])
+    #print(shapes)
     price_table = pd.concat(price_tables, axis=1)
     
     to_pickle_and_CSV(price_table, file_name)
@@ -108,9 +109,9 @@ def test_yahoo_reader():
 @my_time_decorator
 def fetch_price_table():
     if __name__ == '__main__':
-        #symbols = get_sp500_symbols_from_wiki()
-        symbols = indices
-        file_name = 'ETF_prices'
+        symbols = get_sp500_symbols_from_wiki()
+        #symbols = indices
+        file_name = 'sp500_prices'
         price_table = make_price_table(symbols,
                                        start = dt.datetime(2015,1,1),
                                        end = dt.datetime.today(),

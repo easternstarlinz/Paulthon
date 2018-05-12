@@ -57,7 +57,8 @@ class Beta(object):
         
         self.price_table = PriceTable.head(self.lookback)[[self.stock, self.index]]
         self.daily_returns = daily_returns(self.price_table)
-
+        self.num_data_points = self.daily_returns.shape[0]
+    
     @property
     def initial_scrub(self):
         if self.ScrubParams.stock_cutoff:
@@ -78,6 +79,7 @@ class Beta(object):
     def third_scrub(self):
         if self.ScrubParams.stock_cutoff and self.ScrubParams.index_cutoff and self.ScrubParams.percentile_cutoff:
             cutoff = self.second_scrub['error_squared'].quantile(self.ScrubParams.percentile_cutoff)
+            #print(self.second_scrub[self.second_scrub['error_squared'] < cutoff].loc[:, [self.stock, self.index]])
             return self.second_scrub[self.second_scrub['error_squared'] < cutoff].loc[:, [self.stock, self.index]]
         else:
             return None
@@ -92,6 +94,10 @@ class Beta(object):
             return self.initial_scrub
         else:
             return self.daily_returns
+    
+    @property
+    def num_days_in_calculation(self):
+        return self.main.shape[0]
 
     @property
     def OLS_model_results(self):
@@ -125,6 +131,10 @@ class Beta(object):
     @property
     def degrees_of_freedom(self):
         return self.OLS_model_results.df_resid
+    
+    @property
+    def percent_days_in_calculation(self):
+        return (self.num_days_in_calculation)/self.num_data_points
 
     @property
     def scrub_type(self):
