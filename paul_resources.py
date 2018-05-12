@@ -122,15 +122,15 @@ def get_num_days_above_cutoff(stock, lookback, cutoff, below_cutoff=False, absol
     
     total_days = len(returns.tolist())
     filtered_days = len(filtered_returns.tolist())
-    print(type(returns))
-    print(filtered_days, total_days)
+    #print(type(returns))
+    #print(filtered_days, total_days)
     return filtered_days / total_days
 
 num = get_num_days_above_cutoff('SPY', 450, .005, absolute_value = True)
-print(num)
+#print(num)
 
 num = get_num_days_above_cutoff('SPY', 450, -.01, below_cutoff=True)
-print(num)
+#print(num)
 
 
 
