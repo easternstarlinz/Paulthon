@@ -5,3 +5,6 @@
 *.swo
 *.swn
 *.csv#
+*.pkl
+*.pyc
+*.csv
