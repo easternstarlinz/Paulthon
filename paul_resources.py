@@ -19,15 +19,20 @@ from ols2 import OLS as MainOLS
 from scipy.interpolate import interp1d, UnivariateSpline
 import logging
 
-PriceTable = pickle.load(open('sp500_3_price_table.pkl', 'rb'))
+ManualSymbolExcludes = ['BRK.B', 'BKNG', 'BHF', 'BF.B', 'CBRE', 'FTV', 'UA', 'WELL', 'XRX' 'BHH', 'AEE']
+
+PriceTable = pickle.load(open('sp500_prices.pkl', 'rb'))
 PriceTable.index = pd.to_datetime(PriceTable.index)
 stocks = PriceTable.columns.values.tolist()
-stocks = [i for i in stocks if i not in  {'BHH', 'CBRE', 'WELL', 'BKNG', 'BHF', 'FTV', 'UA'}]
-PriceTable = PriceTable.loc[:, stocks]
+SymbolExcludes = ManualSymbolExcludes + [i for i in stocks if PriceTable.loc[:, i].isnull().values.any()]
 
+stocks = [i for i in stocks if i not in SymbolExcludes]
+PriceTable = PriceTable.loc[:, stocks][::-1]
+#print(PriceTable)
 
 ETF_PriceTable = pickle.load(open('ETF_prices.pkl', 'rb'))
 ETF_PriceTable.index = pd.to_datetime(ETF_PriceTable.index)
+#print(ETF_PriceTable)
 
 # Temporary Fix to use ETF_PriceTable in the Beta Module
 #PriceTable = ETF_PriceTable
@@ -41,6 +46,9 @@ HealthcareSymbols = info[(info.Sector == 'Medical') & (info['Market Cap'] > 750)
 HealthcareSymbols = [i for i in HealthcareSymbols if i not in {'AAAP', 'BOLD', 'LNTH', 'MEDP', 'TCMD'}]
 
 Symbols = info.index.tolist()
+SP500Symbols = pd.read_html('https://en.wikipedia.org/wiki/List_of_S&P_500_companies')[0][0][1:].reset_index(drop=True).tolist()
+SP500Symbols = sorted([sym for sym in SP500Symbols if sym not in SymbolExcludes])
+
 
 BestBetas = pickle.load(open('best_betas.pkl', 'rb'))
 
@@ -71,6 +79,9 @@ def setup_standard_logger(file_name):
     logger.addHandler(file_handler)
     return logger
 
+def daily_returns(price_table: 'df of prices') -> 'df of daily_returns':
+    return price_table / price_table.shift(-1) - 1
+
 def get_ETF_beta_to_SPY(ETF):
     ETF_betas = pickle.load(open('ETF_betas.pkl', 'rb'))
     try:
@@ -84,6 +95,51 @@ Best_Betas = pickle.load(open('Best_Betas.pkl', 'rb'))
 SPY_Betas_Raw = pickle.load(open('SPY_Betas_Raw.pkl', 'rb'))
 SPY_Betas_Scrubbed = pickle.load(open('SPY_Betas_Scrubbed.pkl', 'rb'))
 
+def get_total_return(stock, lookback):
+    stock_prices = PriceTable.loc[:, stock].head(lookback)
+    stock_prices = stock_prices[stock_prices.notnull()]
+    #print(stock_prices.to_string())
+    start_price = stock_prices.iloc[-1]
+    end_price = stock_prices.iloc[0]
+    total_return = end_price / start_price - 1
+    #print(start_price, end_price)
+    return total_return
+
+def get_num_days_above_cutoff(stock, lookback, cutoff, below_cutoff=False, absolute_value=False):
+    stock_prices = PriceTable.loc[:, stock].head(lookback)
+    stock_prices = stock_prices[stock_prices.notnull()]
+    returns = daily_returns(stock_prices)
+    if below_cutoff == False:
+        if absolute_value == False:
+            filtered_returns = returns[returns>cutoff]
+        else:
+            filtered_returns = returns[abs(returns)>cutoff]
+    else:
+        if absolute_value == False:
+            filtered_returns = returns[returns<cutoff]
+        else:
+            filtered_returns = returns[abs(returns)<cutoff]
+    
+    total_days = len(returns.tolist())
+    filtered_days = len(filtered_returns.tolist())
+    print(type(returns))
+    print(filtered_days, total_days)
+    return filtered_days / total_days
+
+num = get_num_days_above_cutoff('SPY', 450, .005, absolute_value = True)
+print(num)
+
+num = get_num_days_above_cutoff('SPY', 450, -.01, below_cutoff=True)
+print(num)
+
+
+
+
+
+
+#num = get_total_return('SPY', 400)
+#print(num)
+
 def merge_dfs_horizontally(dfs: 'list of dfs'):
     if len(dfs) == 1:
         return dfs[0]
@@ -96,8 +152,6 @@ def append_dfs_vertically(dfs: 'list of dfs'):
     else:
         return reduce(lambda x, y: x.append(y), dfs)
 
-def daily_returns(price_table: 'df of prices') -> 'df of daily_returns':
-    return price_table / price_table.shift(-1) - 1
 
 def tprint(*args):
     print("TPrint Here--------")
@@ -169,4 +223,3 @@ def show_mc_distributions_as_line_chart(mc_distributions, labels = None):
 
 if __name__ == '__main__':
     pass
-    #print(info.to_string())

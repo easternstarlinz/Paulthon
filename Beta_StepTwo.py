@@ -47,6 +47,7 @@ class Beta_StepTwo(Beta):
         self.stock_line = copy.deepcopy(StockLineBetaAdjusted(self.stock, self.lookback, beta_value, self.index))
         self.adjusted_returns = self.stock_line.adjusted_returns
         self.adjusted_returns_df_column_name = self.stock_line.adjusted_returns_df_column_name
+        print(self.stock, self.index) 
     
     """
     @property
@@ -72,37 +73,3 @@ class Beta_StepTwo(Beta):
             return self.daily_returns[abs(self.daily_returns[self.stock]) <= self.ScrubParams.stock_cutoff]
         else:
             return None
-
-
-#def __init__(self, stock: 'str', lookback: 'int', beta: 'float', index: 'str', base = None):
-
-if __name__ == '__main__':
-    stock = 'ABBV'
-    stock2 = 'PFE'
-    index = 'XLV'
-    beta_lookback = 252
-    chart_lookback = beta_lookback
-
-    base = 100
-    beta = Beta_StepTwo(stock, index, beta_lookback, ScrubParams(.075, .01, .8)).beta
-    beta2 = Beta_StepTwo(stock2, index, beta_lookback, ScrubParams(.075, .01, .8)).beta
-    #beta = Beta(stock, index, beta_lookback, ScrubParams(.075, .01, .8)).beta
-    #beta2 = Beta(stock2, index, beta_lookback, ScrubParams(.075, .01, .8)).beta
-#beta, beta2 = 0.0, 0.0
-
-# Stock Lines to plot
-    stock_line = StockLineSimple(stock, chart_lookback, base)
-    index_line = StockLineSimple(index, chart_lookback, base)
-    stock_line_adj = StockLineBetaAdjusted(stock, chart_lookback, beta, index, base)
-    tprint(stock_line_adj.prices_df.round(2))
-    
-    stock_line_adj2 = StockLineBetaAdjusted(stock2, chart_lookback, beta2, index, base)
-
-    stock_lines = [stock_line.stock_line(color = 'red'),
-                   index_line.stock_line(color = 'black'),
-                   stock_line_adj.stock_line(color = 'blue'),
-                   #stock_line_adj2.stock_line(color = 'c')
-                   ]
-    StockChart(stock_lines).run()
-
-    Beta(stock, index, beta_lookback, ScrubParams(.075, .01, .8)).show_scrub_trajectory()
