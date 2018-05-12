@@ -23,7 +23,7 @@ from decorators import my_time_decorator
 EarningsEvents = get_earnings_events()
 
 class Stock(object):
-    elagolix_info = pd.read_excel('CLVS_RiskScenarios.xlsx',
+    elagolix_info = pd.read_excel('CLVS_RiskScenarios2.xlsx',
                              header = [0],
                              index_col = [0,1],
                              sheet_name = 'Sub_States')
