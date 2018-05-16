@@ -6,6 +6,7 @@ from Timing_Module import get_time_to_expiry
 from Event_Module import Earnings, IdiosyncraticVol
 from decorators import my_time_decorator, empty_decorator
 from paul_resources import setup_standard_logger
+from statistics import mean
 
 NO_USE_TIMING_DECORATOR = True
 if NO_USE_TIMING_DECORATOR:
@@ -24,10 +25,11 @@ def optimally_get_mc_distribution_for_IdiosyncraticVol(event, expiry):
     default_vol = .10
     magnitude_mult = event.at_the_money_vol / default_vol
     time_mult = math.sqrt(get_time_to_expiry(expiry))
-    
+    #print('Time Mult:', time_mult)    
     mc_distribution = (IdiosyncraticVolDist - 1)*magnitude_mult*time_mult + 1
-
+    #print('Mean MC Dist:', np.mean(mc_distribution))
     logger.info('IdioVol: {}'.format(np.average(mc_distribution)))
+    print('MC Dist HERE', mc_distribution)
     return mc_distribution
 
 @my_time_decorator

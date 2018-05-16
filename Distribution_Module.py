@@ -1,3 +1,4 @@
+# Standard Packages
 import datetime as dt
 import pandas as pd
 import math
@@ -7,11 +8,15 @@ import copy
 import matplotlib.pyplot as plt
 from collections import namedtuple
 from statistics import mean
-from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array
-from decorators import my_time_decorator
-from py_vollib.black_scholes.implied_volatility import black_scholes, implied_volatility
-from Option_Module import get_time_to_expiry
 import logging
+from py_vollib.black_scholes.implied_volatility import black_scholes, implied_volatility
+
+# Paul Packages
+from Option_Module import get_time_to_expiry
+
+# Paul General Formulas
+from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array, to_pickle_and_CSV
+from decorators import my_time_decorator
 
 # Logging Setup
 logger = logging.getLogger(__name__)
@@ -251,11 +256,28 @@ class Distribution_MultiIndex(Distribution):
 def float_to_distribution(move_input: 'float', csv_file):
     distribution_df = pd.read_csv(csv_file).set_index('State')
     mean_move = Distribution(distribution_df).mean_move
-    distribution_df.loc[:, 'Pct_Move'] *= (move_input/mean_move)
-    distribution_df.loc[:, 'Relative_Price'] = distribution_df.loc[:, 'Pct_Move'] + 1
+    
+    # Old Way Using Pct Returns 
+    #distribution_df.loc[:, 'Pct_Move'] *= (move_input/mean_move)
+    #print(distribution_df)
+    #distribution_df.loc[:, 'Relative_Price'] = distribution_df.loc[:, 'Pct_Move'] + 1
+    
+    # New Way Using Natural Log Returns
+    distribution_df.loc[:, 'Relative_Price'] = np.exp(distribution_df.loc[:, 'Pct_Move']*move_input/mean_move)
+    distribution_df.loc[:, 'Pct_Move'] = distribution_df.loc[:, 'Relative_Price'] - 1
+    average_relative_price = Distribution(distribution_df).average_move + 1 # Normalize the Event Distribution (off due to natural log math?)
+    #print('Average Relative Price:', average_relative_price)
+    distribution_df.loc[:, 'Relative_Price'] *= (1/average_relative_price)
+    #print('HERE---------', distribution_df.loc[:, 'Relative_Price']) 
+    distribution_df.loc[:, 'Pct_Move'] = distribution_df.loc[:, 'Relative_Price'] - 1
+    #print('HERE---------', distribution_df.loc[:, 'Pct_Move']) 
+    #print(distribution_df)
+    
     #new_dist = Distribution(distribution_df)
     #print(new_dist.mean_move, new_dist.average_move, new_dist.straddle)
-    return Distribution(distribution_df)
+    dist = Distribution(distribution_df)
+    #print('Average Move:', dist.average_move)
+    return dist
 
 def float_to_event_distribution(move_input: 'float'):
     return float_to_distribution(move_input, 'Event.csv')
@@ -272,16 +294,17 @@ def distribution_info_to_distribution(distribution_info):
 
 def mc_distribution_to_distribution(mc_distribution,
                                     bins = 10**4+1,
-                                    to_csv=False,
-                                    csv_file_name = None):
+                                    to_file=False,
+                                    file_name = None):
     
-    mean_mc_price = mean(mc_distribution)
+    mean_mc_price = np.mean(mc_distribution)
     
     counts, binEdges = np.histogram(mc_distribution, bins)
     binCenters = .5*(binEdges[1:] + binEdges[:-1])
     
     probs = [i / sum(counts) for i in counts]
-    relative_moves = [binCenter / mean_mc_price for binCenter in binCenters]
+    #relative_moves = [binCenter / mean_mc_price for binCenter in binCenters]
+    relative_moves = [binCenter / 1.0 for binCenter in binCenters]
     pct_moves = [relative_move - 1 for relative_move in relative_moves]
 
     distribution_info = {'State': np.array(range(len(counts))),
@@ -289,9 +312,10 @@ def mc_distribution_to_distribution(mc_distribution,
                          'Pct_Move': pct_moves,
                          'Relative_Price': relative_moves}
 
-    if to_csv is True:
+    if to_file is True:
         distribution_df = distribution_info_to_distribution(distribution_info).distribution_df
-        distribution_df.to_csv(csv_file_name)
+        #distribution_df.to_csv(file_name)
+        to_pickle_and_CSV(distribution_df, file_name)
     
     logger.info("Iterations: {:,}".format(sum(counts)))
     logger.info("Total Prob: {:.2f}".format(sum(probs)))
