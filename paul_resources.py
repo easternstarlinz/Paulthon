@@ -5,13 +5,13 @@ import pickle
 import math
 import decimal
 import copy
-from functools import reduce
 import pprint
 import matplotlib.pyplot as plt
 import statsmodels.formula.api as sm
 import pylab
 import scipy.stats as ss
 import statsmodels.api as sm
+from functools import reduce
 from sklearn.linear_model import LinearRegression
 from decorators import my_time_decorator
 from ols import OLS
@@ -48,7 +48,6 @@ HealthcareSymbols = [i for i in HealthcareSymbols if i not in {'AAAP', 'BOLD', '
 Symbols = info.index.tolist()
 SP500Symbols = pd.read_html('https://en.wikipedia.org/wiki/List_of_S&P_500_companies')[0][0][1:].reset_index(drop=True).tolist()
 SP500Symbols = sorted([sym for sym in SP500Symbols if sym not in SymbolExcludes])
-
 
 BestBetas = pickle.load(open('best_betas.pkl', 'rb'))
 

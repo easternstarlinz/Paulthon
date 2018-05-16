@@ -30,7 +30,7 @@ class Stock(object):
 
     fda_meeting = Event('CLVS', .1, 'Q2_2018', 'FDA Meeting')
     data = Event('CLVS', Distribution(pd.read_csv('CLVS.csv')), 'Q2_2018', 'Ph3_Data')
-    elagolix = ComplexEvent('CLVS', Distribution_MultiIndex(elagolix_info), dt.date(2018,6,1), 'Elagolix Approval')
+    elagolix = ComplexEvent('CLVS', Distribution_MultiIndex(elagolix_info), dt.date(2018,5,15), 'Elagolix Approval')
     all_other_events = [data, fda_meeting, elagolix]
     
     vol_surface_spline_cache = {}

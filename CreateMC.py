@@ -37,7 +37,7 @@ def sum_mc_distributions(mc_distributions: 'list of mc_distributions'):
         if len(mc_distributions) > 1:
             return reduce(lambda x, y: np.multiply(x,y), mc_distributions)
         else:
-            return np.array(mc_distributions)
+            return np.array(mc_distributions[0])
     except Exception:
         print("MC Simulations have different iteration sizes.")
 
@@ -48,6 +48,7 @@ def get_total_mc_distribution_from_events(events, expiry = None, symbol = None, 
         return np.ones(mc_iterations)
     
     events = filter_events_before_expiry(events, expiry)
+    print('Events HERE', events)
     mc_distributions = [optimally_get_mc_distribution_for_event(evt, expiry) for evt in events]
     return sum_mc_distributions(mc_distributions)
 
@@ -74,7 +75,7 @@ def get_total_mc_distribution_from_events_vanilla(events, expiry = None, symbol 
     if not events:
         return np.ones(mc_iterations)
     
-    events = filter_events_before_expiry(events)
+    events = filter_events_before_expiry(events, expiry)
     distributions = get_distributions_from_events(events, expiry)
     mc_distributions = get_mc_distributions(distributions, mc_iterations)
     return sum_mc_distributions(mc_distributions)
