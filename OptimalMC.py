@@ -2,11 +2,16 @@ import datetime as dt
 from datetime import timedelta
 import numpy as np
 import math
+from statistics import mean
+
+# Paul Modules
 from Timing_Module import get_time_to_expiry
 from Event_Module import Earnings, IdiosyncraticVol
+
+# Paul Utility Functions
+#from paul_resources import setup_standard_logger
+from utility.general import setup_standard_logger
 from decorators import my_time_decorator, empty_decorator
-from paul_resources import setup_standard_logger
-from statistics import mean
 
 NO_USE_TIMING_DECORATOR = True
 if NO_USE_TIMING_DECORATOR:

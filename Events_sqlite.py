@@ -4,9 +4,13 @@ from datetime import timedelta
 import pickle
 import random
 import sqlite3
-from paul_resources import HealthcareSymbols, Symbols, to_pickle
-from decorators import my_time_decorator
+
 from Event_Module import Earnings
+
+#from paul_resources import HealthcareSymbols, Symbols, to_pickle
+from data.finance import Symbols, HealthcareSymbols
+from utility.general import to_pickle
+from decorators import my_time_decorator
 
 #conn = sqlite3.connect('earnings.db', check_same_thread=False)
 #conn = sqlite3.connect(':memory:')

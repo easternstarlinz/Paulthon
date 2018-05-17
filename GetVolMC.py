@@ -18,9 +18,12 @@ from Event_Module import IdiosyncraticVol, Earnings, TakeoutEvent, Event, SysEvt
 from Distribution_Module import Distribution, float_to_event_distribution, float_to_bs_distribution
 from CreateMC import get_total_mc_distribution_from_events, filter_events_before_expiry
 
-# Paul General Functions
+# Paul Utility Functions
 from decorators import my_time_decorator, empty_decorator
-from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array, setup_standard_logger
+#from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array, setup_standard_logger
+from data.finance import InformationTable
+from utility.general import tprint, rprint, setup_standard_logger
+from utility.graphing import get_histogram_from_array
 
 NO_USE_TIMING_DECORATOR = True
 if NO_USE_TIMING_DECORATOR:

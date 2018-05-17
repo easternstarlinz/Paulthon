@@ -7,6 +7,7 @@ from pprint import pprint
 from multiprocessing import Pool
 from multiprocessing.dummy import Pool as ThreadPool
 
+# Paul Modules
 from Option_Module import Option, get_option_price, get_implied_volatility, get_option_price
 from Timing_Module import Timing, event_prob_by_expiry
 from Event_Module import IdiosyncraticVol, TakeoutEvent, Earnings, Event, ComplexEvent, SysEvt_PresElection
@@ -17,19 +18,21 @@ from term_structure import term_structure
 from GetVolMC import get_vol_surface_from_events, get_vol_surface_spline, get_call_prices_from_events, get_option_sheet_from_events, get_term_structure
 from CreateMC import get_total_mc_distribution_from_events
 
-from paul_resources import TakeoutParams, Symbols
+# Paul Utility Functions
+#from paul_resources import TakeoutParams, Symbols
+from data.finance import TakeoutParams, Symbols
 from decorators import my_time_decorator
 
 EarningsEvents = get_earnings_events()
 
 class Stock(object):
-    elagolix_info = pd.read_excel('CLVS_RiskScenarios2.xlsx',
-                             header = [0],
-                             index_col = [0,1],
-                             sheet_name = 'Sub_States')
+    elagolix_info = pd.read_excel('/home/paul/Paulthon/Events/Parameters/CLVS_RiskScenarios2.xlsx',
+                                     header = [0],
+                                     index_col = [0,1],
+                                     sheet_name = 'Sub_States')
 
     fda_meeting = Event('CLVS', .1, 'Q2_2018', 'FDA Meeting')
-    data = Event('CLVS', Distribution(pd.read_csv('CLVS.csv')), 'Q2_2018', 'Ph3_Data')
+    data = Event('CLVS', Distribution(pd.read_csv('/home/paul/Paulthon/Events/Parameters/CLVS.csv')), 'Q2_2018', 'Ph3_Data')
     elagolix = ComplexEvent('CLVS', Distribution_MultiIndex(elagolix_info), dt.date(2018,5,15), 'Elagolix Approval')
     all_other_events = [data, fda_meeting, elagolix]
     
