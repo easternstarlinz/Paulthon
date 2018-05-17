@@ -1,7 +1,7 @@
-import pandas as pd
-import numpy as np
 import datetime as dt
 from datetime import timedelta
+import numpy as np
+import pandas as pd
 import math
 import random
 import copy
@@ -10,13 +10,21 @@ from functools import reduce
 from scipy.interpolate import interp1d, UnivariateSpline
 from collections import namedtuple
 import logging
-from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array, setup_standard_logger
-from decorators import my_time_decorator, empty_decorator
+
+
+# Paul Resources
 from Option_Module import Option, OptionPrice, OptionPriceMC, get_implied_volatility, get_time_to_expiry
 from Timing_Module import event_prob_by_expiry
 from Event_Module import IdiosyncraticVol, Earnings, TakeoutEvent, Event, SysEvt_PresElection
 from Distribution_Module import Distribution, float_to_event_distribution, float_to_bs_distribution
 from OptimalMC import optimally_get_mc_distribution_for_event
+
+# Paul Utility Functions
+#from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array, setup_standard_logger
+from data.finance import InformationTable
+from utility.general import tprint, rprint, setup_standard_logger
+from utility.graphing import get_histogram_from_array
+from decorators import my_time_decorator, empty_decorator
 
 NO_USE_TIMING_DECORATOR = True
 if NO_USE_TIMING_DECORATOR:

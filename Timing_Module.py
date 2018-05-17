@@ -1,23 +1,27 @@
 import datetime as dt
+from datetime import timedelta
+import numpy as np
 import pandas as pd
 from pandas.tseries.offsets import BDay
 import math
-import numpy as np
+from statistics import mean
+from collections import namedtuple
 import random
 import copy
 from pprint import pprint
 from ppretty import ppretty
-import datetime as dt
-from datetime import timedelta
 import matplotlib.pyplot as plt
-from collections import namedtuple
-from statistics import mean
 from py_vollib.black_scholes.implied_volatility import black_scholes, implied_volatility
 import logging
 
+# Paul Modules
 from Option_Module import get_time_to_expiry
 from Distribution_Module import Distribution, float_to_distribution
-from paul_resources import InformationTable, tprint, rprint
+
+# Paul General Utility Functions
+##from paul_resources import InformationTable, tprint, rprint
+from data.finance import InformationTable
+from utility.general import tprint, rprint
 from decorators import my_time_decorator
 
 
@@ -38,18 +42,18 @@ logger.addHandler(file_handler)
 today = pd.datetime.today()
 
 
-descriptors = pd.read_csv('TimingDescriptors.csv')
+descriptors = pd.read_csv('/home/paul/Paulthon/Events/Parameters/Timing/TimingDescriptors.csv')
 
-TimingMappings = pd.read_excel('TimingMappings.xlsx',
-                         header = [0,1],
-                         index_col = [0,1],
-                         sheet_name = 'TimingMappings')
+TimingMappings = pd.read_excel('/home/paul/Paulthon/Events/Parameters/Timing/TimingMappings.xlsx',
+                                 header = [0,1],
+                                 index_col = [0,1],
+                                 sheet_name = 'TimingMappings')
 TimingMappings = TimingMappings.reset_index().set_index('level_1').loc[:, ['Start', 'End']]
 
-mappings = pd.read_excel('TimingMappings.xlsx',
-                         header = [0,1],
-                         index_col = [0,1],
-                         sheet_name = 'TimingMappings')
+mappings = pd.read_excel('/home/paul/Paulthon/Events/Parameters/Timing/TimingMappings.xlsx',
+                             header = [0,1],
+                             index_col = [0,1],
+                             sheet_name = 'TimingMappings')
 
 def validate_date_string(date_text):
     try:

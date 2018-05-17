@@ -8,6 +8,7 @@ from multiprocessing import Pool
 from multiprocessing.dummy import Pool as ThreadPool
 import warnings
 
+# Paul Modules
 from Stock_Module import Stock
 from Option_Module import Option, get_option_price, get_implied_volatility, get_option_price
 from Timing_Module import Timing, event_prob_by_expiry
@@ -18,7 +19,9 @@ from timeline_chart import get_event_timeline
 from term_structure import term_structure
 from GetVolMC import get_vol_surface_from_events, get_vol_surface_spline, get_call_prices_from_events, get_option_sheet_from_events, get_term_structure
 from CreateMC import get_total_mc_distribution_from_events
-from paul_resources import TakeoutParams, Symbols
+
+# Paul Utility Functions
+from data.finance import TakeoutParams, Symbols
 from decorators import my_time_decorator, empty_decorator
 
 NO_USE_TIMING_DECORATOR = False

@@ -3,14 +3,20 @@ pd.options.mode.chained_assignment = None
 import datetime as dt
 from functools import reduce
 from pprint import pprint
-from paul_resources import show_mc_distributions_as_line_chart
-from decorators import my_time_decorator
+
+
+# Paul Modules
 from Option_Module import Option, OptionPriceMC
 from Timing_Module import Timing
 from Event_Module import Event, IdiosyncraticVol, Earnings, TakeoutEvent, ComplexEvent, SysEvt_PresElection
 from Distribution_Module import Distribution, Distribution_MultiIndex
 #from biotech_class_run import get_total_mc_distribution, get_option_sheet_from_mc_distribution, option_sheet
 from biotech_class_run import get_total_mc_distribution, get_option_sheet_from_mc_distribution
+
+# Paul Utility Functions
+#from paul_resources import show_mc_distributions_as_line_chart
+from utility.graphing import show_mc_distributions_as_line_chart
+from decorators import my_time_decorator
 
 # Logging Setup
 import logging
@@ -40,7 +46,7 @@ expiries = [expiry1, expiry2, expiry3, expiry4, expiry5, expiry6]
 expiries = [expiry1, expiry3, expiry5]
 expiries = [expiry3]
 
-elagolix_info = pd.read_excel('CLVS_RiskScenarios.xlsx',
+elagolix_info = pd.read_excel('/home/paul/Paulthon/Events/Parameters/CLVS_RiskScenarios.xlsx',
                          header = [0],
                          index_col = [0,1],
                          sheet_name = 'Sub_States')

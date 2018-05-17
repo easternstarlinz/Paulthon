@@ -9,11 +9,16 @@ from collections import namedtuple
 from statistics import mean
 from py_vollib.black_scholes.implied_volatility import black_scholes, implied_volatility
 
-from decorators import my_time_decorator
+# Paul Modules
 from Option_Module import get_time_to_expiry
 from Timing_Module import Timing, event_prob_by_expiry
 from Distribution_Module import Distribution, Distribution_MultiIndex, float_to_event_distribution, float_to_bs_distribution, float_to_volbeta_distribution, get_no_event_distribution
-from paul_resources import InformationTable, tprint, rprint
+
+# Paul Utility Functions
+##from paul_resources import InformationTable, tprint, rprint
+from data.finance import InformationTable, TakeoutBuckets
+from utility.general import tprint, rprint
+from decorators import my_time_decorator
 
 import logging
 
@@ -374,8 +379,9 @@ class TakeoutEvent(GeneralEvent):
     mult = 1.0
     instances = []
     
-    takeout_buckets = pd.read_csv('TakeoutBuckets.csv')
-    takeout_buckets.set_index('Rank', inplace=True)
+    #takeout_buckets = pd.read_csv('TakeoutBuckets.csv')
+    #takeout_buckets.set_index('Rank', inplace=True)
+    takeout_buckets = TakeoutBuckets
 
     base_takeout_premium = .35
     base_mcap = 8750

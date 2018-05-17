@@ -15,7 +15,10 @@ from py_vollib.black_scholes.implied_volatility import black_scholes, implied_vo
 from Option_Module import get_time_to_expiry
 
 # Paul General Formulas
-from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array, to_pickle_and_CSV
+#from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array, to_pickle_and_CSV
+from data.finance import InformationTable
+from utility.general import tprint, rprint, to_pickle_and_CSV
+from utility.graphing import get_histogram_from_array
 from decorators import my_time_decorator
 
 # Logging Setup
@@ -280,13 +283,13 @@ def float_to_distribution(move_input: 'float', csv_file):
     return dist
 
 def float_to_event_distribution(move_input: 'float'):
-    return float_to_distribution(move_input, 'Event.csv')
+    return float_to_distribution(move_input, '/home/paul/Paulthon/Events/Distributions/Event.csv')
 
 def float_to_volbeta_distribution(move_input: 'float'):
-    return float_to_distribution(move_input, 'VolbetaDistribution.csv')
+    return float_to_distribution(move_input, '/home/paul/Paulthon/Events/Distributions/VolbetaDistribution.csv')
 
 def float_to_bs_distribution(move_input: 'float'):
-    return float_to_distribution(move_input, 'BlackScholes.csv')
+    return float_to_distribution(move_input, '/home/paul/Paulthon/Events/Distributions/BlackScholes.csv')
 
 def distribution_info_to_distribution(distribution_info):
     distribution_df = pd.DataFrame(distribution_info).set_index('State').loc[:, ['Prob', 'Pct_Move', 'Relative_Price']]
@@ -347,5 +350,3 @@ if __name__ == '__main__':
     mc_distribution = bs_distribution_original.mc_simulation(10**6)
     bs_distribution_created = mc_distribution_to_distribution(mc_distribution)
     print("Created: {:.2f}".format(bs_distribution_created.mean_move))
-
-# IS IT BAD THAT DISTRIBUTION_MODULE IMPORT DISTRIBUTION TRANSFORMS WHICH IMPORTS DISTRIBUTIONMODULE?

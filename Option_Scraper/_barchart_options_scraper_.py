@@ -9,10 +9,11 @@ from  more_itertools import unique_everseen
 import requests
 from bs4 import BeautifulSoup as bs
 import re
+import requests
 
 import sys
 sys.path.append('/home/paul/Paulthon')
-from paul_resources import to_pickle_and_CSV
+from utility.general import to_pickle
 
 # Outdatedbrowser fix
 #firefox_capabilities = DesiredCapabilities.FIREFOX
@@ -45,26 +46,52 @@ class barchart_options():
     # extract expiry dates
     # --------------------------------------------
     def _extract_expiry_dates(self):
-        #print(self.base_SRC.prettify)
-        print(type(self.base_SRC))
-        raw_date_links = []
-        #for link in self.base_SRC.find_all('select'):
-        for link in self.base_SRC.find_all():
-        #for link in self.base_SRC.find_all('select', href=re.compile(r'data-broadcast-on-change data-on-change'), class_=lambda x: x != 'story-link'):
-        #for link in self.base_SRC.find_all('a', href=True):
-            #options = link.find_all('option').attrs.values()
-            #print(self.symbol)
-            to_pickle_and_CSV(link, 'barchart')
-            #print(options)
-            raw_date_links.append(list(link.attrs.values())[0])
-
-        reg_exp = r'[A-z]{3}-\d{2}-\d{4}'
-        dates = []
+        url = self.basic_URL
+        headers = {'user-agent': 'Mozilla/5.0'}
+        print(url, headers)
+        response = requests.get(url, headers=headers)
+        print(response.content)
+        print(len(response.content))
+        print(type(response.content))
+        with open('barchart.txt', 'w') as f:
+            f.write(str(response.content))
+        print("base_SRC: ", len(self.base_SRC))
+        
+        
+        
+        """
+        with open('barchart.txt', 'w') as f:
+            print('Hello Suzie')
+            f.write('Hello World')
+            f.write('Hello Paul')
+            print('Hello Jeremy Quentzel')
+            #print('Hello Jeremy', type(self.base_SRC.find_all().text))
+            print(len(self.base_SRC.find_all()))
+            print(type(self.base_SRC.find_all()))
+            print(type(str(self.base_SRC.find_all())))
+            #print(str(self.base_SRC.find_all()))
+            #print(self.base_SRC.prettify)
+            print(type(self.base_SRC))
+            raw_date_links = []
+            #for link in self.base_SRC.find_all('select'):
+            for link in self.base_SRC.find_all():
+            #for link in self.base_SRC.find_all('select', href=re.compile(r'data-broadcast-on-change data-on-change'), class_=lambda x: x != 'story-link'):
+            #for link in self.base_SRC.find_all('a', href=True):
+                #options = link.find_all('option').attrs.values()
+                #print(self.symbol)
+                #print(options)
+                #raw_date_links.append(list(link.attrs.values())[0])
+                #print('Hello Paul', type(str(link)))
+                f.write(str(link))
+             
+            reg_exp = r'[A-z]{3}-\d{2}-\d{4}'
+            dates = []
         for raw_date in raw_date_links:
             #print(raw_date_links)
             ms = re.search(reg_exp, raw_date)
             dates.append(ms.group())
         return list(unique_everseen(dates))
+        """
     # --------------------------------------------
     # get option greeks source data
     # --------------------------------------------
