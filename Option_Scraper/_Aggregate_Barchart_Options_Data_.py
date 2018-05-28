@@ -52,7 +52,11 @@ logpath = datapath + r''
 #datapath = r"..\YOUR_PROJECT_DIR\Barchart_Options_Data\\"
 #logpath = datapath + r'Barchart_OptionsData_LogFiles\\'
 
-logging.basicConfig(filename=logpath + 'BRC_Options_Log_{}.log'.format(today),
+#logging.basicConfig(filename=logpath + 'BRC_Options_Log_{}.log'.format(today),
+#                    format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',
+#                    level=logging.INFO)
+
+logging.basicConfig(filename='Log.log',
                     format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',
                     level=logging.INFO)
 # ------------------------------------------ \\\\

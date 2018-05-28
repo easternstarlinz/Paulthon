@@ -21,7 +21,7 @@ import logging
 from ols import OLS
 from ols2 import OLS as MainOLS
 
-# File saving utility functions
+# File Saving Utility Functions
 def to_pickle(content, file_name):
     pickle_file = open('{}.pkl'.format(file_name), 'wb')
     pickle.dump(content, pickle_file, pickle.HIGHEST_PROTOCOL)
@@ -31,7 +31,7 @@ def to_pickle_and_CSV(content, file_name):
     to_pickle(content, file_name)
     content.to_csv("{}.csv".format(file_name))
 
-# Logging utility function
+# Logging Utility Function
 def setup_standard_logger(file_name):
     # Logging Setup
     logger = logging.getLogger(__name__)
@@ -45,12 +45,12 @@ def setup_standard_logger(file_name):
     logger.addHandler(file_handler)
     return logger
 
-# DataFrame utility functions
-def merge_dfs_horizontally(dfs: 'list of dfs'):
+# DataFrame Utility Functions
+def merge_dfs_horizontally(dfs: 'list of dfs', suffixes=('_x', '_y')):
     if len(dfs) == 1:
         return dfs[0]
     else:
-        return reduce(lambda x, y: pd.merge(x, y, left_index=True, right_index=True), dfs)
+        return reduce(lambda x, y: pd.merge(x, y, left_index=True, right_index=True, suffixes=suffixes), dfs)
 
 def append_dfs_vertically(dfs: 'list of dfs'):
     if len(dfs) == 1:
@@ -58,7 +58,7 @@ def append_dfs_vertically(dfs: 'list of dfs'):
     else:
         return reduce(lambda x, y: x.append(y), dfs)
 
-# Printing utility functions
+# Printing Utility Functions
 def tprint(*args):
     print("TPrint Here--------")
     for arg in args:
