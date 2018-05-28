@@ -7,11 +7,11 @@ import requests
 from bs4 import BeautifulSoup
 import sys
 sys.path.append('/home/paul/Paulthon')
-from utility.general import tprint, merge_dfs_horizontally, append_dfs_vertically, to_pickle_and_CSV
+from utility.general import tprint, merge_dfs_horizontally, append_dfs_vertically, to_pickle_and_CSV, to_pickle
 from decorators import profile
 
 SLEEP_TOGGLE = True
-GREEKS_PAGE_LOAD_TIMEOUT = 60
+GREEKS_PAGE_LOAD_TIMEOUT = 90
 
 
 class Chrome_Crawler():
@@ -73,9 +73,9 @@ class Barchart_Crawler(Chrome_Crawler):
             self.close_driver()
 
             if expiries:
-                    return expiries
+                return expiries
             else:
-                    return False
+                return False
 
         def get_base_markup(self, expiry, display=False):
             try:
@@ -130,6 +130,20 @@ class Barchart_Crawler(Chrome_Crawler):
             markup = self.get_base_markup(expiry, display=display)
             soup = BeautifulSoup(markup[INDEX], 'lxml')
             df = pd.read_html(str(soup.find_all('table')))[0].set_index('Strike').loc[:, self.base_reidx_cols]
+            
+            # Drop the bottom row?
+            #print(df.iloc[-1, 0])
+            #print(self.base_reidx_cols)
+            if df.iloc[-1, 0] == self.base_reidx_cols[0]:
+                df = df[:-1]
+            
+            # Transform 'Strike' values to floats
+            df.index = df.index.astype(float)
+            
+            print('================')
+            print(df)
+            df.astype(float)
+            
             return df
         
         def create_greeks_df(self, expiry, option_type='Call', display=False):
@@ -138,13 +152,14 @@ class Barchart_Crawler(Chrome_Crawler):
             soup = BeautifulSoup(markup[INDEX], 'lxml')
             df = pd.read_html(str(soup.find_all('table')))[0].set_index('Strike').loc[:, self.greeks_reidx_cols]
             
-            # Drop the bottom row
-            df = df[:-1]
+            print('---------Greeks df------------')
+            print(df)
+            # Drop the bottom row?
+            if df.iloc[-1, 0] == self.greeks_reidx_cols[0]:
+                df = df[:-1]
 
             # Transform 'Strike' values to floats
-            index = df.index.tolist()
-            index = [float(i) for i in index]
-            df.index = index
+            df.index = df.index.astype(float)
             
             # Transform 'Delta' values to floats
             deltas = df['Delta'].tolist()
@@ -153,20 +168,25 @@ class Barchart_Crawler(Chrome_Crawler):
 
             # Transform 'IV' values to floats
             vols = df['IV'].tolist()
-            vols = [float(i[:-1]) for i in vols]
+            vols = [float(i[:-1])/100 for i in vols]
             df['IV'] = vols
             
+            # Clean Column Labels
             #cols = list(df)
             #cols_cleaned = [col.strip() for col in cols]
             #df.columns = cols_cleaned
+            
+            print('++++++++++++++++++++++++++')
+            print(df)
+            to_pickle(df, 'greeks_df')
             return df
         
-        def create_combined_df(self, expiry, option_type='Call'):
-            base_df = self.create_base_df(expiry, option_type)
+        def create_combined_df(self, expiry, option_type='Call', display=False):
+            base_df = self.create_base_df(expiry, option_type, display=display)
             print(base_df.to_string())
             to_pickle_and_CSV(base_df, 'base')
             
-            greeks_df = self.create_greeks_df(expiry, option_type)
+            greeks_df = self.create_greeks_df(expiry, option_type, display=display)
             print(greeks_df.to_string())
             to_pickle_and_CSV(greeks_df, 'greeks')
             
@@ -175,15 +195,15 @@ class Barchart_Crawler(Chrome_Crawler):
             to_pickle_and_CSV(combined_df, 'combined')
             return combined_df
         
-        def create_calls_and_puts_df(self, expiry):
+        def create_calls_and_puts_df(self, expiry, display=False):
             try:    
                 print('Trying calls and puts cache')
                 print(self.calls_and_puts_cache)
                 return self.calls_and_puts_cache[self.symbol]
             
             except:
-                calls_df = self.create_combined_df(expiry, 'Call')
-                puts_df = self.create_combined_df(expiry, 'Put')
+                calls_df = self.create_combined_df(expiry, 'Call', display=display)
+                puts_df = self.create_combined_df(expiry, 'Put', display=display)
                 
                 to_pickle_and_CSV(calls_df, 'calls')
                 to_pickle_and_CSV(puts_df, 'puts')
@@ -212,16 +232,16 @@ class Barchart_Crawler(Chrome_Crawler):
             return vol
 
 
-@profile        
+#@profile        
 def run_barchart_crawler():             
     if __name__ == '__main__':
         # Run spider
-        stock = Barchart_Crawler('PEP')
-        df = stock.create_greeks_df('2018-07-20', display=True)
+        stock = Barchart_Crawler('XBI')
+        df = stock.create_calls_and_puts_df('2018-09-21', display=False)
         print(df)
-        atm_vol = stock.at_the_money_vol('2018-07-20')
-        put_vol = stock.put_vol('2018-07-20')
-        print('ATM Vol: {:.2f}, Put Vol: {:.2f}'.format(atm_vol, put_vol))
+        #atm_vol = stock.at_the_money_vol('2018-07-20')
+        #put_vol = stock.put_vol('2018-07-20')
+        #print('ATM Vol: {:.2f}, Put Vol: {:.2f}'.format(atm_vol, put_vol))
         #greeks = spy.create_call_greeks_df('2018-07-20')
         #print(greeks)
         #call_data = spy.create_base_call_df('2018-07-20')

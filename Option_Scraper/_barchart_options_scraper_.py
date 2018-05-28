@@ -14,6 +14,7 @@ import requests
 import sys
 sys.path.append('/home/paul/Paulthon')
 from utility.general import to_pickle
+from crawler.crawlers.barchart_expiries_spider import Barchart_Expiries
 
 # Outdatedbrowser fix
 #firefox_capabilities = DesiredCapabilities.FIREFOX
@@ -46,6 +47,9 @@ class barchart_options():
     # extract expiry dates
     # --------------------------------------------
     def _extract_expiry_dates(self):
+        return Barchart_Expiries(self.symbol).parse()
+        
+        """
         url = self.basic_URL
         headers = {'user-agent': 'Mozilla/5.0'}
         print(url, headers)
@@ -56,8 +60,8 @@ class barchart_options():
         with open('barchart.txt', 'w') as f:
             f.write(str(response.content))
         print("base_SRC: ", len(self.base_SRC))
-        
-        
+        """
+           
         
         """
         with open('barchart.txt', 'w') as f:
