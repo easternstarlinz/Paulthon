@@ -21,6 +21,7 @@ Long/Short Portfolio based on Options Flows:
     - V: 10, S: 10, U: 8
     - Would need to create the correct framework and test before knowing if there is a signal.
     - What would be the best platform to do this?
+    - (Same idea but combined with a hedge fund with fundamental analysis)
 
 Parameterized System for Stock Events and Portfolio Construction:
     - V: 10, S: 7, U: 10
@@ -43,13 +44,12 @@ Betas:
     - V: 7, S: 7, U: 8
     - Better betas (higher R-squared)
     - View into highest correlated index for each symbol (based on R-squared)
-    - Betas and Correlations to all indices of interest
     - Valuable for risk-management of a long short book
 
 Stock Graphs:
     - V: 9, S: 7, U: 9
     - Stock graphs that adjust for the index move
-    - Extremely valuable for assessing relative performance of an asset, numerically and visually
+    - Valuable for assessing relative performance of a stock, numerically and visually
 
 Earnings Magnitude Metrics:
     - V: 5, S: 8, U: 7
@@ -58,6 +58,7 @@ Earnings Magnitude Metrics:
 Position Sizing:
     - V: 4, S: 9, U: 4
     - Extended Kelly Criterion for position sizing optimization
+    - Sizing criteria for event and non-event driven ideas
 ----------------------------------------------------------------------------------
 
 
