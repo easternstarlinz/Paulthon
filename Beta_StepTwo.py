@@ -16,12 +16,14 @@ import scipy.stats as ss
 import statsmodels.api as sm
 from ols import OLS
 from ols2 import OLS as MainOLS
-from paul_resources import PriceTable, daily_returns, tprint
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 import copy
 from beta_class import Beta, ScrubParams
 from StockLine_Module import StockLineSimple, StockLineBetaAdjusted, StockChart
 
+from utility.general import tprint
+from data.finance import PriceTable
+from utility.finance import daily_returns
 if __name__ == '__Main__':
     stock = 'ABBV'
     index = 'XLV'

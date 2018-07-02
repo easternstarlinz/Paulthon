@@ -19,11 +19,10 @@ from Distribution_Module import Distribution, float_to_event_distribution, float
 from CreateMC import get_total_mc_distribution_from_events, filter_events_before_expiry
 
 # Paul Utility Functions
-from decorators import my_time_decorator, empty_decorator
-#from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array, setup_standard_logger
-from data.finance import InformationTable
-from utility.general import tprint, rprint, setup_standard_logger
+from utility.decorators import my_time_decorator, empty_decorator
+from utility.general import tprint, rprint, setup_standard_logger, merge_dfs_horizontally
 from utility.graphing import get_histogram_from_array
+from data.finance import InformationTable
 
 NO_USE_TIMING_DECORATOR = True
 if NO_USE_TIMING_DECORATOR:
@@ -66,23 +65,41 @@ def get_call_IVs(call_options, call_prices):
 
 @my_time_decorator
 def get_option_sheet_df(options, content, content_label = 'IV'):
+    """This function takes a list of option contracts and content (prices or implied vols), and creates a DataFrame with the information"""
+
+    # Extract the expiry from the first option contract (all contracts should have the same expiry date and only vary by strike)
     expiry = options[0].Expiry
+    
+    # Extract the strikes
     strikes = [option.Strike for option in options]
+    
+    # Extract the content; should already be a list
     content = list(content)
+    
+    # Define row and column labels for the DataFrame
     index_r = pd.Index(strikes, name = 'Strike')
     iterables_c = [[expiry], [content_label]]
     index_c = pd.MultiIndex.from_product(iterables_c, names = ['Expiry', 'Option_Info'])
+    
+    # Create the DataFrame
     df = pd.DataFrame(content, index = index_r, columns = index_c)
-    return df[df[(expiry, content_label)] > .0025].round(4)
+    
+    # This line makes sense for a single expiry, but it returns an Empty DataFrame when I merge multiple expiries together that don't have the same rows.
+    #df = df[df[(expiry, content_label)] > .0025].round(4)
+    return df
     return pd.DataFrame(content, index = index_r, columns = index_c).round(3)
 
 @my_time_decorator
 def get_vol_surface_df(call_options, call_IVs):
-    return get_option_sheet_df(call_options, call_IVs, 'IV')
+    return get_option_sheet_df(options = call_options,
+                               content = call_IVs,
+                               content_label = 'IV')
 
 @my_time_decorator
 def get_call_prices_df(call_options, call_prices):
-    return get_option_sheet_df(call_options, call_prices, 'Call_Price')
+    return get_option_sheet_df(options = call_options,
+                               content = call_prices,
+                               content_label = 'Call_Price')
 
 call_prices_cache = {}
 @my_time_decorator
@@ -147,7 +164,7 @@ def get_vol_surface_from_events(events, expiry, strikes = None, pretty = False):
 
     call_options, call_prices = get_call_prices_from_events(events, expiry, strikes = strikes, pretty = False)
     call_IVs = get_call_IVs(call_options, call_prices)
-    
+
     if pretty == True:
         return get_vol_surface_df(call_options, call_IVs) 
     else:
@@ -173,7 +190,7 @@ def get_vol_surface_spline(vol_surface):
 
 @my_time_decorator
 def get_term_structure(events, expiries, strikes, mc_iterations = 10**5):
-    """Events -> Event Groupings by Expiry -> Vol_Surfaces by Expiry"""
+    """Events -> Event Groupings by Expiry -> Vol_Surfaces by Expiry -> a DataFrame showing all expiries"""
     if strikes is None:
         strikes = np.arange(.5, 1.5, .025)
     
@@ -181,7 +198,7 @@ def get_term_structure(events, expiries, strikes, mc_iterations = 10**5):
     implied_vols = [get_vol_surface_from_events(event_grouping, expiry, strikes = strikes, pretty = True) for event_grouping, expiry in zip(event_groupings, expiries)]
     
     logger.debug('Term Structure ran successfully.')
-    return reduce(lambda x,y: pd.merge(x, y, left_index=True, right_index=True), implied_vols)
+    return merge_dfs_horizontally(implied_vols)
 
 """
 @my_time_decorator

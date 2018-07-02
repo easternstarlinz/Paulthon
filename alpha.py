@@ -6,7 +6,7 @@ import math
 from operator import mul
 from functools import reduce
 import matplotlib.pyplot as plt
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 from paul_resources import HealthcareSymbols, BestBetas, info
 
 def get_total_return(df: 'df of prices'):

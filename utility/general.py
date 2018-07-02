@@ -13,7 +13,7 @@ import scipy.stats as ss
 import statsmodels.api as sm
 from functools import reduce
 from sklearn.linear_model import LinearRegression
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 from scipy.interpolate import interp1d, UnivariateSpline
 import logging
 

@@ -26,7 +26,8 @@ Long/Short Portfolio based on Options Flows:
 Parameterized System for Stock Events and Portfolio Construction:
     - V: 10, S: 7, U: 10
     - Self-maintaining, highly descriptive, well-designed parameter system
-    - Quantiative AND qualitative insights for trader using the system
+    - Smart way of handling for the passing of time
+    - Concise quantiative and qualitative insights for trader using the system
     - Timeline Chart shows upcoming events and magnitude
 
 Volatility Forecast:
@@ -62,18 +63,11 @@ Position Sizing:
 ----------------------------------------------------------------------------------
 
 
-If I were to form a mutually beneficial partership with a Portfolio Manager, what could I offer in exchange for their stock specific knowledge and event timeline?
+What can I offer PMs/analysts in exchange for their domain knowledge?
     - Option Flows for their symbols and my insights
-    - Betas for all Symbols
+    - Betas, Stock Graphs
     - System for organizing stock events, mutually shared.
 
-Potential Relationships:
+Relationships:
     - Andrew Han
     - Jay Cecil
-    - Ray Kim
-    - Mike Ferrier
-    - 
-
-Questions:
-    - If they are employed elsewhere, can I monetarily pay them?
-

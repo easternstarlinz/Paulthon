@@ -1,6 +1,6 @@
 from Event_Module import Earnings
 import datetime as dt
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 
 event = Earnings('CRBP', .075, 'Q2_2018')
 

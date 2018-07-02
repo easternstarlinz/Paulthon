@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from collections import namedtuple
 from statistics import mean
 from paul_resources import InformationTable, tprint, rprint, setup_standard_logger
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 from py_vollib.black_scholes.implied_volatility import black_scholes, implied_volatility
 from Option_Module import get_time_to_expiry
 

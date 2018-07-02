@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d, UnivariateSpline, InterpolatedUnivariateSpline
 import matplotlib.pyplot as plt
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 from statistics import mean
 from Option_Module import Option, OptionPriceMC
 from Distribution_Module import float_to_volbeta_distribution

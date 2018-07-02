@@ -16,7 +16,9 @@ from biotech_class_run import get_total_mc_distribution, get_option_sheet_from_m
 # Paul Utility Functions
 #from paul_resources import show_mc_distributions_as_line_chart
 from utility.graphing import show_mc_distributions_as_line_chart
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
+
+from stock_events import all_other_events
 
 # Logging Setup
 import logging
@@ -34,7 +36,6 @@ logger.addHandler(stream_handler)
 
 sorted_events = [IdiosyncraticVol('CLVS', .1)]
 # Define Expiries
-expiry1 = dt.date(2018, 5, 21)
 expiry2 = dt.date(2018, 6, 21)
 expiry3 = dt.date(2018, 7, 21)
 expiry4 = dt.date(2018, 8, 21)
@@ -42,9 +43,9 @@ expiry5 = dt.date(2018, 9, 21)
 expiry6 = dt.date(2018, 10, 21)
 expiry7 = dt.date(2018, 11, 21)
 expiry8 = dt.date(2018, 12, 21)
-expiries = [expiry1, expiry2, expiry3, expiry4, expiry5, expiry6]
-expiries = [expiry1, expiry3, expiry5]
-expiries = [expiry3]
+expiries = [expiry2, expiry3, expiry4, expiry5, expiry6]
+expiries = [expiry3, expiry5, expiry7]
+#expiries = [expiry3]
 
 elagolix_info = pd.read_excel('/home/paul/Paulthon/Events/Parameters/CLVS_RiskScenarios.xlsx',
                          header = [0],
@@ -68,15 +69,18 @@ for i in range(len(events)):
 event_groupings = [events_bid, events, events_ask, events_high_POS, events_low_POS, events_max_optionality]
 event_grouping_names = ['Bid', 'Mid', 'Ask', 'Elagolix - High P.O.S.', 'Elagolix - Low P.O.S.', 'Event - Max Optionality']
 
-
-def term_structure(events, expiries, metric = 'IV', mc_iterations = 10**5):
+events = all_other_events
+def term_structure(events, expiries, metric = 'IV', mc_iterations = 10**6):
     mc_distributions = list(map(lambda expiry: get_total_mc_distribution(events, expiry, mc_iterations=mc_iterations), expiries))
+    print(len(mc_distributions))
+    print(events)
+    print(expiries)
+    show_mc_distributions_as_line_chart(mc_distributions, labels = expiries)
     implied_vols = list(map(lambda dist, expiry: get_option_sheet_from_mc_distribution(dist, expiry).loc[:, [(expiry, metric)]], mc_distributions, expiries))
-    #show_mc_distributions_as_line_chart(mc_distributions, labels = expiries)
     return reduce(lambda x,y: pd.merge(x, y, left_index=True, right_index=True), implied_vols)
 
-#term_structure = term_structure(events, expiries, 'IV', mc_iterations=10**6)
-#print(term_structure.round(3))
+term_structure = term_structure(events, expiries, 'IV', mc_iterations=10**6)
+print(term_structure.round(3))
 #expiry = dt.date(2018, 6, 15)
 #mc_iterations = 10**6
 #option_info = option_sheet(event_groupings.values(), expiry, mc_iterations)

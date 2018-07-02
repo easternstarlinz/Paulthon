@@ -24,7 +24,7 @@ from OptimalMC import optimally_get_mc_distribution_for_event
 from data.finance import InformationTable
 from utility.general import tprint, rprint, setup_standard_logger
 from utility.graphing import get_histogram_from_array
-from decorators import my_time_decorator, empty_decorator
+from utility.decorators import my_time_decorator, empty_decorator
 
 NO_USE_TIMING_DECORATOR = True
 if NO_USE_TIMING_DECORATOR:

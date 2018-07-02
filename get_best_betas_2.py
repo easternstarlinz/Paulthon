@@ -4,14 +4,20 @@ import math
 import pickle
 from functools import reduce
 import itertools
-from paul_resources import HealthcareSymbols, SP500Symbols, Symbols, tprint, PriceTable, daily_returns, setup_standard_logger, ETF_PriceTable, merge_dfs_horizontally, append_dfs_vertically, to_pickle_and_CSV, get_ETF_beta_to_SPY, get_total_return
 from beta_class import ScrubParams, Beta
-from decorators import my_time_decorator, empty_decorator
 from collections import namedtuple
 from multiprocessing import Pool
 from multiprocessing.dummy import Pool as ThreadPool
-from ETFs import indices as ETFs
+from data.ETFs import indices as ETFs
 from Beta_StepTwo import Beta_StepTwo
+
+# Paul Resources
+#from paul_resources import HealthcareSymbols, SP500Symbols, Symbols, tprint, PriceTable, daily_returns, setup_standard_logger, ETF_PriceTable, merge_dfs_horizontally, append_dfs_vertically, to_pickle_and_CSV, get_ETF_beta_to_SPY, get_total_return
+
+from utility.decorators import my_time_decorator, empty_decorator
+from data.finance import PriceTable, HealthcareSymbols, SP500Symbols, Symbols, ETF_PriceTable
+from utility.general import tprint, setup_standard_logger, merge_dfs_horizontally, append_dfs_vertically, to_pickle_and_CSV
+from utility.finance import daily_returns, get_ETF_beta_to_SPY, get_total_return
 
 # Standard Module Setup
 NO_USE_TIMING_DECORATOR = False
@@ -203,15 +209,18 @@ indices = ['SPY', 'QQQ']
 stocks = ['AAPL', 'GOOG', 'FB', 'AMZN', 'ALNY', 'CRBP', 'NBIX', 'SRPT']
 indices = ['SPY', 'QQQ', 'XLV', 'IBB', 'XBI']
 stocks = HealthcareSymbols[0:5]
-
-#best_betas = get_best_betas(stocks, indices, lookback, cutoff_params, percentile_cutoff, to_file = True, file_name = 'Best_Betas')
+stocks = [i for i in HealthcareSymbols if i in SP500Symbols]
+stocks = [i for i in stocks if i not in {'AAAP', 'ABMD'}]
+stocks = stocks[0:5]
+print(stocks)
+best_betas = get_best_betas(stocks, indices, lookback, cutoff_params, percentile_cutoff, to_file = False, file_name = 'Best_Betas')
 #df = best_betas.round(2).sort_values([('Best', 'Corr')], ascending=False)
 #print(df.to_string())
 
-stocks = [etf for etf in ETFs if etf != 'SPY']
+#stocks = [etf for etf in ETFs if etf != 'SPY']
 #stocks = ['XLV', 'XBI', 'XLI', 'XLF', 'XRT', 'XLP']
-stocks = HealthcareSymbols[0:10]
-stocks = SP500Symbols
+#stocks = HealthcareSymbols[0:25]
+#stocks = SP500Symbols
 
 def calculate_betas_to_SPY(stocks):
     indices = ['SPY']
@@ -231,8 +240,8 @@ def calculate_raw_betas_to_SPY(stocks):
     df = betas.round(3).sort_values([(indices[0],'Corr')], ascending=False)
     print(df.to_string())
 
-calculate_betas_to_SPY(stocks)
-calculate_raw_betas_to_SPY(stocks)
+#calculate_betas_to_SPY(stocks)
+#calculate_raw_betas_to_SPY(stocks)
 
 
 columns = ['Beta', 'Corr']

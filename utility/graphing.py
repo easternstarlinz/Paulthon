@@ -13,7 +13,7 @@ import scipy.stats as ss
 import statsmodels.api as sm
 from functools import reduce
 from sklearn.linear_model import LinearRegression
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 from scipy.interpolate import interp1d, UnivariateSpline
 import logging
 
@@ -38,7 +38,9 @@ def show_mc_distributions_as_line_chart(mc_distributions, labels = None):
     for mc_distribution in mc_distributions:
         min_cutoff = np.percentile(mc_distribution, 0)
         max_cutoff = np.percentile(mc_distribution, 100)
-        mc_distribution = [i for i in mc_distribution if (i > min_cutoff) and (i < max_cutoff)]
+        print(min_cutoff)
+        print(max_cutoff)
+        #mc_distribution = [i for i in mc_distribution if (i > min_cutoff) and (i < max_cutoff)]
         
         #print('Percentiles', (np.percentile(mc_distribution, .1), np.percentile(mc_distribution, .9)))
         #print('Min_Max', (np.min(mc_distribution), np.max(mc_distribution)))

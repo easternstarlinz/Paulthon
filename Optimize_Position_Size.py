@@ -17,7 +17,7 @@ from CreateMC import get_total_mc_distribution_from_events, get_total_mc_distrib
 from Optimization_Formulas import find_maximum, kelly_criterion
 
 # Paul General Formulas
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 from paul_resources import get_histogram_from_array
 
 # Declare Expiry

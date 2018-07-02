@@ -10,7 +10,7 @@ import itertools
 import tkinter as tk
 import matplotlib.pyplot as plt
 from scipy.stats import norm
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 from paul_resources import tprint, rprint, get_histogram_from_array
 from pprint import pprint
 from Distribution_Module import Distribution, mc_distribution_to_distribution

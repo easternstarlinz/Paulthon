@@ -17,7 +17,7 @@ import statsmodels.api as sm
 from ols import OLS
 from ols2 import OLS as MainOLS
 from paul_resources import PriceTable, daily_returns, tprint
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 
 class ScrubParams(object):
     """Three Parameters for Scrubbing Process; Sequentially Optional"""

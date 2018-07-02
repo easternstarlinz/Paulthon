@@ -1,12 +1,13 @@
+import datetime as dt
+import pandas as pd
+from pprint import pprint
+
+from multiprocessing import Pool
+from multiprocessing.dummy import Pool as ThreadPool
+
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter("ignore", category=RuntimeWarning)
-import pandas as pd
-import datetime as dt
-from pprint import pprint
-from multiprocessing import Pool
-from multiprocessing.dummy import Pool as ThreadPool
-import warnings
 
 # Paul Modules
 from Stock_Module import Stock
@@ -22,7 +23,7 @@ from CreateMC import get_total_mc_distribution_from_events
 
 # Paul Utility Functions
 from data.finance import TakeoutParams, Symbols
-from decorators import my_time_decorator, empty_decorator
+from utility.decorators import my_time_decorator, empty_decorator
 
 NO_USE_TIMING_DECORATOR = False
 if NO_USE_TIMING_DECORATOR:
@@ -36,10 +37,6 @@ def get_stock_objects(symbols: 'list of symbols'):
 
 @my_time_decorator
 def get_option_price_first_time(stock, option):
-    return stock.get_option_price(option)
-
-@my_time_decorator
-def get_option_price_second_time(stock, option):
     return stock.get_option_price(option)
 
 @my_time_decorator

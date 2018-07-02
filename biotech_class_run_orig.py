@@ -10,7 +10,7 @@ from functools import reduce
 from scipy.interpolate import interp1d, UnivariateSpline
 from collections import namedtuple
 from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 from Option_Module import Option, OptionPrice, OptionPriceMC, get_implied_volatility, get_time_to_expiry
 from Timing_Module import event_prob_by_expiry
 from Event_Module import IdiosyncraticVol, Earnings, TakeoutEvent, Event, SysEvt_PresElection

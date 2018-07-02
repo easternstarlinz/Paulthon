@@ -16,7 +16,7 @@ from Distribution_Module import Distribution, mc_distribution_to_distribution
 from Option_Module import get_time_to_expiry
 
 # General Purpose Paul Formuals
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 
 def kelly_criterion(probs, pct_moves, X=None):
     if X is None:

@@ -13,7 +13,7 @@ from py_vollib.black_scholes.implied_volatility import black_scholes, implied_vo
 ##from paul_resources import InformationTable, tprint, rprint
 from data.finance import InformationTable
 from utility.general import tprint, rprint
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 """
 -Option: NamedTuple
     -Params:
@@ -77,20 +77,30 @@ def get_implied_volatility(Option,
     t = get_time_to_expiry(Option.Expiry)
     
     if S <= .05:
+        print('Stock price is below 5 cents. Check stock price')
         return 0
-
-    if flag == 'c':
-        if S - K > price or price/S > .9:
-            return 0
-    else:
-        if K - S > price or price/S > .9:
-            return 0
-
+    
+    # If the option price is below the specified threshold, return volatility of 0
     if price < .01:
         return 0
 
-    #print("Strike: {}{}, Underlying: {:.2f}, Option: {:.2f}".format(K, flag, S, price))
-    #print(price, S, K, t, r, flag) 
+    # If the intrinsic value is below the specified threshold, return volatility of 0
+    if flag == 'c':
+        #print('S', S)
+        #print('K', K)
+        #print('Instrinsic Value', max(S - K), 0)
+        #print('Price', price)
+
+        if price - max((S - K), 0) < .01:
+            return 0
+    elif flag == 'p':
+        if price - max((K - S), 0) < .01:
+            return 0
+    else:
+        raise ValueError
+
+
+    #print('Type: {}, S: {:.2f}, K: {:.2f}, price: {:.2f}'.format(flag, S, K, price))
     return implied_volatility(price, S, K, t, r, flag)
 
 def get_option_price(Option,

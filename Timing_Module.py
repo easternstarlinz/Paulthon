@@ -22,7 +22,7 @@ from Distribution_Module import Distribution, float_to_distribution
 ##from paul_resources import InformationTable, tprint, rprint
 from data.finance import InformationTable
 from utility.general import tprint, rprint
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 
 
 
