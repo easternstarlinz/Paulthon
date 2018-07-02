@@ -18,7 +18,7 @@ from Distribution_Module import Distribution, Distribution_MultiIndex, float_to_
 ##from paul_resources import InformationTable, tprint, rprint
 from data.finance import InformationTable, TakeoutBuckets
 from utility.general import tprint, rprint
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 
 import logging
 

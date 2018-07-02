@@ -8,12 +8,13 @@ from matplotlib import style
 style.use('ggplot')
 from bs4 import BeautifulSoup
 import sklearn
-from decorators import my_time_decorator
-from paul_resources import HealthcareSymbols, to_pickle_and_CSV
+from utility.decorators import my_time_decorator
+#from paul_resources import HealthcareSymbols, to_pickle_and_CSV
+from utility.general import to_pickle_and_CSV
 from multiprocessing import Pool
 from multiprocessing.dummy import Pool as ThreadPool
 import logging
-from ETFs import indices
+#from ETFs import indices
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -109,9 +110,10 @@ def test_yahoo_reader():
 @my_time_decorator
 def fetch_price_table():
     if __name__ == '__main__':
-        symbols = get_sp500_symbols_from_wiki()
+        #symbols = get_sp500_symbols_from_wiki()
         #symbols = indices
-        file_name = 'sp500_prices'
+        symbols = ['XBI', 'SRPT', 'CRBP', 'NBIX']
+        file_name = '/home/paul/Paulthon/DataFiles/StockPrices/sp500_prices_paul'
         price_table = make_price_table(symbols,
                                        start = dt.datetime(2015,1,1),
                                        end = dt.datetime.today(),

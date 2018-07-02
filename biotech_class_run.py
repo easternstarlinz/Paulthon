@@ -22,7 +22,7 @@ from Distribution_Module import Distribution, float_to_event_distribution, float
 from data.finance import InformationTable
 from utility.general import tprint, rprint
 from utility.graphing import get_histogram_from_array
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 
 #@my_time_decorator
 def get_option_sheet_from_mc_distribution(mc_distribution, expiry = None, strikes = None):

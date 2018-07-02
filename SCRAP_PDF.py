@@ -3,7 +3,7 @@ from paul_resources import show_mc_distributions_as_line_chart
 import numpy as np
 from scipy.interpolate import interp1d, UnivariateSpline, InterpolatedUnivariateSpline
 import matplotlib.pyplot as plt
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 from statistics import mean
 import pandas as pd
 import datetime as dt

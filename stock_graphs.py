@@ -5,11 +5,12 @@ import decimal
 import pandas as pd
 import numpy as np
 import statsmodels.formula.api as sm
-from time_decorator import my_time_decorator
+from utility.decorators import my_time_decorator
 from ols2 import OLS
 import math
 import matplotlib.pyplot as plt
 import scipy.stats as ss
+from data.finance import PriceTable
 
 #If I structured each Stock Data Point as a Dictionary, what would it look like?
 #Keys....
@@ -17,8 +18,8 @@ import scipy.stats as ss
 
 
 #import price table from pickle file for s&p500 + discretionary symbols
-price_table = pickle.load(open('sp500_price_table.pkl', 'rb')).head(2000)
-
+#price_table = pickle.load(open('sp500_price_table.pkl', 'rb')).head(2000)
+price_table = PriceTable
 #Functions
 def scatter(pairs: 'list of tuples'=[], label = "", color = 'red') -> 'empty':
     plt.scatter([i[0] for i in pairs], [i[1] for i in pairs], label = label, color = color)
@@ -50,7 +51,7 @@ def HVs_Multiple_Syms(symbols: 'list of strings' = ['pg']) -> 'none':
             for i in [cc_moves, cc_moves_initial_scrub, cc_moves_scrubbed]]
         print("----------------------------\n")
 
-HVs_Multiple_Syms(['AMZN', 'AAPL', 'GOOG', 'FB'])
+#HVs_Multiple_Syms(['AMZN', 'AAPL', 'GOOG', 'FB'])
 """Params Layout
 Each stock is an object -- highest level
 -Stock
@@ -131,7 +132,8 @@ class Stock(object):
             , bucket_size: 'int' = 10) -> 'list of tuples':
 
         #import price table from pickle file -> s&p500 + discretionary symbols
-        self.price_table = pickle.load(open('sp500_price_table.pkl', 'rb')).head(2000)
+        #self.price_table = pickle.load(open('sp500_price_table.pkl', 'rb')).head(2000)
+        self.price_table = PriceTable
 
         #instantiate passed variables
         self.index = index
@@ -160,7 +162,7 @@ class Stock(object):
         self.end_date = self.price_table.tail(1).index.values
         
         #Attribute: closing prices for index and stock (-> pandas series)
-        self.index_prices = price_table[self.index].head(self.data_points)
+        self.index_prices = self.price_table[self.index].head(self.data_points)
         self.stock_prices = price_table[self.stock].head(self.data_points)
     
         #Attribute: cc_moves for index and stock (-> lists of floats)
@@ -445,14 +447,14 @@ class Stock(object):
 #Stocks: AMZN, AAPL, GOOG, FB, MSFT, PG, PFE, XOM, CVX, WMT, ALNY, SRPT, EXEL, MRNS, CRBP, NBIX, BMRN 
 #Hash Dictionary for index_cutoff parameter
 index_cutoff_hash = {'SPY': .01, 'IWM': .01, 'RUT': .01, 'XLP': .01, 'XBI': .02, 'IBB': .01, 'AAL': .01, 'DAL': .01}
-sym1, sym2 = 'SPY', 'CL'
+sym1, sym2 = 'XBI', 'CRBP'
 my_pairing = Stock(sym1,
             sym2,
             index_cutoff = index_cutoff_hash[sym1],
             stock_cutoff=.075,
             pct_cutoff = .2,
-            data_points = 100,
-            #base100=False,
+            data_points = 750,
+            base100=True,
             #beta_setting = 'scrubbed',
             #manual_beta = 1.0,
             #scatter_type = 'all',
@@ -461,7 +463,7 @@ my_pairing = Stock(sym1,
 
 
 #my_pairing.Scrub_ScatterPlot(scatter_type = 'all')
-my_pairing.StockChart(base100 = False, beta_setting = 'scrubbed', manual_beta = 1.0)
+my_pairing.StockChart(base100 = True, beta_setting = 'scrubbed', manual_beta = 1.0)
 my_pairing.raw_pairs.summary()
 my_pairing.initial_scrub.summary()
 my_pairing.second_scrub.summary()
@@ -471,7 +473,7 @@ print(my_pairing.third_scrub.olspoints[0])
 #my_pairing.Adj_ScatterPlot()
 #my_pairing.RollingHVsLineGraph()
 my_pairing.Print_HV_Calculations()
-#my_pairing_2.Scrub_ScatterPlot(scatter_type = 'all')
+my_pairing.Scrub_ScatterPlot(scatter_type = 'all')
 #my_pairing_2.StockChart(base100 = False, beta_setting = 'scrubbed', manual_beta = 1.0)
 
 print(help(Stock))

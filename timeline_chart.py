@@ -2,12 +2,17 @@ import pandas as pd
 import numpy as np
 import datetime as dt
 from datetime import timedelta
+from dateutil.relativedelta import relativedelta
+
 from collections import OrderedDict
 import matplotlib.pyplot as plt
 #plt.style.use('bmh')
 from Timing_Module import Timing
 from Event_Module import IdiosyncraticVol, TakeoutEvent, Earnings, Event
 from term_structure import term_structure
+
+# Use the adjustText module from github (downloaded with pip)
+from adjustText import adjust_text
 
 def filter_discrete_events(events):
     return [evt for evt in events if not isinstance(evt, (IdiosyncraticVol, TakeoutEvent))]
@@ -18,11 +23,10 @@ def get_event_center_dates(events):
 def get_event_mean_moves(events):
     return [evt.get_distribution().mean_move for evt in events]
 
-
 def get_event_timeline(events: 'list of events' = None, symbol: 'str' = '', expiries = None):
     """Get the Event Timeline in the form of a graph for a list of events. Symbol is an optional parameters to display in the Graph Title"""
 
-    # Establish event information: events, center_dates, mean_moves
+    # Establish Event Information: events, center_dates, mean_moves
     events = filter_discrete_events(events)
     dates = get_event_center_dates(events)
     event_mean_moves = get_event_mean_moves(events)
@@ -77,17 +81,33 @@ def get_event_timeline(events: 'list of events' = None, symbol: 'str' = '', expi
     for i in range(len(events)):
         ax1.annotate(s = repr(events[i]),
                      xy = (dates[i], event_mean_moves[i]),
-                     xytext = (dates[i], event_mean_moves[i]+.00875 + scatter_sizes[i]*.01*.01*.025),
+                     xytext = (dates[i], event_mean_moves[i]+.025075 + scatter_sizes[i]*.01*.01*.025),
                      ha='center',
                      fontsize=10.0)
-
+    
+    
+    """
+    texts = []
+    for i in range(len(events)):
+        txt = ax1.text(dates[i],
+                       event_mean_moves[i],
+                      repr(events[i]),
+                       ha='center',
+                       fontsize=10.0)
+        texts.append(txt)
+    adjust_text(texts)
+    """
 
     #fig.autofmt_xdate()
     # Set x and y Tick Marks, Tick Labels, and Axis Labels.
     # Set Tick Marks
-    xticks = [dt.date(2018, m, 1) for m in range(dt.date.today().month, 13)]
+    # X Ticks
+    xticks = [dt.date(2018, dt.date.today().month, 1) + relativedelta(months=i) for i in range(13)]
     ax1.set_xticks(xticks)
-    ax1.set_yticks(np.arange(0, max(event_mean_moves)+.05, .05))
+    
+    # Y Ticks
+    yticks = np.arange(0, max(event_mean_moves)+.05, .05)
+    ax1.set_yticks(yticks)
     
     # Set Tick Labels
     ax1.set_xticklabels([t.strftime('%-m/%-d/%y') for t in xticks])
@@ -126,8 +146,8 @@ def get_event_timeline(events: 'list of events' = None, symbol: 'str' = '', expi
     """
     
     # For now I don't want to see term structure in the graph, but keeping the code here as an option for later.
-    """
-    # Create a Line Graph to show Term Structure
+    """ 
+    # Show Term Structure as a Line Graph
     if expiries is not None:
         expiries = [date for date in xticks if date > dt.date.today()]
         term_struc = term_structure(events, expiries, metric = 'IV', mc_iterations = 10**5)

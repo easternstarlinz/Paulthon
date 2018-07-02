@@ -11,7 +11,7 @@ from Event_Module import Earnings, IdiosyncraticVol
 # Paul Utility Functions
 #from paul_resources import setup_standard_logger
 from utility.general import setup_standard_logger
-from decorators import my_time_decorator, empty_decorator
+from utility.decorators import my_time_decorator, empty_decorator
 
 NO_USE_TIMING_DECORATOR = True
 if NO_USE_TIMING_DECORATOR:

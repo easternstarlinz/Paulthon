@@ -1,9 +1,11 @@
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter("ignore", category=RuntimeWarning)
+
 import pandas as pd
 import datetime as dt
 from pprint import pprint
+
 from multiprocessing import Pool
 from multiprocessing.dummy import Pool as ThreadPool
 
@@ -17,24 +19,17 @@ from timeline_chart import get_event_timeline
 from term_structure import term_structure
 from GetVolMC import get_vol_surface_from_events, get_vol_surface_spline, get_call_prices_from_events, get_option_sheet_from_events, get_term_structure
 from CreateMC import get_total_mc_distribution_from_events
+from stock_events import all_other_events
 
 # Paul Utility Functions
 #from paul_resources import TakeoutParams, Symbols
 from data.finance import TakeoutParams, Symbols
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 
 EarningsEvents = get_earnings_events()
 
 class Stock(object):
-    elagolix_info = pd.read_excel('/home/paul/Paulthon/Events/Parameters/CLVS_RiskScenarios2.xlsx',
-                                     header = [0],
-                                     index_col = [0,1],
-                                     sheet_name = 'Sub_States')
-
-    fda_meeting = Event('CLVS', .1, 'Q2_2018', 'FDA Meeting')
-    data = Event('CLVS', Distribution(pd.read_csv('/home/paul/Paulthon/Events/Parameters/CLVS.csv')), 'Q2_2018', 'Ph3_Data')
-    elagolix = ComplexEvent('CLVS', Distribution_MultiIndex(elagolix_info), dt.date(2018,5,15), 'Elagolix Approval')
-    all_other_events = [data, fda_meeting, elagolix]
+    all_other_events = all_other_events
     
     vol_surface_spline_cache = {}
 
@@ -57,10 +52,11 @@ class Stock(object):
     
     @property
     def other_events(self):
-        if self.stock == 'CLVS':
-            return self.all_other_events
-        else:
-            return []
+        return [evt for evt in self.all_other_events if evt.stock == self.stock]
+        #if self.stock == 'CLVS':
+        #    return self.all_other_events
+        #else:
+        #    return []
     
     # Think about how to use a cache for events
     @property
@@ -75,19 +71,19 @@ class Stock(object):
     @property
     def sorted_events(self):
         return sorted(self.events, key=lambda evt: Timing(evt.timing_descriptor).center_date)
-
     
     def get_event_timeline(self):
         get_event_timeline(self.events, self.stock, self.expiries)
 
     def get_term_structure(self, strikes = None, mc_iterations = 10**6):
-        term_struc = get_term_structure(self.events, self.expiries, strikes = strikes, mc_iterations = mc_iterations)
+        print('These are the events:', self.events)
+        term_struc = get_term_structure(self.events, self.expiries, strikes=strikes, mc_iterations=mc_iterations)
         return term_struc.round(2)
         return term_struc.iloc[[term_struc.index.get_loc(1.00, method='nearest')], :]
 
     @property
     def expiries(self):
-        return [dt.date(2018, 5, 21), dt.date(2018, 6, 21), dt.date(2018, 7, 21), dt.date(2018, 8, 21), dt.date(2018, 9, 21), dt.date(2018, 10, 21), dt.date(2018, 11, 21), dt.date(2018, 12, 21)]
+        return [dt.date(2018, 6, 21), dt.date(2018, 7, 21), dt.date(2018, 8, 21), dt.date(2018, 9, 21), dt.date(2018, 10, 21), dt.date(2018, 11, 21), dt.date(2018, 12, 21)]
     
     @property
     def best_index(self):

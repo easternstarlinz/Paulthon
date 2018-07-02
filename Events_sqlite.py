@@ -10,12 +10,12 @@ from Event_Module import Earnings
 #from paul_resources import HealthcareSymbols, Symbols, to_pickle
 from data.finance import Symbols, HealthcareSymbols
 from utility.general import to_pickle
-from decorators import my_time_decorator
+from utility.decorators import my_time_decorator
 
-#conn = sqlite3.connect('earnings.db', check_same_thread=False)
+conn = sqlite3.connect('earnings.db', check_same_thread=False)
 #conn = sqlite3.connect(':memory:')
 
-#c = conn.cursor()
+c = conn.cursor()
 
 #c.execute("""CREATE TABLE earnings (
 #            stock text,
@@ -24,6 +24,7 @@ from decorators import my_time_decorator
 #            event_name text
 #            )""")
 
+# Insert earnings events into table
 def insert_earnings_event(earns):
     with conn:
         c.execute("INSERT INTO earnings VALUES (:stock, :event_input, :timing_descriptor, :event_name)",
@@ -31,7 +32,15 @@ def insert_earnings_event(earns):
                  'event_input': earns.event_input_value,
                  'timing_descriptor': earns.timing_descriptor.strftime('%Y-%m-%d'),
                  'event_name': earns.event_name})
-#@my_time_decorator
+
+@my_time_decorator
+def insert_events_to_table(earnings_evts: 'list of events'):
+    for evt in earnings_evts:
+        insert_earnings_event(evt)
+
+
+
+@my_time_decorator
 def instantiate_earnings_event(params: 'tuple of Earnings params from sqlite db'):
     return Earnings(*params)
 
@@ -62,21 +71,21 @@ def get_earnings_events(symbol=None):
 
 @my_time_decorator
 def create_earnings_events(stocks: 'list of stocks'):
-    """Create Earnings Events for a List of Stocks"""
-    event_names = ['Q1_2018', 'Q2_2018', 'Q3_2018', 'Q4_2018']
-    q1_date_range = list(pd.date_range(dt.date(2018, 1, 1), dt.date(2018, 3, 30)))
+    """Create Earnings Events for a List of Stocks based on Random Dates"""
+    event_names = ['Q3_2018', 'Q4_2018', 'Q1_2019', 'Q2_2019']
+    q3_date_range = list(pd.date_range(dt.date(2018, 7, 1), dt.date(2018, 9, 30)))
     
     earnings_events = []
     for stock in stocks:
         # Set Event Input
-        event_input = random.uniform(.03, .07)
+        event_input = random.uniform(.03, .08)
         
         # Set Earnings Dates
-        q1_date = random.choice(q1_date_range)
-        timing_descriptors = [q1_date,
-                q1_date + timedelta(90),
-                              q1_date + timedelta(180),
-                              q1_date + timedelta(270)]
+        q3_date = random.choice(q3_date_range)
+        timing_descriptors = [q3_date,
+                q3_date + timedelta(90),
+                              q3_date + timedelta(180),
+                              q3_date + timedelta(270)]
 
         # Instantiate Earnings Events and append to main list
         for i in range(4):
@@ -89,10 +98,6 @@ def create_earnings_events(stocks: 'list of stocks'):
    
     return earnings_events
 
-@my_time_decorator
-def insert_events_to_table(earnings_events: 'list of events'):
-    for evt in earnings_evts:
-        insert_earnings_event(evt)
 
 @my_time_decorator
 def get_specific_symbol(symbol, earnings_evts):
@@ -109,10 +114,6 @@ def instantiate_timer(params, n=1):
         evt = Earnings(*params)
 
 @my_time_decorator
-def instantiate_earnings_event_2(params):
-    return Earnings(*params)
-
-@my_time_decorator
 def get_earnings_evts_from_pickle(symbol):
     earnings_evts = pickle.load(open('EarningsEvents.pkl', 'rb'))
     return [evt for evt in earnings_evts if evt.stock == symbol]
@@ -122,22 +123,19 @@ def get_earnings_evts_from_pickle(symbol):
 
 #conn.close()
 
-
 if __name__ == '__main__':
     params = ('CRBP', .05, dt.date(2018, 6, 5), 'Q2_2018')
     instantiate_timer(params, 1)
     instantiate_timer(params, 10)
     instantiate_timer(params, 100)
     instantiate_timer(params, 1000)
-    #instantiate_timer(params, 10000)
-
-    a = instantiate_earnings_event_2(params)
-    print(a.timing_descriptor, type(a.timing_descriptor))
-    print('Sup', a)
 
 
-    #earnings_evts = create_earnings_events(Symbols)
-    #to_pickle(earnings_evts, 'EarningsEvents')
+
+    evts = create_earnings_events(HealthcareSymbols)
+    print(evts)
+    insert_events_to_table(evts)
+    to_pickle(evts, 'EarningsEvents')
     
     """ 
     conn = sqlite3.connect('earnings.db', check_same_thread=False)
