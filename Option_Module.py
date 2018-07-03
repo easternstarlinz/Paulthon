@@ -1,19 +1,9 @@
 import datetime as dt
 import numpy as np
-import pandas as pd
-import math
-import random
-import copy
 from statistics import mean
 from collections import namedtuple
-import matplotlib.pyplot as plt
 from py_vollib.black_scholes.implied_volatility import black_scholes, implied_volatility
 
-# Paul Packages
-##from paul_resources import InformationTable, tprint, rprint
-from data.finance import InformationTable
-from utility.general import tprint, rprint
-from utility.decorators import my_time_decorator
 """
 -Option: NamedTuple
     -Params:

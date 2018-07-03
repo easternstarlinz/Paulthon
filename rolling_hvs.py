@@ -1,22 +1,17 @@
+# Standard Imports
+import datetime as dt
 import numpy as np
 import pandas as pd
-import seaborn
-import pickle
-import copy
-import pprint
-import decimal
-import statsmodels.formula.api as sm
-from time_decorator import my_time_decorator
-from paul_resources import tprint, rprint
-from ols import OLS
 import math
-import datetime as dt
-import matplotlib.pyplot as plt
-import scipy.stats as ss
-import statsmodels.api as sm
-from sklearn.linear_model import LinearRegression
-from beta_class_6 import StockLineBetaAdjusted, Beta, ScrubParams
 from functools import reduce
+import seaborn
+import matplotlib.pyplot as plt
+import statsmodels.formula.api as sm
+import statsmodels.api as sm
+
+# Paul Modules
+from beta_class_6 import StockLineBetaAdjusted, Beta, ScrubParams
+from ols import OLS
 
 # Configuration Parameters
 stock = 'NBIX'

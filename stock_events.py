@@ -2,7 +2,7 @@ import pandas as pd
 import datetime as dt
 
 # Paul Modules
-from Event_Module import IdiosyncraticVol, TakeoutEvent, Earnings, Event, ComplexEvent, SysEvt_PresElection
+from Event_Module import Event, IdiosyncraticVol, TakeoutEvent, Earnings, ComplexEvent, SysEvt_PresElection
 from Distribution_Module import Distribution, Distribution_MultiIndex
 
 

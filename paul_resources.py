@@ -1,25 +1,13 @@
-import datetime as dt
 import numpy as np
 import pandas as pd
 import pickle
-import math
-import decimal
-import copy
-import pprint
 import matplotlib.pyplot as plt
 import statsmodels.formula.api as sm
 import pylab
-import scipy.stats as ss
 import statsmodels.api as sm
 from functools import reduce
-from sklearn.linear_model import LinearRegression
-from utility.decorators import my_time_decorator
 from scipy.interpolate import interp1d, UnivariateSpline
 import logging
-
-# Paul Modules
-from ols import OLS
-from ols2 import OLS as MainOLS
 
 ManualSymbolExcludes = ['BRK.B', 'BKNG', 'BHF', 'BF.B', 'CBRE', 'FTV', 'UA', 'WELL', 'XRX' 'BHH', 'AEE']
 

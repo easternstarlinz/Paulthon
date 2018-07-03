@@ -1,20 +1,12 @@
 import datetime as dt
 import pandas as pd
-import math
-import numpy as np
 import random
-import copy
-import pylab
-from collections import namedtuple
-from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array
 from utility.decorators import my_time_decorator
-from Distribution_Module import Distribution, float_to_event_distribution, float_to_bs_distribution
-from Option_Module import Option, OptionPrice, OptionPriceMC, get_implied_volatility
-from Event_Module import IdiosyncraticVol, Event, SysEvt_PresElection, TakeoutEvent, Earnings
-from functools import reduce
+from utility.general import rprint
+from Option_Module import Option, OptionPrice
+from Event_Module import Event, SysEvt_PresElection, TakeoutEvent, Earnings
 
-
-#----------------------------------------------Module Tests---------------------------------------------------#
+#---------------------------------------Module Tests----------------------------------------#
 """
     -timing_test_for_distribution_addition
     -timing_test_for_mc_simulation_by_iteration_size

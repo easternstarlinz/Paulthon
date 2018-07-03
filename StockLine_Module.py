@@ -1,27 +1,16 @@
-import numpy as np
-import datetime as dt
 import pandas as pd
-import pickle
-import copy
-import pprint
-from pprint import pprint
-import decimal
-import statsmodels.formula.api as sm
-from sklearn.linear_model import LinearRegression
-from collections import namedtuple
-import math
 import matplotlib.pyplot as plt
-import matplotlib.ticker as tkr
-import scipy.stats as ss
-import statsmodels.api as sm
-from ols import OLS
-from ols2 import OLS as MainOLS
-from beta_class import Beta
 
-from utility.decorators import my_time_decorator
+import statsmodels.formula.api as sm
+import statsmodels.api as sm
+
+# Paul Utils
 from utility.general import tprint
-from data.finance import PriceTable
 from utility.finance import daily_returns
+from data.finance import PriceTable
+
+from ols import OLS
+from beta_class import Beta
 
 class ScrubParams(object):
     """Three Parameters for Scrubbing Process; Sequentially Optional"""

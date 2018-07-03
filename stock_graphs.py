@@ -1,15 +1,13 @@
 import pickle
 import copy
 import pprint
-import decimal
-import pandas as pd
 import numpy as np
-import statsmodels.formula.api as sm
-from utility.decorators import my_time_decorator
 from ols2 import OLS
 import math
 import matplotlib.pyplot as plt
 import scipy.stats as ss
+
+from utility.decorators import my_time_decorator
 from data.finance import PriceTable
 
 #If I structured each Stock Data Point as a Dictionary, what would it look like?
