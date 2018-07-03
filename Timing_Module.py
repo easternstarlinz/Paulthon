@@ -1,30 +1,10 @@
 import datetime as dt
-from datetime import timedelta
-import numpy as np
 import pandas as pd
-from pandas.tseries.offsets import BDay
-import math
-from statistics import mean
-from collections import namedtuple
-import random
-import copy
-from pprint import pprint
-from ppretty import ppretty
-import matplotlib.pyplot as plt
-from py_vollib.black_scholes.implied_volatility import black_scholes, implied_volatility
 import logging
+from py_vollib.black_scholes.implied_volatility import black_scholes, implied_volatility
 
-# Paul Modules
-from Option_Module import get_time_to_expiry
-from Distribution_Module import Distribution, float_to_distribution
-
-# Paul General Utility Functions
-##from paul_resources import InformationTable, tprint, rprint
-from data.finance import InformationTable
-from utility.general import tprint, rprint
+# Paul Utils
 from utility.decorators import my_time_decorator
-
-
 
 # Logging Setup
 logger = logging.getLogger(__name__)
@@ -40,7 +20,6 @@ logger.addHandler(file_handler)
 
 
 today = pd.datetime.today()
-
 
 descriptors = pd.read_csv('/home/paul/Paulthon/Events/Parameters/Timing/TimingDescriptors.csv')
 
@@ -215,10 +194,3 @@ class Timing(object):
 
     def get_event_prob_by_expiry(self, expiry):
         return event_prob_by_expiry(self.timing_descriptor, expiry)
-
-
-if __name__ == '__main__':
-    print(Timing('2H_2018').center_date)
-    t = Timing('2H_2018')
-    pprint(vars(t))
-    pprint(dir(t))

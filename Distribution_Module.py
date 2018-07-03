@@ -1,23 +1,14 @@
 # Standard Packages
-import datetime as dt
 import pandas as pd
 import math
 import numpy as np
 import random
-import copy
-import matplotlib.pyplot as plt
-from collections import namedtuple
 from statistics import mean
 import logging
 from py_vollib.black_scholes.implied_volatility import black_scholes, implied_volatility
 
-# Paul Packages
-from Option_Module import get_time_to_expiry
-
 # Paul General Formulas
-#from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array, to_pickle_and_CSV
-from data.finance import InformationTable
-from utility.general import tprint, rprint, to_pickle_and_CSV
+from utility.general import to_pickle_and_CSV
 from utility.graphing import get_histogram_from_array
 from utility.decorators import my_time_decorator
 

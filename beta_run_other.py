@@ -1,6 +1,5 @@
 from beta_class_3 import ScrubParams, Beta
 from utility.decorators import my_time_decorator
-from ols2 import OLS as MainOLS
 
 @my_time_decorator
 def run():

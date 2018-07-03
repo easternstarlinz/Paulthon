@@ -1,14 +1,15 @@
-#from All_Events import Stock
+import numpy as np
+import datetime as dt
+
+
 from Stock_Module import Stock
 from Option_Module import Option
-import datetime as dt
 from utility.decorators import my_time_decorator
-import numpy as np
 
 @my_time_decorator
 def run_all():
     stock = Stock('NBIX')
-    expiry = dt.date(2018, 10, 1)
+    #expiry = dt.date(2018, 10, 1)
 
     """
     stock.get_event_timeline()
@@ -25,12 +26,14 @@ def run_all():
         #print('Strike: {:.2f}, Price: {:.4f}'.format(strike, option_price))
     #term_structure = crbp.get_term_structure()
     """
-    strikes = np.arange(.9, 1.1, .025)
+    print('Getting Event Timeline')
+    stock.get_event_timeline()
+    
+    #strikes = np.arange(.9, 1.1, .025)
     #option_sheet = stock.get_option_sheet(expiry, strikes = strikes)
-    term_structure = stock.get_term_structure(strikes = strikes)
+    #term_structure = stock.get_term_structure(strikes = strikes)
     #print(option_sheet)
     #print(stock.events)
-    print(term_structure.to_string())
-    print(stock.events)
-    stock.get_event_timeline()
+    #print(term_structure.to_string())
+    #print(stock.events)
 run_all()

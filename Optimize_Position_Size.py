@@ -1,24 +1,19 @@
 # Standard Packages
 import pandas as pd
-import matplotlib.pyplot as plt
 import numpy as np
-import scipy.optimize as spo
-import math
 import datetime as dt
 from statistics import mean
-import sympy as sym
 
 # Paul Packages
 from Stock_Module import Stock
 from Option_Module import get_time_to_expiry
 from Event_Module import IdiosyncraticVol
 from Distribution_Module import Distribution, mc_distribution_to_distribution
-from CreateMC import get_total_mc_distribution_from_events, get_total_mc_distribution_from_events_vanilla
+from CreateMC import get_total_mc_distribution_from_events_vanilla
 from Optimization_Formulas import find_maximum, kelly_criterion
 
 # Paul General Formulas
-from utility.decorators import my_time_decorator
-from paul_resources import get_histogram_from_array
+from utility.graphing import get_histogram_from_array
 
 # Declare Expiry
 expiry = dt.date(2019, 5, 15)

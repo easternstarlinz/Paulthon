@@ -3,25 +3,15 @@ import numpy as np
 import datetime as dt
 from datetime import timedelta
 import math
-import random
-import copy
-import pylab
 from functools import reduce
-from scipy.interpolate import interp1d, UnivariateSpline
-from collections import namedtuple
-
+from scipy.interpolate import interp1d
 
 # Paul Modules
-from Option_Module import Option, OptionPrice, OptionPriceMC, get_implied_volatility, get_time_to_expiry
+from Option_Module import Option, OptionPriceMC, get_implied_volatility, get_time_to_expiry
 from Timing_Module import event_prob_by_expiry
-from Event_Module import IdiosyncraticVol, Earnings, TakeoutEvent, Event, SysEvt_PresElection
-from Distribution_Module import Distribution, float_to_event_distribution, float_to_bs_distribution
+from Event_Module import IdiosyncraticVol, Earnings, Event 
 
 # Paul Utility Functions
-#from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array
-from data.finance import InformationTable
-from utility.general import tprint, rprint
-from utility.graphing import get_histogram_from_array
 from utility.decorators import my_time_decorator
 
 #@my_time_decorator

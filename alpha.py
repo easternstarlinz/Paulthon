@@ -1,13 +1,12 @@
-from paul_resources import PriceTable, daily_returns, tprint, rprint, lprint
-from beta_class_6 import Beta, ScrubParams, StockLineBetaAdjusted
 import numpy as np
 import pandas as pd
 import math
-from operator import mul
-from functools import reduce
 import matplotlib.pyplot as plt
+
+from beta_class_6 import Beta, ScrubParams, StockLineBetaAdjusted
+from paul_resources import HealthcareSymbols, BestBetas, info, PriceTable, daily_returns
+
 from utility.decorators import my_time_decorator
-from paul_resources import HealthcareSymbols, BestBetas, info
 
 def get_total_return(df: 'df of prices'):
     #return prices_df_stock.head(1).iloc[0] / prices_df_stock.tail(1).iloc[0] - 1

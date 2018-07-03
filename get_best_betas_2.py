@@ -2,12 +2,10 @@ import pandas as pd
 import numpy as np
 import math
 import pickle
-from functools import reduce
 import itertools
 from beta_class import ScrubParams, Beta
 from collections import namedtuple
 from multiprocessing import Pool
-from multiprocessing.dummy import Pool as ThreadPool
 from data.ETFs import indices as ETFs
 from Beta_StepTwo import Beta_StepTwo
 

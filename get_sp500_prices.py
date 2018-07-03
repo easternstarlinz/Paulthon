@@ -1,19 +1,16 @@
 import datetime as dt
-import numpy as np
 import pandas as pd
 import pickle
+import logging
+
 import pandas_datareader.data as web
-import matplotlib.pyplot as plt
-from matplotlib import style
-style.use('ggplot')
-from bs4 import BeautifulSoup
-import sklearn
-from utility.decorators import my_time_decorator
-#from paul_resources import HealthcareSymbols, to_pickle_and_CSV
-from utility.general import to_pickle_and_CSV
+
 from multiprocessing import Pool
 from multiprocessing.dummy import Pool as ThreadPool
-import logging
+
+# Paul Utils
+from utility.decorators import my_time_decorator
+from utility.general import to_pickle_and_CSV
 #from ETFs import indices
 
 logger = logging.getLogger(__name__)
