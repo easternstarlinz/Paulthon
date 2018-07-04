@@ -55,5 +55,3 @@ class OLS(object):
     def ols(self):
         #Return a list of tuples containing (x, y, y_hat, error, error_squared)
         return list(zip(self.x, self.y, self.y_hat, self.error, self.error_squared))
-
-
