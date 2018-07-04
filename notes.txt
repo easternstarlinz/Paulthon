@@ -1,0 +1,12 @@
+Working on the beta_class file. Currently, ScrubParams has three paramaters which are sequentially optional. To reduce complexity, I am going to make them all required with defaults. As of now, the code does the second and third scrub operations if there is a parameter entered, but I wwill change it to run in all cases. If I want, I can add a simple if statement to check to see if the Parameter is 0 or 1 and does not need to be ran, to save unecessary computations.
+
+Right now the scrubbing processes are dependent on each other and sequential.
+     - initial scrub (stock cutoff)
+     - second scrub (index cutoff)
+     - third scrub (percentile cutoff)
+
+It may be more clear to logically separate the scrubbing mechanism from their order, and then call the independent functions in the class. In theory, these scrubbing mechanisms should be viable as on their own as standalone analyses. In fact, I've had a lot of confusion around having to order them, so why not separate out the scrubbing processses from the ordering? -> I implemented this and took out the 'Scrub Type' being conditional on the number of parameters designated.
+
+deleted beta_run_other.py file, it had one function to show betas for different index_value inputs but can re-write it, not worth keeping for now.
+
+deleted beta_run_file.py -- same idea, old version of shocking the beta calculation based on the index_cutoff parameter.

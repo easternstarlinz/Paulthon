@@ -7,7 +7,6 @@ import statsmodels.api as sm
 from ols import OLS
 from ols2 import OLS as MainOLS
 
-from utility.decorators import my_time_decorator
 from utility.general import tprint
 from data.finance import PriceTable
 from utility.finance import daily_returns
@@ -30,7 +29,12 @@ class ScrubParams(object):
         self.percentile_cutoff = percentile_cutoff
 
     def __repr__(self):
-        return "ScrubParams(Stock Cutoff: {:2f}, Index Cutoff: {:2f}, Percentile Cutoff: {:2f})".format(self.stock_cutoff, self.index_cutoff, self.percentile_cutoff)
+        return "ScrubParams(Stock Cutoff: {:2f}, Index Cutoff: {:2f}, Percentile Cutoff: {:0f})".format(self.stock_cutoff, self.index_cutoff, self.percentile_cutoff)
+
+
+
+
+
 
 class Beta(object):
     def __init__(self,
@@ -52,41 +56,37 @@ class Beta(object):
     def initial_scrub(self):
         """Eliminate data points where the stock moved greater (absolute value) than the specified stock cutoff.
            This process imposes a celing for the magnitude of stock moves included in the sample."""
-        return stock_ceiling_scrub_process(returns_df_to_scrub=self.daily_returns,
-                                          stock_to_drive_scrubbing=self.stock,
-                                          stock_move_ceiling=self.scrub_params.stock_cutoff)
+        if self.scrub_params.stock_cutoff < 1.0:
+            return self.daily_returns[abs(self.daily_returns[self.stock]) <= self.scrub_params.stock_cutoff]
+        else:
+            return self.daily_returns
     
     @property
     def second_scrub(self):
-        """Eliminate data points where the index moved less than the index cutoff. Only keep data points above the floor."""
-        return index_floor_scrub_process(returns_df_to_scrub=self.initial_scrub,
-                                         index_to_drive_scrubbing=self.index,
-                                         index_move_floor=self.scrub_params.index_cutoff)
+        """Eliminate data points where the index moved less than the index cutoff"""
+        if self.scrub_params.index_cutoff > 0:
+            df = self.initial_scrub[abs(self.initial_scrub[self.index]) >= self.scrub_params.index_cutoff]
+            df = OLS_df(df)
+            return df
+        else:
+            return self.initial_scrub
     
     @property
     def third_scrub(self):
         """Keep the n percentile data points that have the best fit based on OLS regression"""
-        return best_fit_scrub_process(returns_df_to_scrub=self.second_scrub,
-                                      stock=self.stock,
-                                      index=self.index,
-                                      percentile_cutoff=self.scrub_params.percentile_cutoff)
+        if self.scrub_params.percentile_cutoff < 1.0:
+            best_fit_cutoff = self.second_scrub['error_squared'].quantile(self.scrub_params.percentile_cutoff)
+            return self.second_scrub[self.second_scrub['error_squared'] < best_fit_cutoff].loc[:, [self.stock, self.index]]
+        else:
+            return self.second_scrub
     
-    scrubbed_returns_cache = {}
     @property
     def scrubbed_returns(self):
-        if self.stock in Beta.scrubbed_returns_cache:
-            return Beta.scrubbed_returns_cache[self.stock]
-        else:
-            Beta.scrubbed_returns_cache[self.stock] = self.third_scrub
-            return Beta.scrubbed_returns_cache[self.stock]
-
+        return self.third_scrub
+    
     @property
     def num_days_in_calculation(self):
         return self.scrubbed_returns.shape[0]
-    
-    @property
-    def percent_days_in_calculation(self):
-        return (self.num_days_in_calculation)/self.num_data_points
 
     @property
     def OLS_model_results(self):
@@ -97,17 +97,6 @@ class Beta(object):
         ols_results = ols_model.fit()
         return ols_results
     
-    @property
-    def rsquared(self):
-        return self.OLS_model_results.rsquared
-
-    @property
-    def degrees_of_freedom(self):
-        return self.OLS_model_results.df_resid
-    
-    
-    
-    # These calculations use my own OLS class as opposed to the smmodule. The degrees are freedom differ by one (not sure how to affect this parameter with the open-source model.
     @property
     def OLS_object(self):
         stock_returns = list(self.scrubbed_returns[self.stock])
@@ -126,44 +115,58 @@ class Beta(object):
     @property
     def corr(self):
         return self.OLS_object.corr
+
+    @property
+    def rsquared(self):
+        return self.OLS_model_results.rsquared
+
+    @property
+    def degrees_of_freedom(self):
+        return self.OLS_model_results.df_resid
     
     @property
+    def percent_days_in_calculation(self):
+        return (self.num_days_in_calculation)/self.num_data_points
+
+    @property
     def scrub_type(self):
-        if self.scrub_params.stock_cutoff >= 1.0 and self.scrub_params.index_cutoff == 0 and self.scrub_params.percentile_cutoff == 1.0:
-            return "Raw Returns"
-        elif self.scrub_params.index_cutoff == 0 and self.scrub_params.percentile_cutoff == 1.0:
-            return "Initial Scrub"
-        elif self.scrub_params.percentile_cutoff == 1.0:
-            return "Second Scrub"
+        if self.scrub_params.percentile_cutoff:
+            return "Third_Scrub"
+        elif self.scrub_params.index_cutoff:
+            return "Second_Scrub"
+        elif self.scrub_params.stock_cutoff:
+            return "Initial_Scrub"
         else:
-            return "Third Scrub"
+            return "Raw_Returns"
 
     def describe(self):
         """Scrub Type: Beta, Corr., n"""
         pprint("{}-> Beta: {:.2f}, Corr.: {:.2f}, n = {:.0f}".format(self.scrub_type, self.beta1, self.corr, self.degrees_of_freedom))
-    
-
-    @my_time_decorator
+        
     def show_scrub_trajectory(self):
         """Beta at Each Stage of the Scrubbing Process: Raw_Returns, Initial_Scrub, Second_Scrub, Third_Scrub"""
         print("{} (Index: {}), n = {}, {}".format(self.stock, self.index, self.lookback, self.scrub_params))
         
-        raw_returns = ScrubParams(1.0, 0.0, 1.0)
-        initial_scrub = ScrubParams(self.scrub_params.stock_cutoff, 0.0, 1.0)
-        second_scrub = ScrubParams(self.scrub_params.stock_cutoff, self.scrub_params.index_cutoff, 1.0)
-        third_scrub = ScrubParams(self.scrub_params.stock_cutoff, self.scrub_params.index_cutoff, self.scrub_params.percentile_cutoff)
-
-        scrub_params_list= [raw_returns, initial_scrub, second_scrub, third_scrub]
+        # This is an alternative comparaison order which is not currently in use
+        scrub_params1 = ScrubParams()
+        scrub_params2 = ScrubParams(2, self.scrub_params.index_cutoff, 1.0)
+        scrub_params3 = ScrubParams(self.scrub_params.stock_cutoff, self.scrub_params.index_cutoff, 1.0)
+        scrub_params4 = ScrubParams(self.scrub_params.stock_cutoff, self.scrub_params.index_cutoff, self.scrub_params.percentile_cutoff)
         
-        for param_set in scrub_params_list:
-            Beta.scrubbed_returns_cache = {}
-            Beta(self.stock, self.index, self.lookback, param_set).describe()
+        scrub_params1 = ScrubParams()
+        scrub_params2 = ScrubParams(self.scrub_params.stock_cutoff)
+        scrub_params3 = ScrubParams(self.scrub_params.stock_cutoff, self.scrub_params.index_cutoff)
+        scrub_params4 = ScrubParams(self.scrub_params.stock_cutoff, self.scrub_params.index_cutoff, self.scrub_params.percentile_cutoff)
+
+        scrub_params_list= [scrub_params1, scrub_params2, scrub_params3, scrub_params4]
+        
+        for paramset in scrub_paramsList:
+            Beta(self.stock, self.index, self.lookback, paramset).describe()
 
 class StockLineSimple(object):
-    def __init__(self, stock: 'str', lookback: 'int', base=None):
+    def __init__(self, stock: 'str', lookback: 'int', base = None):
         self.stock = stock
         self.lookback = lookback
-        
         if base is None:
             self.base = self.stock
         else:
@@ -280,3 +283,4 @@ class StockChart(object):
         plt.subplots_adjust(left=.09, bottom=.12, right =.94, top=.9, wspace=.2, hspace=0)
         
         plt.show()
+
