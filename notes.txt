@@ -10,3 +10,33 @@ It may be more clear to logically separate the scrubbing mechanism from their or
 deleted beta_run_other.py file, it had one function to show betas for different index_value inputs but can re-write it, not worth keeping for now.
 
 deleted beta_run_file.py -- same idea, old version of shocking the beta calculation based on the index_cutoff parameter.
+
+Beta Process:
+    1) Determine scrub cutoffs
+        - stock_ceiling, index_floor
+        - stock_abs_ceiling, index_abs_floor
+        - stock_upper_limit, index_lower_limit
+        - stock_upper_limit_abs, index_lower_limit_abs
+        - abs_stock_move_upper_limit, abs_index_move_lower_limit
+
+    1) Determine stock_ceiling:
+        - scrub_returns_by_percentile(df_stock_moves)
+        - calculate_HV_of_scrubbed_returns
+        - HV_to_average_daily_move_transform
+        - average_daily_move_to_cutoff_transform
+    2) Default values
+        - 
+
+
+For the scrubbing processes, I only want to run the respective process IF the user wants to scrub on that dimension. It is a waste of computation and IF the user communicates "don't scrub".
+    - Right now, for the...
+    - stock_scrub_process, do not run the process if the user inputs a value for stock_ceiling greater than 1.0, since only scrubbing moves with such a high cutoff doesn't make sense.
+    - index_scrub_process, do not run the process if the user inputs a value for index_floor of 0, since this would include all moves (scrubbing would be a tautology)
+    - best_fit_scrub_process, do not run the process if the user inputs a percentile of 100 since this communicates to keep all data points
+
+My thought is to screen based on a Boolean value of False, where if the user inputs the word "False", he does not want to scrub on that dimension. This may be more clear too to read and understand, especially for the stock_scrub_process. False would simply mean that we are not scrubbing on that process, and it also makes for a common if statement across all three processes.
+
+This process was no good because of the huge variation based on the percentile chosen (for SRPT, 99 v 98 from 13% v 9%. It is better to do an initial scrub and then work with standard deviation from there).
+def determine_stock_ceiling_for_scrub_process_from_stock_returns(returns_df, percentile_ceiling):
+    """Weinerize the returns with a percentile cutoff. The purpose of the normalization process is to scrub away outsized moves for all stocks, while taking into account that some stocks on average move more than other stocks.
+    A percentile cutoff is intuitive because a 3.0% move for AAPL may be outsized whereas a 3.0% move for SRPT would be standard daily volatility."""
