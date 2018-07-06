@@ -109,7 +109,7 @@ def fetch_price_table():
     if __name__ == '__main__':
         #symbols = get_sp500_symbols_from_wiki()
         #symbols = indices
-        symbols = ['XBI', 'SRPT', 'CRBP', 'NBIX']
+        symbols = ['XBI', 'IBB', 'SPY', 'QQQ', 'SRPT', 'CRBP', 'NBIX', 'BIIB', 'ALNY', 'PFE']
         file_name = '/home/paul/Paulthon/DataFiles/StockPrices/sp500_prices_paul'
         price_table = make_price_table(symbols,
                                        start = dt.datetime(2015,1,1),

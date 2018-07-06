@@ -9,7 +9,9 @@ def create_ols_df(returns_df: 'Two-column DataFrame of daily returns for the sto
     ols_model = sm.OLS(returns_df[stock], returns_df[index], missing='drop')
     ols_results = ols_model.fit()
 
-    returns_df['y_hat'] = returns_df[index]*ols_results.params[index]
+    ols_beta = ols_results.params[index]
+
+    returns_df['y_hat'] = returns_df[index]*ols_beta
     returns_df['error'] = returns_df[stock] - returns_df['y_hat']
     returns_df['error_squared'] = returns_df['error']*returns_df['error']
     return returns_df

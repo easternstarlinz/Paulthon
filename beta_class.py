@@ -12,25 +12,8 @@ from utility.general import tprint
 from data.finance import PriceTable
 from utility.finance import daily_returns
 
+from scrub_params import ScrubParams
 from scrubbing_processes import stock_ceiling_scrub_process, index_floor_scrub_process, best_fit_scrub_process
-
-class ScrubParams(object):
-    """Three Parameters for Scrubbing Process:
-        - Stock Cutoff: Scrub all moves that are larger (absolute value) than the stock cutoff
-        - Index Cutoff: Scrub all moves where the index move is smaller (absolute value) than the stock cutoff)
-        - Percentile Cutoff: With the remaining data points, keep the n-percentile data points with the best fit on the OLS Regression fit.
-        """
-    def __init__(self,
-                 stock_cutoff=5,
-                 index_cutoff=0,
-                 percentile_cutoff=100):
-        
-        self.stock_cutoff = stock_cutoff
-        self.index_cutoff = index_cutoff
-        self.percentile_cutoff = percentile_cutoff
-
-    def __repr__(self):
-        return "ScrubParams(Stock Cutoff: {:2f}, Index Cutoff: {:2f}, Percentile Cutoff: {:2f})".format(self.stock_cutoff, self.index_cutoff, self.percentile_cutoff)
 
 class Beta(object):
     def __init__(self,
@@ -52,33 +35,36 @@ class Beta(object):
     def initial_scrub(self):
         """Eliminate data points where the stock moved greater (absolute value) than the specified stock cutoff.
            This process imposes a celing for the magnitude of stock moves included in the sample."""
-        return stock_ceiling_scrub_process(returns_df_to_scrub=self.daily_returns,
-                                          stock_to_drive_scrubbing=self.stock,
-                                          stock_move_ceiling=self.scrub_params.stock_cutoff)
+        initial_scrub = stock_ceiling_scrub_process(returns_df_to_scrub=self.daily_returns,
+                                                    stock_to_drive_scrubbing=self.stock,
+                                                    stock_move_ceiling=self.scrub_params.stock_cutoff)
+        return initial_scrub
     
     @property
     def second_scrub(self):
         """Eliminate data points where the index moved less than the index cutoff. Only keep data points above the floor."""
-        return index_floor_scrub_process(returns_df_to_scrub=self.initial_scrub,
-                                         index_to_drive_scrubbing=self.index,
-                                         index_move_floor=self.scrub_params.index_cutoff)
-    
+        second_scrub = index_floor_scrub_process(returns_df_to_scrub=self.initial_scrub,
+                                                 index_to_drive_scrubbing=self.index,
+                                                 index_move_floor=self.scrub_params.index_cutoff)
+        return second_scrub
+
     @property
     def third_scrub(self):
         """Keep the n percentile data points that have the best fit based on OLS regression"""
-        return best_fit_scrub_process(returns_df_to_scrub=self.second_scrub,
-                                      stock=self.stock,
-                                      index=self.index,
-                                      percentile_cutoff=self.scrub_params.percentile_cutoff)
+        third_scrub = best_fit_scrub_process(returns_df_to_scrub=self.second_scrub,
+                                             stock=self.stock,
+                                             index=self.index,
+                                             percentile_cutoff=self.scrub_params.percentile_cutoff)
+        return third_scrub
     
     scrubbed_returns_cache = {}
     @property
     def scrubbed_returns(self):
-        if self.stock in Beta.scrubbed_returns_cache:
-            return Beta.scrubbed_returns_cache[self.stock]
+        if (self.stock, self.index) in Beta.scrubbed_returns_cache:
+            return Beta.scrubbed_returns_cache[(self.stock, self.index)]
         else:
-            Beta.scrubbed_returns_cache[self.stock] = self.third_scrub
-            return Beta.scrubbed_returns_cache[self.stock]
+            Beta.scrubbed_returns_cache[(self.stock, self.index)] = self.third_scrub
+            return Beta.scrubbed_returns_cache[(self.stock, self.index)]
 
     @property
     def num_days_in_calculation(self):
@@ -129,11 +115,13 @@ class Beta(object):
     
     @property
     def scrub_type(self):
-        if self.scrub_params.stock_cutoff >= 1.0 and self.scrub_params.index_cutoff == 0 and self.scrub_params.percentile_cutoff == 1.0:
+        if all([self.scrub_params.stock_cutoff is False,
+               self.scrub_params.index_cutoff is False,
+               self.scrub_params.percentile_cutoff is False]):
             return "Raw Returns"
-        elif self.scrub_params.index_cutoff == 0 and self.scrub_params.percentile_cutoff == 1.0:
+        elif self.scrub_params.index_cutoff is False and self.scrub_params.percentile_cutoff is False:
             return "Initial Scrub"
-        elif self.scrub_params.percentile_cutoff == 1.0:
+        elif self.scrub_params.percentile_cutoff is False:
             return "Second Scrub"
         else:
             return "Third Scrub"
@@ -148,9 +136,9 @@ class Beta(object):
         """Beta at Each Stage of the Scrubbing Process: Raw_Returns, Initial_Scrub, Second_Scrub, Third_Scrub"""
         print("{} (Index: {}), n = {}, {}".format(self.stock, self.index, self.lookback, self.scrub_params))
         
-        raw_returns = ScrubParams(1.0, 0.0, 1.0)
-        initial_scrub = ScrubParams(self.scrub_params.stock_cutoff, 0.0, 1.0)
-        second_scrub = ScrubParams(self.scrub_params.stock_cutoff, self.scrub_params.index_cutoff, 1.0)
+        raw_returns = ScrubParams(False, False, False)
+        initial_scrub = ScrubParams(self.scrub_params.stock_cutoff, False, False)
+        second_scrub = ScrubParams(self.scrub_params.stock_cutoff, self.scrub_params.index_cutoff, False)
         third_scrub = ScrubParams(self.scrub_params.stock_cutoff, self.scrub_params.index_cutoff, self.scrub_params.percentile_cutoff)
 
         scrub_params_list= [raw_returns, initial_scrub, second_scrub, third_scrub]

@@ -4,19 +4,17 @@ import numpy as np
 import math
 import pickle
 import itertools
-from collections import namedtuple, OrderedDict
-from functools import reduce
+from collections import namedtuple
 #from multiprocessing import Pool
 
 # Paul Modules
 from beta_class import ScrubParams, Beta
 from Beta_StepTwo import Beta_StepTwo
-from scrubbing_processes import default_stock_ceiling_params, default_index_floor_params, BEST_FIT_PERCENTILE, get_scrub_params
 
 # Paul Utils
 from utility.decorators import my_time_decorator, empty_decorator
 from utility.general import tprint, setup_standard_logger, merge_dfs_horizontally, append_dfs_vertically, to_pickle_and_CSV
-from utility.finance import daily_returns, get_ETF_beta_to_SPY, get_total_return, calculate_percentile_value, get_symbol_from_returns_df, get_stock_prices, get_daily_returns, scrub_func, calculate_HV_from_returns, scrub_returns
+from utility.finance import daily_returns, get_ETF_beta_to_SPY, get_total_return, calculate_percentile, get_symbol_from_returns_df, get_stock_prices, get_daily_returns, scrub_func, calculate_HV_from_returns, scrub_returns
 
 # Finance Data
 from data.finance import PriceTable, ETF_PriceTable, Symbols, HealthcareSymbols, SP500Symbols
@@ -40,161 +38,6 @@ INDEX_SD_CUTOFF = 1.75
 
 LOOKBACK_DEFAULT = 400
 sd_cutoff_params = SD_Cutoff_Params(STOCK_SD_CUTOFF, INDEX_SD_CUTOFF, STOCK_SD_PERCENTILE_CUTOFF, INDEX_SD_PERCENTILE_CUTOFF)
-
-def create_beta_object_from_scrub_params(stock,
-                                         index,
-                                         lookback=252,
-                                         scrub_params= ScrubParams(False, False, False)):
-    
-    beta = Beta(stock, index, lookback, scrub_params)
-    return beta
-
-def create_beta_object(stock,
-                       index,
-                       lookback=252,
-                       stock_ceiling_params=default_stock_ceiling_params,
-                       index_floor_params=default_index_floor_params,
-                       best_fit_param=BEST_FIT_PERCENTILE):
-    """Calculate the adjusted beta measurement for the stock and index over a lookback based on the three core adjustments:
-        - Stock Ceiling: Scrub data points where the stock moved more than the specified threshold.
-        - Index Floor: Scrub data points where the index moved less than the specified threshold.
-        - Best Fit Param: Keep only the n-percentile best fit points in the OLS regression"""
-
-    scrub_params = get_scrub_params(stock,
-                                    index,
-                                    lookback=lookback,
-                                    stock_ceiling_params=default_stock_ceiling_params,
-                                    index_floor_params=default_index_floor_params,
-                                    best_fit_param=BEST_FIT_PERCENTILE)
-    
-    beta = Beta(stock, index, lookback, scrub_params)
-    return beta
-
-
-def get_betas_multiple_indices(stock,
-                               indices: 'iterable of indices',
-                               lookback=252,
-                               stock_ceiling_params=default_stock_ceiling_params,
-                               index_floor_params=default_index_floor_params,
-                               best_fit_param=BEST_FIT_PERCENTILE,
-                               save_to_file=False):
-    
-    scrub_params_all = [get_scrub_params(stock, index, lookback, stock_ceiling_params, index_floor_params, best_fit_param) for index in indices]
-    
-    betas = [create_beta_object_from_scrub_params(stock, indices[i], lookback, scrub_params_all[i]) for i in range(len(indices))]
-    #betas = [create_beta_object(stock, index, lookback, stock_ceiling_params, index_floor_params, best_fit_param) for index in indices]
-    
-    # OLS Info
-    beta_values = [beta.beta for beta in betas]
-    corrs = [beta.corr for beta in betas]
-    
-    # Scrubbing Info
-    stock_cutoffs = [scrub_params.stock_cutoff for scrub_params in scrub_params_all]
-    index_cutoffs = [scrub_params.index_cutoff for scrub_params in scrub_params_all]
-    
-    # Beta to SPY Info
-    index_betas_to_SPY = [get_ETF_beta_to_SPY(index) for index in range(len(indices))]
-    betas_to_SPY = [index_betas_to_SPY[i]*beta_values[i] for i in range(len(indices))]
-    
-    # Returns over the lookback period
-    returns = [get_total_return(stock, lookback) for _ in range(len(indices))]
-    index_returns = [get_total_return(index, lookback) for index in indices]
-    idio_returns = [(1+returns[i])/(1+index_returns[i]*beta_values[i]) - 1 for i in range(len(indices))]
-    
-    # Additional_Info
-    percent_days_in_calc = [beta.percent_days_in_calculation for beta in betas]
-    
-    # Not including in the table but can always add back.
-    #percentile_cutoffs = [percentile_cutoff for stock in range(len(stocks))]
-    
-    
-    # Create DataFrame
-            # Keep this for later
-    """
-            OLS_info = [beta_values, corrs],
-            scrubbing_info = [stock_cutoffs, index_cutoffs],
-            beta_to_SPY_info = [index_betas_to_SPY, betas_to_SPY],
-            returns_info = [returns, index_returns, idio_returns],
-            additional_info = [percent_days_in_calc]
-    
-    # Prepare information
-    {
-            # OLS Info
-            'Beta': beta_values,
-            'Corr': corrs,
-     
-            # Scrubbing Info
-            'Stock_Cutoff': stock_cutoffs,
-            'Index_Cutoff': index_cutoffs,
-            
-            # Beta to SPY Info
-            'Index_Beta_to_SPY': index_betas_to_SPY,
-            'Beta_to_SPY': betas_to_SPY,
-            
-            # Returns Info
-            'Return': returns,
-            'Index_Return': index_returns,
-            
-            # Additional Info
-            'Idio_return': idio_returns,
-            'Percent_Days': percent_days_in_calc
-    }
-
-    table_info =  reduce(lambda x, y: x.extend(y), **all_info)
-    print(table_info)
-    table_info = list(zip(*table_info))
-    print(table_info)
-    table_info = list(zip(beta_values, corrs, stock_cutoffs, index_cutoffs, index_betas_to_SPY, betas_to_SPY, returns, index_returns, idio_returns, percent_days_in_calc))
-    
-    
-    InfoLabels = ['Beta', 'Corr', 'Stock_Cutoff', 'Index_Cutoff', 'Index_Beta_to_SPY', 'Beta_to_SPY', 'Return', 'Index_Return', 'Idio_Return', 'Percent_Days']
-    all_info = [OLS_info, scrubbing_info, beta_to_SPY_info, returns_info, additional_info]
-    print(all_info) 
-            """
-    # Prepare information
-    table_info_dict =  OrderedDict([
-                        # OLS Info
-                        ('Beta', beta_values),
-                        ('Corr', corrs),
-                     
-                        # Scrubbing Info
-                        ('Stock_Cutoff', stock_cutoffs),
-                        ('Index_Cutoff', index_cutoffs),
-                        
-                        # Beta to SPY Info
-                        ('Index_Beta_to_SPY', index_betas_to_SPY),
-                        ('Beta_to_SPY', betas_to_SPY),
-                        
-                        # Returns Info
-                        ('Return', returns),
-                        ('Index_Return', index_returns),
-                        ('Idio_return', idio_returns),
-                        
-                        # Additional Info
-                        ('Percent_Days', percent_days_in_calc)
-                        ])
-
-    InfoLabels = table_info_dict.keys()
-    print(InfoLabels, type(InfoLabels))
-    
-    table_info = list(zip(*table_info_dict.values()))
-    print(table_info)
-
-    index_row = pd.Index(indices, name = 'Stock')
-    iterables_columns = [[stock], InfoLabels]
-    index_column = pd.MultiIndex.from_product(iterables_columns, names = ['Index', 'Beta_Info'])
-    df = pd.DataFrame(table_info, index = index_row, columns = index_column)
-    
-    if save_to_file:
-        to_pickle_and_CSV(df, file_name)
-    
-    return df
-
-stock = 'NBIX'
-indices = ['XBI', 'IBB']
-betas = get_betas_multiple_indices(stock, indices)
-print(betas.to_string())
-
 
 
 @my_time_decorator
