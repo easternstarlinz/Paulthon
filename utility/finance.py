@@ -73,6 +73,19 @@ def get_daily_returns(stock, lookback=252):
     price_table = get_stock_prices(stock, lookback)
     return daily_returns(price_table)
 
+def get_total_return(stock, lookback):
+    """Get the total return for a stock over a lookback (num. days)"""
+    # Get prices over the lookback period
+    stock_prices = get_stock_prices(stock, lookback)
+    
+    # Get start and end prices
+    start_price = stock_prices.iloc[-1].item()
+    end_price = stock_prices.iloc[0].item()
+    
+    print('Start Price: ', start_price, 'End Price: ', end_price)
+    # Calculate total return
+    total_return = end_price / start_price - 1
+    return total_return
 
 
 #returns = get_daily_returns('XBI', lookback=20)
@@ -158,18 +171,6 @@ def get_scrub_params_from_sd_cutoff_params(stock,
     stock_cutoff = max(.02 + index_cutoff*2, stock_cutoff_raw)
     return ScrubParams(stock_cutoff, index_cutoff, percentile_cutoff)
 
-def get_total_return(stock, lookback):
-    """Get the total return for a stock over a lookback (num. days)"""
-    # Get prices over the lookback period
-    stock_prices = get_stock_prices_over_lookback(stock, lookback)
-    
-    # Get start and end prices
-    start_price = stock_prices.iloc[-1]
-    end_price = stock_prices.iloc[0]
-    
-    # Calculate total return
-    total_return = end_price / start_price - 1
-    return total_return
 
 def get_num_days_above_cutoff(stock, lookback, cutoff, below_cutoff=False, absolute_value=False):
     # Get prices over the lookback period
