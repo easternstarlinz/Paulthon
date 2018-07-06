@@ -47,10 +47,28 @@ def setup_standard_logger(file_name):
 
 # DataFrame Utility Functions
 def merge_dfs_horizontally(dfs: 'list of dfs', suffixes=('_x', '_y')):
+    dfs = [df for df in dfs if df is not None]
+
     if len(dfs) == 1:
         return dfs[0]
     else:
         return reduce(lambda x, y: pd.merge(x, y, left_index=True, right_index=True, suffixes=suffixes), dfs)
+
+def concat_dfs_horizontally(dfs: 'list of dfs'):
+    dfs = [df for df in dfs if df is not None]
+
+    if len(dfs) == 1:
+        return dfs[0]
+    else:
+        return reduce(lambda x, y: pd.concat(dfs, axis=1))
+
+def outer_join_dfs_horizontally(dfs: 'list of dfs'):
+    dfs = [df for df in dfs if df is not None]
+
+    if len(dfs) == 1:
+        return dfs[0]
+    else:
+        return reduce(lambda x, y: x.join(y, how='outer'), dfs)
 
 def append_dfs_vertically(dfs: 'list of dfs'):
     if len(dfs) == 1:

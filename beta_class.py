@@ -26,8 +26,8 @@ class Beta(object):
                  stock_ceiling_params=default_stock_ceiling_params,
                  index_floor_params=default_index_floor_params,
                  best_fit_param=BEST_FIT_PERCENTILE):
-        """The Beta object takes as parameters the stock, index, lookback, and scrubparams object.
-           The user can enter scrub_params OR a set of stock_ceiling_params, index_floor_params, and best_fit_param."""
+        """The Beta object takes as parameters the stock, index, lookback, and scrub_params object.
+           The user can enter scrub_params OR a set of stock_ceiling_params, index_floor_params, and best_fit_param which map to scrub_params."""
         self.stock = stock
         self.index = index
         self.lookback = lookback

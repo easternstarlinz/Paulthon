@@ -76,6 +76,7 @@ SP500Symbols = pd.read_html('https://en.wikipedia.org/wiki/List_of_S&P_500_compa
 SP500Symbols = sorted([sym for sym in SP500Symbols if sym not in SymbolExcludes])
 
 AllSymbols = set(HealthcareSymbols).union(set(SP500Symbols))
+AllSymbols = sorted([sym for sym in AllSymbols if sym not in SymbolExcludes])
 print(AllSymbols)
 
 
