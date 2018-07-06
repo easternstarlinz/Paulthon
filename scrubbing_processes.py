@@ -53,14 +53,14 @@ class Index_Floor_Params(object):
 
 
 # Stock Ceiling Params
-STOCK_CEILING_INITIAL_CEILING = .10
+STOCK_CEILING_INITIAL_CEILING = .125
 STOCK_CEILING_SD_MULTIPLIER = 3.0
 
 default_stock_ceiling_params  = Stock_Ceiling_Params(initial_ceiling=STOCK_CEILING_INITIAL_CEILING,
                                                      SD_multiplier=STOCK_CEILING_SD_MULTIPLIER)
 
 # Index Floor Params
-INDEX_FLOOR_SD_MULTIPLIER = 1.5
+INDEX_FLOOR_SD_MULTIPLIER = 1.0
 
 default_index_floor_params = Index_Floor_Params(SD_multiplier=INDEX_FLOOR_SD_MULTIPLIER)
 

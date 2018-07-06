@@ -33,31 +33,10 @@ logger.addHandler(stream_handler)
 """
 --------------------------------------------------------------------
 The functions in this module are web scraping functions.
-    1) Pull S&P 500 symbols from Wikipedia (and create pickle file).
-        --get_sp500_symbols_from_wiki()    
-
-    2) Get historical data for multiple stocks from Yahoo Finance
+    1) Get historical data for multiple stocks from Yahoo Finance
         --make_price_table(symbols,start,end)
 --------------------------------------------------------------------
 """
-
-def get_sp500_symbols_from_wiki():
-    """Pull S&P 500 Symbols from Wikipedia (with the ability to add discretionary symbols)"""
-    # Pull symbols from Wikipedia table
-    sp500_symbols = pd.read_html('https://en.wikipedia.org/wiki/List_of_S&P_500_companies')[0][0][1:].reset_index(drop=True).tolist()
-   
-    # Add Discretionary Stock and Indices
-    discretionary_stocks = HealthcareSymbols
-    discretionary_indices = ['SPY', 'IWM', 'QQQ', 'IBB', 'XBI', 'XLP', 'XRT'] + ['XLV', 'XLF', 'XLE', 'AMLP', 'VFH', 'GDX', 'XLU']
-    discretionary_symbols = discretionary_stocks + discretionary_indices
-    discretionary_symbols = ['SPY']
-
-    # All Symbols for Output
-    all_symbols = sorted(list(set(sp500_symbols + discretionary_symbols)))
-    all_symbols = pd.Series(all_symbols).sort_values().reset_index(drop=True)
-    to_pickle_and_CSV(all_symbols, 'current_symbols')
-    return all_symbols.values.tolist()
-
 @my_time_decorator
 def make_price_table(symbols: 'list',
                      start = dt.datetime(2016,1,1),
@@ -110,10 +89,10 @@ def test_yahoo_reader():
 @my_time_decorator
 def fetch_price_table():
     if __name__ == '__main__':
-        #symbols = get_sp500_symbols_from_wiki()
         #symbols = indices
         symbols = ['XBI', 'IBB', 'SPY', 'QQQ', 'SRPT', 'CRBP', 'NBIX', 'BIIB', 'ALNY', 'PFE']
         symbols = AllSymbols
+        symbols = ['AAAP', 'XBI']
         file_name = '/home/paul/Paulthon/DataFiles/StockPrices/sp500_prices_paul'
         price_table = make_price_table(symbols,
                                        start = dt.datetime(2015,1,1),

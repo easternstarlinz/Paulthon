@@ -37,6 +37,11 @@ For the scrubbing processes, I only want to run the respective process IF the us
 My thought is to screen based on a Boolean value of False, where if the user inputs the word "False", he does not want to scrub on that dimension. This may be more clear too to read and understand, especially for the stock_scrub_process. False would simply mean that we are not scrubbing on that process, and it also makes for a common if statement across all three processes.
 
 This process was no good because of the huge variation based on the percentile chosen (for SRPT, 99 v 98 from 13% v 9%. It is better to do an initial scrub and then work with standard deviation from there).
+
+
 def determine_stock_ceiling_for_scrub_process_from_stock_returns(returns_df, percentile_ceiling):
     """Weinerize the returns with a percentile cutoff. The purpose of the normalization process is to scrub away outsized moves for all stocks, while taking into account that some stocks on average move more than other stocks.
     A percentile cutoff is intuitive because a 3.0% move for AAPL may be outsized whereas a 3.0% move for SRPT would be standard daily volatility."""
+
+Question: Should I split the initial_scrub process into two separate processes to enhance with clarity? Or are the two steps of initial_scrub related enough to combine into one step?
+right now the standard dev version is a higher abstractted level of params, distinguish by scrub_params v scrtub_values? id have to make the current scrub_params into scrub_values

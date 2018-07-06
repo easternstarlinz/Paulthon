@@ -13,19 +13,35 @@ from data.finance import PriceTable
 from utility.finance import daily_returns
 
 from scrub_params import ScrubParams
-from scrubbing_processes import stock_ceiling_scrub_process, index_floor_scrub_process, best_fit_scrub_process
+from scrubbing_processes import stock_ceiling_scrub_process, index_floor_scrub_process, best_fit_scrub_process, default_stock_ceiling_params, default_index_floor_params, BEST_FIT_PERCENTILE, get_scrub_params
 
 class Beta(object):
     def __init__(self,
                  stock: 'str',
                  index: 'str',
-                 lookback: 'int',
-                 scrub_params: 'obj'):
-        """The Beta object takes as parameters the stock, index, lookback, and scrubparams object"""
+                 lookback: 'int'=252,
+                 scrub_params: 'obj'=None,
+                 
+                 # Optional Parameters as an alternative to entering scrub_params
+                 stock_ceiling_params=default_stock_ceiling_params,
+                 index_floor_params=default_index_floor_params,
+                 best_fit_param=BEST_FIT_PERCENTILE):
+        """The Beta object takes as parameters the stock, index, lookback, and scrubparams object.
+           The user can enter scrub_params OR a set of stock_ceiling_params, index_floor_params, and best_fit_param."""
         self.stock = stock
         self.index = index
         self.lookback = lookback
-        self.scrub_params = scrub_params
+        
+        if scrub_params == None:
+            self.scrub_params = get_scrub_params(stock,
+                                                 index,
+                                                 lookback=252, 
+                                                 stock_ceiling_params=default_stock_ceiling_params,
+                                                 index_floor_params=default_index_floor_params,
+                                                 best_fit_param=BEST_FIT_PERCENTILE)
+        
+        else:
+            self.scrub_params = scrub_params
         
         self.price_table = PriceTable.head(self.lookback)[[self.stock, self.index]]
         self.daily_returns = daily_returns(self.price_table)

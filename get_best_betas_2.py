@@ -41,6 +41,7 @@ INDEX_SD_CUTOFF = 1.75
 LOOKBACK_DEFAULT = 400
 sd_cutoff_params = SD_Cutoff_Params(STOCK_SD_CUTOFF, INDEX_SD_CUTOFF, STOCK_SD_PERCENTILE_CUTOFF, INDEX_SD_PERCENTILE_CUTOFF)
 
+# Unnecessary function because can literally just invoke the class???
 def create_beta_object_from_scrub_params(stock,
                                          index,
                                          lookback=252,
@@ -82,7 +83,6 @@ def get_betas_multiple_indices(stock,
     scrub_params_all = [get_scrub_params(stock, index, lookback, stock_ceiling_params, index_floor_params, best_fit_param) for index in indices]
     
     betas = [create_beta_object_from_scrub_params(stock, indices[i], lookback, scrub_params_all[i]) for i in range(len(indices))]
-    #betas = [create_beta_object(stock, index, lookback, stock_ceiling_params, index_floor_params, best_fit_param) for index in indices]
     
     # OLS Info
     beta_values = [beta.beta for beta in betas]
@@ -91,97 +91,46 @@ def get_betas_multiple_indices(stock,
     # Scrubbing Info
     stock_cutoffs = [scrub_params.stock_cutoff for scrub_params in scrub_params_all]
     index_cutoffs = [scrub_params.index_cutoff for scrub_params in scrub_params_all]
+    percentile_cutoffs = [scrub_params.percentile_cutoff for scrub_params in scrub_params_all]
+    percent_days_in_calc = [beta.percent_days_in_calculation for beta in betas]
     
     # Beta to SPY Info
-    index_betas_to_SPY = [get_ETF_beta_to_SPY(index) for index in range(len(indices))]
+    index_betas_to_SPY = [get_ETF_beta_to_SPY(index) for index in indices]
     betas_to_SPY = [index_betas_to_SPY[i]*beta_values[i] for i in range(len(indices))]
     
-    # Returns over the lookback period
+    # Returns Info
     returns = [get_total_return(stock, lookback) for _ in range(len(indices))]
     index_returns = [get_total_return(index, lookback) for index in indices]
     idio_returns = [(1+returns[i])/(1+index_returns[i]*beta_values[i]) - 1 for i in range(len(indices))]
     
-    # Additional_Info
-    percent_days_in_calc = [beta.percent_days_in_calculation for beta in betas]
-    
-    # Not including in the table but can always add back.
-    #percentile_cutoffs = [percentile_cutoff for stock in range(len(stocks))]
-    
-    
-    # Create DataFrame
-            # Keep this for later
-    """
-            OLS_info = [beta_values, corrs],
-            scrubbing_info = [stock_cutoffs, index_cutoffs],
-            beta_to_SPY_info = [index_betas_to_SPY, betas_to_SPY],
-            returns_info = [returns, index_returns, idio_returns],
-            additional_info = [percent_days_in_calc]
-    
-    # Prepare information
-    {
-            # OLS Info
-            'Beta': beta_values,
-            'Corr': corrs,
-     
-            # Scrubbing Info
-            'Stock_Cutoff': stock_cutoffs,
-            'Index_Cutoff': index_cutoffs,
-            
-            # Beta to SPY Info
-            'Index_Beta_to_SPY': index_betas_to_SPY,
-            'Beta_to_SPY': betas_to_SPY,
-            
-            # Returns Info
-            'Return': returns,
-            'Index_Return': index_returns,
-            
-            # Additional Info
-            'Idio_return': idio_returns,
-            'Percent_Days': percent_days_in_calc
-    }
-
-    table_info =  reduce(lambda x, y: x.extend(y), **all_info)
-    print(table_info)
-    table_info = list(zip(*table_info))
-    print(table_info)
-    table_info = list(zip(beta_values, corrs, stock_cutoffs, index_cutoffs, index_betas_to_SPY, betas_to_SPY, returns, index_returns, idio_returns, percent_days_in_calc))
-    
-    
-    InfoLabels = ['Beta', 'Corr', 'Stock_Cutoff', 'Index_Cutoff', 'Index_Beta_to_SPY', 'Beta_to_SPY', 'Return', 'Index_Return', 'Idio_Return', 'Percent_Days']
-    all_info = [OLS_info, scrubbing_info, beta_to_SPY_info, returns_info, additional_info]
-    print(all_info) 
-            """
-    # Prepare information
+    # Prepare Information for the DataFrame in an Ordered Dictionary
     table_info_dict =  OrderedDict([
                         # OLS Info
                         ('Beta', beta_values),
                         ('Corr', corrs),
                      
-                        # Scrubbing Info
-                        ('Stock_Cutoff', stock_cutoffs),
-                        ('Index_Cutoff', index_cutoffs),
-                        
                         # Beta to SPY Info
                         ('Index_Beta_to_SPY', index_betas_to_SPY),
                         ('Beta_to_SPY', betas_to_SPY),
                         
                         # Returns Info
-                        ('Return', returns),
+                        ('Stock_Return', returns),
                         ('Index_Return', index_returns),
                         ('Idio_return', idio_returns),
                         
-                        # Additional Info
+                        # Scrubbing Info
+                        ('Stock_Cutoff', stock_cutoffs),
+                        ('Index_Cutoff', index_cutoffs),
+                        ('Percentile_Cutoff', percentile_cutoffs),
                         ('Percent_Days', percent_days_in_calc)
                         ])
 
-    InfoLabels = table_info_dict.keys()
-    print(InfoLabels, type(InfoLabels))
-    
+    # Create DataFrame
+    column_labels = table_info_dict.keys()
     table_info = list(zip(*table_info_dict.values()))
-    print(table_info)
 
     index_row = pd.Index(indices, name = 'Stock')
-    iterables_columns = [[stock], InfoLabels]
+    iterables_columns = [[stock], column_labels]
     index_column = pd.MultiIndex.from_product(iterables_columns, names = ['Index', 'Beta_Info'])
     df = pd.DataFrame(table_info, index = index_row, columns = index_column)
     
@@ -190,13 +139,182 @@ def get_betas_multiple_indices(stock,
     
     return df
 
-stock = 'NBIX'
-indices = ['XBI', 'IBB']
-betas = get_betas_multiple_indices(stock, indices)
-print(betas.to_string())
+def get_betas_multiple_stocks(stocks: 'iterable of stocks',
+                               index: 'one index',
+                               lookback=252,
+                               stock_ceiling_params=default_stock_ceiling_params,
+                               index_floor_params=default_index_floor_params,
+                               best_fit_param=BEST_FIT_PERCENTILE,
+                               save_to_file=False):
+    
+    scrub_params_all = [get_scrub_params(stock, index, lookback, stock_ceiling_params, index_floor_params, best_fit_param) for stock in stocks]
+    
+    betas = [create_beta_object_from_scrub_params(stocks[i], index, lookback, scrub_params_all[i]) for i in range(len(stocks))]
+    
+    # OLS Info
+    beta_values = [beta.beta for beta in betas]
+    corrs = [beta.corr for beta in betas]
+    
+    # Beta to SPY Info
+    index_betas_to_SPY = [get_ETF_beta_to_SPY(stock) for stock in stocks]
+    betas_to_SPY = [index_betas_to_SPY[i]*beta_values[i] for i in range(len(stocks))]
+    
+    # Returns Info
+    returns = [get_total_return(stock, lookback) for stock in stocks]
+    index_returns = [get_total_return(index, lookback) for _ in range(len(stocks))]
+    idio_returns = [(1+returns[i])/(1+index_returns[i]*beta_values[i]) - 1 for i in range(len(stocks))]
+    
+    # Scrubbing Info
+    stock_cutoffs = [scrub_params.stock_cutoff for scrub_params in scrub_params_all]
+    index_cutoffs = [scrub_params.index_cutoff for scrub_params in scrub_params_all]
+    percentile_cutoffs = [scrub_params.percentile_cutoff for scrub_params in scrub_params_all]
+    percent_days_in_calc = [beta.percent_days_in_calculation for beta in betas]
+    
+    
+    # Prepare Information for the DataFrame in an Ordered Dictionary
+    table_info_dict =  OrderedDict([
+                        # Index Symbol
+                        ('Index', [index for _ in range(len(stocks))]),
+
+                        # OLS Info
+                        ('Beta', beta_values),
+                        ('Corr', corrs),
+                     
+                        # Beta to SPY Info
+                        ('Index_Beta_to_SPY', index_betas_to_SPY),
+                        ('Beta_to_SPY', betas_to_SPY),
+                        
+                        # Returns Info
+                        ('Stock_Return', returns),
+                        ('Index_Return', index_returns),
+                        ('Idio_Return', idio_returns),
+                        
+                        # Scrubbing Info
+                        ('Stock_Cutoff', stock_cutoffs),
+                        ('Index_Cutoff', index_cutoffs),
+                        ('Percentile_Cutoff', percentile_cutoffs),
+                        ('Percent_Days', percent_days_in_calc)
+                        
+                        ])
+
+    # Create DataFrame
+    column_labels = table_info_dict.keys()
+    table_info = list(zip(*table_info_dict.values()))
+
+    index_row = pd.Index(stocks, name = 'Stock')
+    #iterables_columns = [[index], column_labels]
+    iterables_columns = [['Index'], column_labels]
+    index_column = pd.MultiIndex.from_product(iterables_columns, names = ['Index', 'Beta_Info'])
+    df = pd.DataFrame(table_info, index = index_row, columns = index_column)
+    
+    if save_to_file:
+        to_pickle_and_CSV(df, file_name)
+    
+    return df
+
+# Same exact formula but different style -- big difference visually, which is better?
+def get_betas_multiple_stocks(stocks: 'iterable of stocks',
+                               index: 'one index',
+                               lookback=252,
+                               stock_ceiling_params=default_stock_ceiling_params,
+                               index_floor_params=default_index_floor_params,
+                               best_fit_param=BEST_FIT_PERCENTILE,
+                               save_to_file=False):
+    
+    scrub_params_all = [get_scrub_params(stock, index, lookback, stock_ceiling_params, index_floor_params, best_fit_param) for stock in stocks]
+    
+    #betas = [create_beta_object_from_scrub_params(stocks[i], index, lookback, scrub_params_all[i]) for i in range(len(stocks))]
+    betas = [Beta(stocks[i], index, lookback, scrub_params_all[i]) for i in range(len(stocks))]
+    beta_values = [beta.beta for beta in betas] 
+    
+    # Returns Info
+    returns = [get_total_return(stock, lookback) for stock in stocks]
+    index_returns = [get_total_return(index, lookback) for _ in range(len(stocks))]
+    idio_returns = [(1+returns[i])/(1+index_returns[i]*beta_values[i]) - 1 for i in range(len(stocks))]
+    
+    # Beta to SPY Info
+    index_betas_to_SPY = [get_ETF_beta_to_SPY(stock) for stock in stocks]
+    betas_to_SPY = [index_betas_to_SPY[i]*beta_values[i] for i in range(len(stocks))]
+    
+    # Prepare Information for the DataFrame in an Ordered Dictionary
+    info =  OrderedDict([
+        # Index Symbol
+        ('Index', [index for _ in range(len(stocks))]),
+
+        # OLS Info
+        ('Beta', beta_values),
+        ('Corr', [beta.corr for beta in betas]),
+     
+        # Beta to SPY Info
+        ('Index_Beta_to_SPY', index_betas_to_SPY),
+        ('Beta_to_SPY', betas_to_SPY),
+        
+        # Returns Info
+        ('Stock_Return', returns),
+        ('Index_Return', index_returns),
+        ('Idio_Return', idio_returns),
+        
+        # Scrubbing Info
+        ('Stock_Cutoff', [scrub_params.stock_cutoff for scrub_params in scrub_params_all]),
+        ('Index_Cutoff', [scrub_params.index_cutoff for scrub_params in scrub_params_all]),
+        ('Percentile_Cutoff', [scrub_params.percentile_cutoff for scrub_params in scrub_params_all]),
+        ('Percent_Days', [beta.percent_days_in_calculation for beta in betas])
+        
+                        ])
+
+    # Create DataFrame
+    column_labels = info.keys()
+    table_info = list(zip(info.values()))
+
+    index_row = pd.Index(stocks, name = 'Stock')
+    #iterables_columns = [[index], column_labels]
+    iterables_columns = [['Index'], column_labels]
+    index_column = pd.MultiIndex.from_product(iterables_columns, names = ['Index', 'Beta_Info'])
+    df = pd.DataFrame(table_info, index = index_row, columns = index_column)
+    
+    if save_to_file:
+        to_pickle_and_CSV(df, file_name)
+    
+    return df
+
+def find_best_index(stock,
+                    indices,
+                    lookback=252,
+                    stock_ceiling_params=default_stock_ceiling_params,
+                    index_floor_params=default_index_floor_params,
+                    best_fit_param=BEST_FIT_PERCENTILE):
+    """For a given stock and group of indices, find the index that has the best fit based on OLS regression"""
+    scrub_params_all = [get_scrub_params(stock, index, lookback, stock_ceiling_params, index_floor_params, best_fit_param) for index in indices]
+    
+    betas = [create_beta_object_from_scrub_params(stock, indices[i], lookback, scrub_params_all[i]) for i in range(len(indices))]
+    
+    # OLS Info
+    corrs = [beta.corr for beta in betas]
+    
+    highest_corr = max(corrs)
+    highest_corr_index = corrs.index(highest_corr)
+    best_index = indices[highest_corr_index]
+    return best_index
+
+def find_best_index_multiple_stocks(stocks,
+                    indices,
+                    lookback=252,
+                    stock_ceiling_params=default_stock_ceiling_params,
+                    index_floor_params=default_index_floor_params,
+                    best_fit_param=BEST_FIT_PERCENTILE):
+
+    best_indices = [find_best_index(stock, indices, lookback, stock_ceiling_params, index_floor_params, best_fit_param) for stock in stocks]
+    best_beta_dfs = [get_betas_multiple_stocks([stock], index, lookback, stock_ceiling_params, index_floor_params, best_fit_param) for stock, index in zip(stocks, best_indices)]
+    best_betas_merged_df = append_dfs_vertically(best_beta_dfs)
+    
+    return best_betas_merged_df
+
+    #sort_values([('Best', 'Index'), ('Best', 'Corr')], ascending=[True, False], inplace=False)
 
 
 
+
+"""
 @my_time_decorator
 def get_betas_multiple_stocks(stocks,
              index,
@@ -237,7 +355,7 @@ def get_betas_multiple_stocks(stocks,
         to_pickle_and_CSV(df, file_name)
     
     return df
-
+"""
 
 @my_time_decorator
 def get_betas_for_multiple_stocks_and_indices(stocks,
@@ -284,6 +402,7 @@ def get_best_betas(stocks,
         to_pickle_and_CSV(df, file_name)
     return df
 
+"""
 lookback = 450
 #stock_cutoff = .0875
 #index_cutoff = .0125
@@ -308,6 +427,8 @@ best_betas = get_best_betas(stocks, indices, lookback, sd_cutoff_params, percent
 #stocks = ['XLV', 'XBI', 'XLI', 'XLF', 'XRT', 'XLP']
 #stocks = HealthcareSymbols[0:25]
 #stocks = SP500Symbols
+"""
+
 
 def calculate_betas_to_SPY(stocks):
     indices = ['SPY']
@@ -327,9 +448,9 @@ def calculate_raw_betas_to_SPY(stocks):
     df = betas.round(3).sort_values([(indices[0],'Corr')], ascending=False)
     print(df.to_string())
 
+"""
 #calculate_betas_to_SPY(stocks)
 #calculate_raw_betas_to_SPY(stocks)
-
 
 columns = ['Beta', 'Corr']
 columns = ['Corr']
@@ -340,7 +461,7 @@ combinations = list(itertools.product(indices, columns))
 #print(best_beta_results.loc[:, [('SPY', 'Beta'), ('IBB', 'Beta')]].round(3))
 #print(best_beta_results.loc[:, [('SPY', 'Beta'), ('SPY', 'Corr')]].round(3))
 #print(best_beta_results.loc[:, [('SPY', 'Beta'), ('SPY', 'Corr'), ('IBB', 'Beta'), ('IBB', 'Corr')]].round(3))
-
+"""
     
 def get_multiple_indices(stocks, indices):
     for index in indices:

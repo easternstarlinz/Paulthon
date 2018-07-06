@@ -68,12 +68,15 @@ industries = sorted(list(set(info.loc[:, 'Industry'])))
 industries = [i.split(' - ')[0] for i in industries]
 
 # Get list of symbols
-HealthcareSymbols = info[(info.Sector == 'Medical') & (info['Market Cap'] > 750) & (info['Price'] > 3.00)].index.tolist()
+HealthcareSymbols = info[(info.Sector == 'Medical') & (info['Market Cap'] > 100) & (info['Price'] > 3.00)].index.tolist()
 HealthcareSymbols = [i for i in HealthcareSymbols if i not in SymbolExcludes]
 
 Symbols = info.index.tolist()
 SP500Symbols = pd.read_html('https://en.wikipedia.org/wiki/List_of_S&P_500_companies')[0][0][1:].reset_index(drop=True).tolist()
 SP500Symbols = sorted([sym for sym in SP500Symbols if sym not in SymbolExcludes])
+
+AllSymbols = set(HealthcareSymbols).union(set(SP500Symbols))
+print(AllSymbols)
 
 
 # Distributions
