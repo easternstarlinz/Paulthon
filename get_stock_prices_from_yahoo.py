@@ -10,11 +10,11 @@ from multiprocessing.dummy import Pool as ThreadPool
 
 # Paul Utils
 from utility.decorators import my_time_decorator
-from utility.general import to_pickle_and_CSV
-#from ETFs import indices
+from utility.general import to_pickle_and_CSV, merge_dfs_horizontally, outer_join_dfs_horizontally
 
 # Finance Data
 from data.finance import AllSymbols
+#from ETFs import indices
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -37,13 +37,26 @@ The functions in this module are web scraping functions.
         --make_price_table(symbols,start,end)
 --------------------------------------------------------------------
 """
+def orient_price_table(df):
+    """Make sure that the price table is ordered with the first row being the most recent date down to the last row which is the oldest date"""
+    first_row_index = df.head(1).index.item()
+    last_row_index = df.tail(1).index.item()
+    
+    print(first_row_index, last_row_index)
+
+    if first_row_index > last_row_index:
+        return df
+    else:
+        return df[::-1]
+
 @my_time_decorator
 def make_price_table(symbols: 'list',
                      start = dt.datetime(2016,1,1),
                      end = dt.datetime.today(),
                      file_name = 'default'):
     """Get prices from Yahoo's website for multiple symbols"""
-    query_attempts = []
+    query_attempts = {}
+    data_points = {}
     failed_symbols = []
     
     def get_prices(symbol, start, end):
@@ -60,24 +73,32 @@ def make_price_table(symbols: 'list',
                     if count == 9:
                         logger.error("{} failed the query".format(symbol))
                         failed_symbols.append(symbol)
-                        query_attempts.append(count)
+                        query_attempts[symbol] = count
                 else:    
                     logger.info("{}: Attempts: {}".format(symbol, count))
-                    query_attempts.append(count)
-                    return df.loc[:, ['adjclose']].rename(columns = {'adjclose' : symbol})
+                    query_attempts[symbol] = count
+                    
+                    price_table = df.loc[:, ['adjclose']].rename(columns = {'adjclose' : symbol})
+                    
+                    data_points[symbol] = price_table.shape[0]
+                    return price_table
         except Exception:
+            print("Fetch Yahoo prices reached the general Exception clause")
             return None
     
     pool = ThreadPool(4)
     price_tables = pool.map(lambda stock: get_prices(stock, start, end), symbols)
-    
-    #shapes = sorted([(df.columns.values.tolist(), df.shape) for df in price_tables], key=lambda x: x[1][0])
-    #print(shapes)
-    price_table = pd.concat(price_tables, axis=1)
-    
+
+    print('Query Attempts: ', query_attempts)
+    print('Data Points: ', data_points)
+    print('Failed Symbols: ', failed_symbols, end= '\n')
+    #price_table = merge_dfs_horizontally(price_tables)
+    price_table = outer_join_dfs_horizontally(price_tables)
+    price_table = orient_price_table(price_table)
+
     to_pickle_and_CSV(price_table, file_name)
-    print(query_attempts, failed_symbols, price_table, end= '\n')
     return price_table
+
 
 #---------------------------------------------------------------------------------------
 def test_yahoo_reader():
@@ -90,9 +111,11 @@ def test_yahoo_reader():
 def fetch_price_table():
     if __name__ == '__main__':
         #symbols = indices
-        symbols = ['XBI', 'IBB', 'SPY', 'QQQ', 'SRPT', 'CRBP', 'NBIX', 'BIIB', 'ALNY', 'PFE']
+        #symbols = ['XBI', 'IBB', 'SPY', 'QQQ', 'SRPT', 'CRBP', 'NBIX', 'BIIB', 'ALNY', 'PFE']
         symbols = AllSymbols
-        symbols = ['AAAP', 'XBI']
+        #symbols = ['AAAP', 'XBI', 'NBIX']
+        #symbols = ['MCRB', 'JNCE', 'CBRE']
+        #symbols = ['XBI', 'IBB']
         file_name = '/home/paul/Paulthon/DataFiles/StockPrices/sp500_prices_paul'
         price_table = make_price_table(symbols,
                                        start = dt.datetime(2015,1,1),
@@ -100,5 +123,7 @@ def fetch_price_table():
                                        file_name = file_name)
        
         to_pickle_and_CSV(price_table, file_name)
+        return price_table
 
-fetch_price_table()
+price_table = fetch_price_table()
+print(price_table)
