@@ -13,8 +13,7 @@ from utility.decorators import my_time_decorator
 from utility.general import to_pickle_and_CSV, merge_dfs_horizontally, outer_join_dfs_horizontally
 
 # Finance Data
-from data.finance import AllSymbols
-#from ETFs import indices
+from data.symbols import symbols, all_symbols
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -103,27 +102,34 @@ def make_price_table(symbols: 'list',
 #---------------------------------------------------------------------------------------
 def test_yahoo_reader():
     symbol = 'A'
-    start = dt.datetime(2016, 1, 1)
+    start = dt.datetime(2015, 1, 1)
     end = dt.datetime.today()
     return web.get_data_yahoo(symbol, start, end).round(2)
 
 @my_time_decorator
 def fetch_price_table():
-    if __name__ == '__main__':
-        #symbols = indices
-        #symbols = ['XBI', 'IBB', 'SPY', 'QQQ', 'SRPT', 'CRBP', 'NBIX', 'BIIB', 'ALNY', 'PFE']
-        symbols = AllSymbols
-        #symbols = ['AAAP', 'XBI', 'NBIX']
-        #symbols = ['MCRB', 'JNCE', 'CBRE']
-        #symbols = ['XBI', 'IBB']
-        file_name = '/home/paul/Paulthon/DataFiles/StockPrices/sp500_prices_paul'
-        price_table = make_price_table(symbols,
-                                       start = dt.datetime(2015,1,1),
-                                       end = dt.datetime.today(),
-                                       file_name = file_name)
-       
-        to_pickle_and_CSV(price_table, file_name)
-        return price_table
+    #symbols = indices
+    #symbols = ['XBI', 'IBB', 'SPY', 'QQQ', 'SRPT', 'CRBP', 'NBIX', 'BIIB', 'ALNY', 'PFE']
+    #symbols = ['AAAP', 'XBI', 'NBIX']
+    #symbols = ['MCRB', 'JNCE', 'CBRE']
+    #symbols = ['XBI', 'IBB']
+    symbols = all_symbols
+    
+    #from data.finance import PriceTable as previous_price_table
+    #symbols = ['XBI']
 
-price_table = fetch_price_table()
-print(price_table)
+    file_name = '/home/paul/Paulthon/DataFiles/StockPrices/stock_prices'
+    
+    price_table = make_price_table(symbols,
+                                   start = dt.datetime(2014,1,1),
+                                   end = dt.datetime.today(),
+                                   file_name = file_name)
+   
+    #price_table = outer_join_dfs_horizontally([previous_price_table, price_table])
+
+    to_pickle_and_CSV(price_table, file_name)
+    return price_table
+
+if __name__ == '__main__':
+    price_table = fetch_price_table()
+    print(price_table)

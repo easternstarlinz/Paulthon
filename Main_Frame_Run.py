@@ -1,14 +1,22 @@
 import numpy as np
 import datetime as dt
-
+#import sys
+#sys.stdout = None
 
 from Stock_Module import Stock
 from Option_Module import Option
 from utility.decorators import my_time_decorator
+from scrubbing_processes import Index_Floor_Params
 
 @my_time_decorator
 def run_all():
-    stock = Stock('NBIX')
+    stock = Stock('CRBP')
+    
+    index_floor_params = Index_Floor_Params(SD_multiplier=1.0)
+
+    beta_info = stock.get_beta_info(index_floor_params=index_floor_params)
+    print(beta_info.round(3).to_string())
+
     #expiry = dt.date(2018, 10, 1)
 
     """
@@ -27,7 +35,7 @@ def run_all():
     #term_structure = crbp.get_term_structure()
     """
     print('Getting Event Timeline')
-    stock.get_event_timeline()
+    #stock.get_event_timeline()
     
     #strikes = np.arange(.9, 1.1, .025)
     #option_sheet = stock.get_option_sheet(expiry, strikes = strikes)
