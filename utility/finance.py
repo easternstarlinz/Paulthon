@@ -3,7 +3,6 @@ import pickle
 import math
 from collections import namedtuple
 
-
 import sys
 sys.path.append('/home/paul/Paulthon')
 
@@ -35,6 +34,12 @@ def calculate_average_daily_move_from_HV(HV):
 def calculate_average_daily_move_from_returns(returns: 'df of returns'):
     return np.nanstd(returns)
 
+def calculate_SD_multiple_from_returns(returns_df, SD_multiplier):
+    average_daily_move = calculate_average_daily_move_from_returns(returns_df)
+    SD_multiple = average_daily_move*SD_multiplier
+    return SD_multiple
+
+
 # Get ETF beta to SPY from a pre-saved table
 def get_ETF_beta_to_SPY(ETF):
     try:
@@ -53,14 +58,14 @@ def get_symbol_from_returns_df(returns_df):
 
 # Get Stock Prices
 def get_stock_prices_over_lookback(stock, lookback):
-    """Keeping this for now but using the function below in practice"""
+    """Keeping this for now but using the function below in practice. Will likely delete this function."""
     stock_prices = PriceTable.loc[:, stock].head(lookback)
     stock_prices = stock_prices[stock_prices.notnull()]
     return stock_prices
 
 def get_stock_prices(stock, lookback=252):
     """Return a DataFrame of prices for a given stock and lookback"""
-    price_table = PriceTable.loc[:, [stock]][::-1].head(lookback)
+    price_table = PriceTable.loc[:, [stock]].head(lookback)
     return price_table
 
 
@@ -82,8 +87,8 @@ def get_total_return(stock, lookback):
     start_price = stock_prices.iloc[-1].item()
     end_price = stock_prices.iloc[0].item()
     
-    print('Start Price: ', start_price, 'End Price: ', end_price)
-    # Calculate total return
+    #print('Start Price: ', start_price, 'End Price: ', end_price)
+    # Calculate Total Teturn
     total_return = end_price / start_price - 1
     return total_return
 

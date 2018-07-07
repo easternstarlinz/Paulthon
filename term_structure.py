@@ -31,42 +31,6 @@ stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
 
-sorted_events = [IdiosyncraticVol('CLVS', .1)]
-# Define Expiries
-expiry2 = dt.date(2018, 7, 19)
-expiry3 = dt.date(2018, 7, 21)
-expiry4 = dt.date(2018, 8, 21)
-expiry5 = dt.date(2018, 9, 21)
-expiry6 = dt.date(2018, 10, 21)
-expiry7 = dt.date(2018, 11, 21)
-expiry8 = dt.date(2018, 12, 21)
-expiries = [expiry2, expiry3, expiry4, expiry5, expiry6]
-expiries = [expiry3, expiry5, expiry7]
-#expiries = [expiry3]
-
-elagolix_info = pd.read_excel('/home/paul/Paulthon/Events/Parameters/CLVS_RiskScenarios.xlsx',
-                         header = [0],
-                         index_col = [0,1],
-                         sheet_name = 'Sub_States')
-
-elagolix = ComplexEvent('CLVS', Distribution_MultiIndex(elagolix_info), dt.date(2018,6,1), 'Elagolix Approval')
-
-events = sorted_events
-events_bid = [event.event_bid for event in events]
-events_ask = [event.event_ask for event in events]
-events_high_POS = [elagolix.event_high_prob_success]
-events_low_POS = [elagolix.event_low_prob_success]
-events_max_optionality = [elagolix.event_max_optionality]
-
-# Define Event Groupings
-event_groupings = {}
-for i in range(len(events)):
-    event_groupings[i] = [events[i] for i in range(i+1)]
-
-event_groupings = [events_bid, events, events_ask, events_high_POS, events_low_POS, events_max_optionality]
-event_grouping_names = ['Bid', 'Mid', 'Ask', 'Elagolix - High P.O.S.', 'Elagolix - Low P.O.S.', 'Event - Max Optionality']
-
-events = all_other_events
 def term_structure(events, expiries, metric = 'IV', mc_iterations = 10**6):
     mc_distributions = list(map(lambda expiry: get_total_mc_distribution(events, expiry, mc_iterations=mc_iterations), expiries))
     print(len(mc_distributions))
@@ -76,12 +40,6 @@ def term_structure(events, expiries, metric = 'IV', mc_iterations = 10**6):
     implied_vols = list(map(lambda dist, expiry: get_option_sheet_from_mc_distribution(dist, expiry).loc[:, [(expiry, metric)]], mc_distributions, expiries))
     return reduce(lambda x,y: pd.merge(x, y, left_index=True, right_index=True), implied_vols)
 
-term_structure = term_structure(events, expiries, 'IV', mc_iterations=10**6)
-print(term_structure.round(3))
-#expiry = dt.date(2018, 6, 15)
-#mc_iterations = 10**6
-#option_info = option_sheet(event_groupings.values(), expiry, mc_iterations)
-#print(option_info)
 
 #def spread(options, events):
 
@@ -138,6 +96,51 @@ def spread_pricing_bid_ask(options: 'list of options', quantities: 'list of quan
 
     info = pd.DataFrame(info).set_index('Level')
     return info
+
+if __name__ == '__main__':
+    sorted_events = [IdiosyncraticVol('CLVS', .1)]
+    # Define Expiries
+    expiry2 = dt.date(2018, 7, 19)
+    expiry3 = dt.date(2018, 7, 21)
+    expiry4 = dt.date(2018, 8, 21)
+    expiry5 = dt.date(2018, 9, 21)
+    expiry6 = dt.date(2018, 10, 21)
+    expiry7 = dt.date(2018, 11, 21)
+    expiry8 = dt.date(2018, 12, 21)
+    expiries = [expiry2, expiry3, expiry4, expiry5, expiry6]
+    expiries = [expiry3, expiry5, expiry7]
+    #expiries = [expiry3]
+
+    elagolix_info = pd.read_excel('/home/paul/Paulthon/Events/Parameters/CLVS_RiskScenarios.xlsx',
+                             header = [0],
+                             index_col = [0,1],
+                             sheet_name = 'Sub_States')
+
+    elagolix = ComplexEvent('CLVS', Distribution_MultiIndex(elagolix_info), dt.date(2018,6,1), 'Elagolix Approval')
+
+    events = sorted_events
+    events_bid = [event.event_bid for event in events]
+    events_ask = [event.event_ask for event in events]
+    events_high_POS = [elagolix.event_high_prob_success]
+    events_low_POS = [elagolix.event_low_prob_success]
+    events_max_optionality = [elagolix.event_max_optionality]
+
+    # Define Event Groupings
+    event_groupings = {}
+    for i in range(len(events)):
+        event_groupings[i] = [events[i] for i in range(i+1)]
+
+    event_groupings = [events_bid, events, events_ask, events_high_POS, events_low_POS, events_max_optionality]
+    event_grouping_names = ['Bid', 'Mid', 'Ask', 'Elagolix - High P.O.S.', 'Elagolix - Low P.O.S.', 'Event - Max Optionality']
+
+    events = all_other_events
+
+    term_structure = term_structure(events, expiries, 'IV', mc_iterations=10**6)
+    print(term_structure.round(3))
+    #expiry = dt.date(2018, 6, 15)
+    #mc_iterations = 10**6
+    #option_info = option_sheet(event_groupings.values(), expiry, mc_iterations)
+    #print(option_info)
 
 if __name__ == '__main__':
     expiry = dt.date(2018, 10, 1)

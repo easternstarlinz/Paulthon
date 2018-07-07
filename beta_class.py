@@ -28,6 +28,12 @@ class Beta(object):
                  best_fit_param=BEST_FIT_PERCENTILE):
         """The Beta object takes as parameters the stock, index, lookback, and scrub_params object.
            The user can enter scrub_params OR a set of stock_ceiling_params, index_floor_params, and best_fit_param which map to scrub_params."""
+        
+        """Calculate the adjusted beta measurement for the stock and index over a lookback based on the three core adjustments:
+        - Stock Ceiling: Scrub data points where the stock moved more than the specified threshold.
+        - Index Floor: Scrub data points where the index moved less than the specified threshold.
+        - Best Fit Param: Keep only the n-percentile best fit points in the OLS regression"""
+        
         self.stock = stock
         self.index = index
         self.lookback = lookback
@@ -50,6 +56,7 @@ class Beta(object):
     @property
     def initial_scrub(self):
         """Eliminate data points where the stock moved greater (absolute value) than the specified stock cutoff.
+           Only keep data points below the stock ceiling.
            This process imposes a celing for the magnitude of stock moves included in the sample."""
         initial_scrub = stock_ceiling_scrub_process(returns_df_to_scrub=self.daily_returns,
                                                     stock_to_drive_scrubbing=self.stock,
@@ -72,16 +79,21 @@ class Beta(object):
                                              index=self.index,
                                              percentile_cutoff=self.scrub_params.percentile_cutoff)
         return third_scrub
+
+    @property
+    def scrubbed_returns_cache_id(self):
+        return (self.stock, self.index, self.scrub_params) 
     
     scrubbed_returns_cache = {}
+    
     @property
     def scrubbed_returns(self):
-        if (self.stock, self.index) in Beta.scrubbed_returns_cache:
-            return Beta.scrubbed_returns_cache[(self.stock, self.index)]
+        if self.scrubbed_returns_cache_id in Beta.scrubbed_returns_cache:
+            return Beta.scrubbed_returns_cache[self.scrubbed_returns_cache_id]
         else:
-            Beta.scrubbed_returns_cache[(self.stock, self.index)] = self.third_scrub
-            return Beta.scrubbed_returns_cache[(self.stock, self.index)]
-
+            Beta.scrubbed_returns_cache[self.scrubbed_returns_cache_id] = self.third_scrub
+            return Beta.scrubbed_returns_cache[self.scrubbed_returns_cache_id]
+    
     @property
     def num_days_in_calculation(self):
         return self.scrubbed_returns.shape[0]
@@ -94,6 +106,7 @@ class Beta(object):
     def OLS_model_results(self):
         stock_returns = self.scrubbed_returns[self.stock]
         index_returns = self.scrubbed_returns[self.index]
+        #print('Stock: {}, Index: {}, Shape: {}'.format(self.stock, self.index, stock_returns.shape))
         
         ols_model = sm.OLS(stock_returns, index_returns, missing='drop')
         ols_results = ols_model.fit()
@@ -119,7 +132,9 @@ class Beta(object):
 
     @property
     def beta(self):
-        return self.OLS_model_results.params[self.index]
+        beta_value = self.OLS_model_results.params[self.index]
+        print('Stock: {}, Index: {}, Beta: {}'.format(self.stock, self.index, beta_value))
+        return beta_value
 
     @property
     def beta1(self):

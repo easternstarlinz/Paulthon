@@ -5,7 +5,7 @@ import math
 from statistics import mean
 
 # Paul Modules
-from Timing_Module import get_time_to_expiry
+from Option_Module import get_time_to_expiry
 from Event_Module import Earnings, IdiosyncraticVol
 
 # Paul Utility Functions

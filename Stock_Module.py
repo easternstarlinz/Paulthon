@@ -8,16 +8,19 @@ import datetime as dt
 from Option_Module import Option, get_option_price 
 from Timing_Module import Timing 
 from Event_Module import IdiosyncraticVol, TakeoutEvent 
-from Events_sqlite import get_earnings_events
 from timeline_chart import get_event_timeline
 from term_structure import term_structure
 from GetVolMC import get_vol_surface_from_events, get_vol_surface_spline, get_call_prices_from_events, get_option_sheet_from_events, get_term_structure
-from stock_events import all_other_events
+
+from get_best_betas_2 import get_betas_multiple_indices
+from scrubbing_processes import default_stock_ceiling_params, default_index_floor_params, BEST_FIT_PERCENTILE
 
 # Paul Utility Functions
 from data.finance import TakeoutParams 
 
-EarningsEvents = get_earnings_events()
+# Events
+from data.earnings_events import EarningsEvents
+from stock_events import all_other_events
 
 class Stock(object):
     all_other_events = all_other_events
@@ -29,6 +32,24 @@ class Stock(object):
         self.vol_surface_spline_cache = {}
     
     # Risk Metrics
+    @property
+    def relevant_indices(self):
+        return ['SPY', 'QQQ', 'IBB', 'XBI']
+    
+    def get_beta_info(self,
+                      lookback=252,
+                      stock_ceiling_params=default_stock_ceiling_params,
+                      index_floor_params=default_index_floor_params,
+                      best_fit_param=BEST_FIT_PERCENTILE):
+        """Get Beta info for the relevant indices. The user can input scrub_params or the other set of params."""
+        beta_info = get_betas_multiple_indices(stock=self.stock,
+                                               indices=self.relevant_indices,
+                                               lookback=lookback,
+                                               stock_ceiling_params=stock_ceiling_params,
+                                               index_floor_params=index_floor_params,
+                                               best_fit_param=best_fit_param)
+        return beta_info
+
     @property
     def best_index(self):
         return 'SPY'

@@ -1,6 +1,7 @@
 import pandas as pd
 import itertools
 
+
 ETFs =  {
             'Large Cap'             :['SPY','IVV','VOO','IWB'],
             'Mid Cap'               :['MDY','IJH','VO','IWR'],

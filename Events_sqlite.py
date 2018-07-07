@@ -8,7 +8,7 @@ import sqlite3
 from Event_Module import Earnings
 
 #from paul_resources import HealthcareSymbols, Symbols, to_pickle
-from data.finance import Symbols, HealthcareSymbols
+from data.symbols import symbols, all_symbols
 from utility.general import to_pickle
 from utility.decorators import my_time_decorator
 
@@ -17,6 +17,7 @@ conn = sqlite3.connect('earnings.db', check_same_thread=False)
 
 c = conn.cursor()
 
+# Keep this code (creates the earnings table if I were to start over)
 #c.execute("""CREATE TABLE earnings (
 #            stock text,
 #            event_input real,

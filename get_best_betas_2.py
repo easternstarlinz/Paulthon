@@ -19,8 +19,8 @@ from utility.general import tprint, setup_standard_logger, merge_dfs_horizontall
 from utility.finance import daily_returns, get_ETF_beta_to_SPY, get_total_return, calculate_percentile_value, get_symbol_from_returns_df, get_stock_prices, get_daily_returns, scrub_func, calculate_HV_from_returns, scrub_returns
 
 # Finance Data
-from data.finance import PriceTable, ETF_PriceTable, Symbols, HealthcareSymbols, SP500Symbols
-from data.ETFs import indices as ETFs
+from data.finance import PriceTable 
+from data.symbols import symbols, all_symbols
 
 NO_USE_TIMING_DECORATOR = False
 if NO_USE_TIMING_DECORATOR:
@@ -41,36 +41,6 @@ INDEX_SD_CUTOFF = 1.75
 LOOKBACK_DEFAULT = 400
 sd_cutoff_params = SD_Cutoff_Params(STOCK_SD_CUTOFF, INDEX_SD_CUTOFF, STOCK_SD_PERCENTILE_CUTOFF, INDEX_SD_PERCENTILE_CUTOFF)
 
-# Unnecessary function because can literally just invoke the class???
-def create_beta_object_from_scrub_params(stock,
-                                         index,
-                                         lookback=252,
-                                         scrub_params= ScrubParams(False, False, False)):
-    
-    beta = Beta(stock, index, lookback, scrub_params)
-    return beta
-
-def create_beta_object(stock,
-                       index,
-                       lookback=252,
-                       stock_ceiling_params=default_stock_ceiling_params,
-                       index_floor_params=default_index_floor_params,
-                       best_fit_param=BEST_FIT_PERCENTILE):
-    """Calculate the adjusted beta measurement for the stock and index over a lookback based on the three core adjustments:
-        - Stock Ceiling: Scrub data points where the stock moved more than the specified threshold.
-        - Index Floor: Scrub data points where the index moved less than the specified threshold.
-        - Best Fit Param: Keep only the n-percentile best fit points in the OLS regression"""
-
-    scrub_params = get_scrub_params(stock,
-                                    index,
-                                    lookback=lookback,
-                                    stock_ceiling_params=default_stock_ceiling_params,
-                                    index_floor_params=default_index_floor_params,
-                                    best_fit_param=BEST_FIT_PERCENTILE)
-    
-    beta = Beta(stock, index, lookback, scrub_params)
-    return beta
-
 
 def get_betas_multiple_indices(stock,
                                indices: 'iterable of indices',
@@ -82,7 +52,7 @@ def get_betas_multiple_indices(stock,
     
     scrub_params_all = [get_scrub_params(stock, index, lookback, stock_ceiling_params, index_floor_params, best_fit_param) for index in indices]
     
-    betas = [create_beta_object_from_scrub_params(stock, indices[i], lookback, scrub_params_all[i]) for i in range(len(indices))]
+    betas = [Beta(stock, indices[i], lookback, scrub_params_all[i]) for i in range(len(indices))]
     
     # OLS Info
     beta_values = [beta.beta for beta in betas]
@@ -99,12 +69,23 @@ def get_betas_multiple_indices(stock,
     betas_to_SPY = [index_betas_to_SPY[i]*beta_values[i] for i in range(len(indices))]
     
     # Returns Info
-    returns = [get_total_return(stock, lookback) for _ in range(len(indices))]
+    returns = [get_total_return(stock, lookback) for _ in indices]
     index_returns = [get_total_return(index, lookback) for index in indices]
     idio_returns = [(1+returns[i])/(1+index_returns[i]*beta_values[i]) - 1 for i in range(len(indices))]
     
+    
+    # Unadjusted OLS Info
+    unadjusted_betas = [Beta(stock, indices[i], lookback, ScrubParams(False, False, False)) for i in range(len(indices))]
+    unadjusted_beta_values = [beta.beta for beta in unadjusted_betas]
+    unadjusted_corrs = [beta.corr for beta in unadjusted_betas]
+    
+    
     # Prepare Information for the DataFrame in an Ordered Dictionary
     table_info_dict =  OrderedDict([
+                        #Unadjusted OLS Info
+                        ('Unadj. Beta', unadjusted_beta_values),
+                        ('Unadj. Corr', unadjusted_corrs),
+                        
                         # OLS Info
                         ('Beta', beta_values),
                         ('Corr', corrs),
@@ -124,15 +105,14 @@ def get_betas_multiple_indices(stock,
                         ('Percentile_Cutoff', percentile_cutoffs),
                         ('Percent_Days', percent_days_in_calc)
                         ])
-
     # Create DataFrame
     column_labels = table_info_dict.keys()
     table_info = list(zip(*table_info_dict.values()))
 
-    index_row = pd.Index(indices, name = 'Stock')
+    index_row = pd.Index(indices, name = 'Index')
     iterables_columns = [[stock], column_labels]
-    index_column = pd.MultiIndex.from_product(iterables_columns, names = ['Index', 'Beta_Info'])
-    df = pd.DataFrame(table_info, index = index_row, columns = index_column)
+    index_column = pd.MultiIndex.from_product(iterables_columns, names = ['Stock', 'Beta_Info'])
+    df = pd.DataFrame(table_info, index=index_row, columns=index_column)
     
     if save_to_file:
         to_pickle_and_CSV(df, file_name)

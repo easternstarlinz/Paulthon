@@ -21,6 +21,20 @@ import logging
 from ols import OLS
 from ols2 import OLS as MainOLS
 
+# Nice way to convert dict of lists to one list
+def dict_of_lists_to_unique_list(dictionary):
+    """Take a Dictory of keys that map to lists and combine the lists to one list"""
+    final_list = []
+    for key in dictionary.keys():
+        final_list.extend(dictionary[key])
+    final_list = sorted(list(set(final_list)))
+    return final_list
+
+def largest_abs_value_in_dataframe(dataframe):
+    max_number = dataframe.max().item()
+    min_number = dataframe.min().item()
+    return max(abs(max_number), abs(min_number))
+
 # File Saving Utility Functions
 def to_pickle(content, file_name):
     pickle_file = open('{}.pkl'.format(file_name), 'wb')
