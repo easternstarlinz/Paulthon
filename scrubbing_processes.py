@@ -83,10 +83,15 @@ class Index_Floor_Params(object):
 STOCK_CEILING_INITIAL_CEILING = .125
 STOCK_CEILING_SD_MULTIPLIER = 4.0
 
+#STOCK_CEILING_INITIAL_CEILING = .2
+#STOCK_CEILING_SD_MULTIPLIER = 25
+
 default_stock_ceiling_params  = Stock_Ceiling_Params(initial_ceiling=STOCK_CEILING_INITIAL_CEILING,
                                                      SD_multiplier=STOCK_CEILING_SD_MULTIPLIER)
 
 # Index Floor Params
+INDEX_FLOOR_SD_MULTIPLIER = 1.0
+
 INDEX_FLOOR_SD_MULTIPLIER = 1.0
 
 default_index_floor_params = Index_Floor_Params(SD_multiplier=INDEX_FLOOR_SD_MULTIPLIER)
@@ -94,6 +99,7 @@ default_index_floor_params = Index_Floor_Params(SD_multiplier=INDEX_FLOOR_SD_MUL
 
 # Best Fit Param
 BEST_FIT_PERCENTILE = 95
+#BEST_FIT_PERCENTILE = 100
 
 stock_ceiling_params = Stock_Ceiling_Params(initial_ceiling=STOCK_CEILING_INITIAL_CEILING,
                                             SD_multiplier=STOCK_CEILING_SD_MULTIPLIER)
