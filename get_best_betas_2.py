@@ -41,6 +41,141 @@ INDEX_SD_CUTOFF = 1.75
 LOOKBACK_DEFAULT = 400
 sd_cutoff_params = SD_Cutoff_Params(STOCK_SD_CUTOFF, INDEX_SD_CUTOFF, STOCK_SD_PERCENTILE_CUTOFF, INDEX_SD_PERCENTILE_CUTOFF)
 
+def get_betas_over_specified_iterable(iterable_choice: 'str: stock, index, or lookback',
+                                      iterable: 'list of stocks, indices, lookback, or a high-level scrub param'):
+    """Random thoughts about approach - not a complete formula"""
+    
+    iterable_choices =   {
+
+                            'stock'     : stock,
+                            'index'     : index,
+                            'lookback'  : lookback
+
+                         }
+
+    iterable_choices[iterable_choice] = iterable 
+    
+    if isinstance(stock, list):
+        stock = iterable
+
+    if isinstance(index, list):
+        index = iterable
+    
+    _, _, _, params = inspect.getargvalues(inspect.currentframe())
+    print(params)
+
+def get_betas_over_iterable(stock,
+                               index,
+                               lookback=252,
+                               stock_ceiling_params=default_stock_ceiling_params,
+                               index_floor_params=default_index_floor_params,
+                               best_fit_param=BEST_FIT_PERCENTILE,
+                               save_to_file=False):
+    
+
+    stock_ceiling_params = [stock_ceiling_params]
+    index_floor_params = [index_floor_params]
+    best_fit_param = [best_fit_param]
+
+    param_combos  = list(itertools.product(stock, index, lookback, stock_ceiling_params, index_floor_params, best_fit_param))
+
+    counter = range(len(param_combos))
+    
+    stocks =    [i[0] for i in param_combos]
+    indices =   [i[1] for i in param_combos]
+    lookbacks = [i[2] for i in param_combos]
+    #scrub_params_all = [get_scrub_params(stock, index, lookback, stock_ceiling_params, index_floor_params, best_fit_param) for params in param_combos]
+    scrub_params_all = [get_scrub_params(*params) for params in param_combos]
+    
+    scrub_param_combos = list(zip(stocks, indices, lookbacks, scrub_params_all))
+    
+    betas = [Beta(stocks[i], indices[i], lookbacks[i], scrub_params_all[i]) for i in counter]
+    
+    # OLS Info
+    beta_values = [beta.beta for beta in betas]
+    corrs = [beta.corr for beta in betas]
+    
+    # Scrubbing Info
+    stock_cutoffs = [scrub_params.stock_cutoff for scrub_params in scrub_params_all]
+    index_cutoffs = [scrub_params.index_cutoff for scrub_params in scrub_params_all]
+    percentile_cutoffs = [scrub_params.percentile_cutoff for scrub_params in scrub_params_all]
+    percent_days_in_calc = [beta.percent_days_in_calculation for beta in betas]
+    
+    # Beta to SPY Info
+    index_betas_to_SPY = [get_ETF_beta_to_SPY(index) for index in indices]
+    betas_to_SPY = [index_betas_to_SPY[i]*beta_values[i] for i in counter]
+    
+    # Returns Info
+    stock_returns = [get_total_return(stocks[i], lookbacks[i]) for i in counter]
+    index_returns = [get_total_return(indices[i], lookbacks[i]) for i in counter]
+    idio_returns = [(1+stock_returns[i])/(1+index_returns[i]*beta_values[i]) - 1 for i in counter]
+    
+    
+    # Unadjusted OLS Info
+    unadjusted_betas = [Beta(stocks[i], indices[i], lookbacks[i], ScrubParams(False, False, False)) for i in counter]
+    unadjusted_beta_values = [beta.beta for beta in unadjusted_betas]
+    unadjusted_corrs = [beta.corr for beta in unadjusted_betas]
+    
+    
+    # Prepare Information for the DataFrame in an Ordered Dictionary
+    table_info_dict =  OrderedDict([
+                        #Unadjusted OLS Info
+                        ('Unadj. Beta', unadjusted_beta_values),
+                        ('Unadj. Corr', unadjusted_corrs),
+                        
+                        # OLS Info
+                        ('Beta', beta_values),
+                        ('Corr', corrs),
+                     
+                        # Beta to SPY Info
+                        ('Index_Beta_to_SPY', index_betas_to_SPY),
+                        ('Beta_to_SPY', betas_to_SPY),
+                        
+                        # Returns Info
+                        ('Stock_Return', stock_returns),
+                        ('Index_Return', index_returns),
+                        ('Idio_return', idio_returns),
+                        
+                        # Scrubbing Info
+                        ('Stock_Cutoff', stock_cutoffs),
+                        ('Index_Cutoff', index_cutoffs),
+                        ('Percentile_Cutoff', percentile_cutoffs),
+                        ('Percent_Days', percent_days_in_calc)
+                        ])
+    
+    parameters = [stock, index, lookback]
+    for parameter in parameters:
+        if len(parameter)>1:
+            iterable = parameter
+        else:
+            pass
+
+    if iterable == stock:
+        not_iterable = index[0]
+    elif iterable == index:
+        not_iterable = stock[0]
+    elif iterable == lookback:
+        not_iterable = 'Stock: {}, Index {}'.format(stock[0], index[0])
+    else:
+        raise ValueError
+
+
+    # Create DataFrame
+    column_labels = table_info_dict.keys()
+    table_info = list(zip(*table_info_dict.values()))
+
+    #index_row = pd.Index(indices, name = 'Index')
+    index_row = pd.Index(iterable, name = 'Index')
+    iterables_columns = [[not_iterable], column_labels]
+    #iterables_columns = [[stock], column_labels]
+    index_column = pd.MultiIndex.from_product(iterables_columns, names = ['Stock', 'Beta_Info'])
+    df = pd.DataFrame(table_info, index=index_row, columns=index_column)
+    
+    if save_to_file:
+        to_pickle_and_CSV(df, file_name)
+    
+    return df
+
 
 def get_betas_multiple_indices(stock,
                                indices: 'iterable of indices',

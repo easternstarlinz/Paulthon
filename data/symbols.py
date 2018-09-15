@@ -10,7 +10,8 @@ from utility.general import dict_of_lists_to_unique_list
 # Symbol Exclude Framework
 excludes = {    
                 'General'           :['BRK.B', 'BKNG', 'BHF', 'BF.B', 'CBRE', 'FTV', 'UA', 'WELL', 'XRX' 'BHH', 'AEE'],
-                'Healthcare'        :['AAAP', 'BOLD', 'LNTH', 'MEDP', 'TCMD']
+                'Healthcare'        :['AAAP', 'BOLD', 'LNTH', 'MEDP', 'TCMD'],
+                'Questionable'      :['EVRG']
            }
 
 
@@ -31,7 +32,6 @@ sectors = sorted(list(set(info.loc[:, 'Sector'])))
 industries = sorted(list(set(info.loc[:, 'Industry'])))
 industries = [i.split(' - ')[0] for i in industries]
 
-
 # SP500 Symbols; Scraped from Wikipedia
 sp500_symbols = pd.read_html('https://en.wikipedia.org/wiki/List_of_S&P_500_companies')[0][0][1:].reset_index(drop=True).tolist()
 
@@ -48,7 +48,7 @@ symbols = {     'SP500'             :sp500_symbols,
                 #'Zachs'             :zachs_symbols
           }
 
-# In the symbols dictionary, scrub symbol excludes for each list of symbols
+# In the symbols dictionary, scrub symbol excludes for each list
 for key in symbols.keys():
     symbols[key] = scrub_symbol_excludes(symbols[key])
 
