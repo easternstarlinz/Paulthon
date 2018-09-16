@@ -1,0 +1,18 @@
+05/20/2018 11:14:52 AM ---------- Large Cap ---------
+05/20/2018 11:15:11 AM ERROR: list index out of range
+Traceback (most recent call last):
+  File "_Aggregate_Barchart_Options_Data_.py", line 85, in <module>
+    calls = brc._create_calls_df(grk, expiry)
+  File "/home/paul/Paulthon/Option_Scraper/_barchart_options_scraper_.py", line 159, in _create_calls_df
+    rows = [[td.text for td in tr.find_all('td')] for tr in tables[0].find_all('tr')]
+IndexError: list index out of range
+05/20/2018 11:15:32 AM ERROR: list index out of range
+Traceback (most recent call last):
+  File "_Aggregate_Barchart_Options_Data_.py", line 85, in <module>
+    calls = brc._create_calls_df(grk, expiry)
+  File "/home/paul/Paulthon/Option_Scraper/_barchart_options_scraper_.py", line 159, in _create_calls_df
+    rows = [[td.text for td in tr.find_all('td')] for tr in tables[0].find_all('tr')]
+IndexError: list index out of range
+05/20/2018 11:15:32 AM etf missing symbols:
+['SPY', 'IWM']
+05/20/2018 11:15:32 AM etf error rate: 2 errors / 2 symbols = 100.00%

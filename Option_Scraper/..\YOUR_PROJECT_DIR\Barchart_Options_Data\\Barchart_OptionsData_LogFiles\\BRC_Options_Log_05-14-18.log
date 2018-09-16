@@ -1,0 +1,18 @@
+05/14/2018 03:33:03 AM ---------- Large Cap ---------
+05/14/2018 03:33:04 AM ERROR: 'NoneType' object has no attribute 'group'
+Traceback (most recent call last):
+  File "_Aggregate_Barchart_Options_Data_.py", line 74, in <module>
+    expirys = brc._extract_expiry_dates()
+  File "/home/paul/Paulthon/Option_Scraper/_barchart_options_scraper_.py", line 48, in _extract_expiry_dates
+    dates.append(ms.group())
+AttributeError: 'NoneType' object has no attribute 'group'
+05/14/2018 03:33:05 AM ERROR: 'NoneType' object has no attribute 'group'
+Traceback (most recent call last):
+  File "_Aggregate_Barchart_Options_Data_.py", line 74, in <module>
+    expirys = brc._extract_expiry_dates()
+  File "/home/paul/Paulthon/Option_Scraper/_barchart_options_scraper_.py", line 48, in _extract_expiry_dates
+    dates.append(ms.group())
+AttributeError: 'NoneType' object has no attribute 'group'
+05/14/2018 03:33:05 AM etf missing symbols:
+['SPY', 'IWM;']
+05/14/2018 03:33:05 AM etf error rate: 2 errors / 2 symbols = 100.00%

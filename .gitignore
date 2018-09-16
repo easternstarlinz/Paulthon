@@ -1,12 +1,9 @@
 *.swp
 *.ipynb
 *.py!
-*.log
 *.swo
 *.swn
 *.csv#
 *.pyc
 *.swl
 *.swm
-*.csv
-*.pkl
