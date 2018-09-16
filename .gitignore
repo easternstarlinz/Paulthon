@@ -1,2 +1,17 @@
+<<<<<<< HEAD
 *.db
 *.log
+=======
+*.swp
+*.ipynb
+*.py!
+*.log
+*.swo
+*.swn
+*.csv#
+*.pyc
+*.swl
+*.swm
+*.csv
+*.pkl
+>>>>>>> 844c24b5883f456f8f9b90ff4d2147582dac3a17
