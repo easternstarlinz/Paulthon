@@ -72,7 +72,7 @@ class SystematicEvent(Event):
         pct_moves = []
         relative_prices = []
 
-        distribution_df = pd.read_csv('/home/paul/Environments/finance_env/SystematicEvent.csv')
+        distribution_df = pd.read_csv('/Users/paulwainer/Environments/finance_env/SystematicEvent.csv')
         distribution_df.set_index('State', inplace=True)
         distribution_df.loc[:, 'Pct_Move'] *= self.modeled_move*100
         distribution_df.loc[:, 'Relative_Price'] = distribution_df.loc[:, 'Pct_Move'] + 1
@@ -100,7 +100,7 @@ class TakeoutEvent(Event):
     mult = 1.0
     instances = []
     
-    takeout_buckets = pd.read_csv('/home/paul/Environments/finance_env/TakeoutBuckets.csv')
+    takeout_buckets = pd.read_csv('/Users/paulwainer/Environments/finance_env/TakeoutBuckets.csv')
     takeout_buckets.set_index('Rank', inplace=True)
 
     base_takeout_premium = .40
@@ -219,7 +219,7 @@ def OptionPrice(Distribution, Option):
 # Option(option_type: 'str: C/P', strike: 'float', expiry: 'datetime')
 # Price(Distribution, Option)
 """
--OptionPrice
+-OptionPriceDist
     -Type: Function
     -Params:
         -Option: 'NamedTuple'
@@ -237,7 +237,7 @@ def OptionPrice(Distribution, Option):
         -Strike: 'float'
         -Expiry: 'Datetime'
 
--OptionPrice: Function
+-OptionPriceDist: Function
     -Params:
         -Option: 'NamedTuple'
         -Distribution: 'Object'
@@ -352,7 +352,7 @@ run3()
 def run():
     if __name__ == "__main__":
         #-------------------PresElection Setup-----------------#
-        PresElectionParams = pd.read_csv("/home/paul/Environments/finance_env/PresElectionParams.csv")
+        PresElectionParams = pd.read_csv("/Users/paulwainer/Environments/finance_env/PresElectionParams.csv")
         PresElectionParams.set_index('Stock', inplace=True)
 
         # Create PresElection Events Dict

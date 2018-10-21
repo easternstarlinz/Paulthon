@@ -2,8 +2,8 @@ import numpy as np
 from functools import reduce
 
 # Paul Resources
-from Timing_Module import event_prob_by_expiry
-from OptimalMC import optimally_get_mc_distribution_for_event
+from option_model.Timing_Module import event_prob_by_expiry
+from option_model.OptimalMC import optimally_get_mc_distribution_for_event
 
 # Paul Utility Functions
 from utility.general import setup_standard_logger

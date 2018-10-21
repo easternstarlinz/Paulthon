@@ -1,8 +1,3 @@
-import datetime as dt
-import pandas as pd
-from pprint import pprint
-
-from multiprocessing import Pool
 from multiprocessing.dummy import Pool as ThreadPool
 
 import warnings
@@ -10,19 +5,11 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter("ignore", category=RuntimeWarning)
 
 # Paul Modules
-from Stock_Module import Stock
-from Option_Module import Option, get_option_price, get_implied_volatility, get_option_price
-from Timing_Module import Timing, event_prob_by_expiry
-from Event_Module import IdiosyncraticVol, TakeoutEvent, Earnings, Event, ComplexEvent, SysEvt_PresElection
-from Distribution_Module import Distribution, Distribution_MultiIndex
-from Events_sqlite import get_earnings_events
-from timeline_chart import get_event_timeline
-from term_structure import term_structure
-from GetVolMC import get_vol_surface_from_events, get_vol_surface_spline, get_call_prices_from_events, get_option_sheet_from_events, get_term_structure
-from CreateMC import get_total_mc_distribution_from_events
+from option_model.Stock_Module import Stock
+from option_model.earnings_events import get_earnings_events
 
 # Paul Utility Functions
-from data.finance import TakeoutParams, Symbols
+from data.finance import Symbols
 from utility.decorators import my_time_decorator, empty_decorator
 
 NO_USE_TIMING_DECORATOR = False

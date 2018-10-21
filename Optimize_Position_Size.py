@@ -2,13 +2,12 @@
 import pandas as pd
 import numpy as np
 import datetime as dt
-from statistics import mean
 
 # Paul Packages
-from Stock_Module import Stock
-from Option_Module import get_time_to_expiry
-from Event_Module import IdiosyncraticVol
-from Distribution_Module import Distribution, mc_distribution_to_distribution
+from option_model.Stock_Module import Stock
+from option_model.Option_Module import get_time_to_expiry
+from option_model.Event_Module import IdiosyncraticVol
+from option_model.Distribution_Module import Distribution, mc_distribution_to_distribution
 from CreateMC import get_total_mc_distribution_from_events_vanilla
 from Optimization_Formulas import find_maximum, kelly_criterion
 

@@ -51,8 +51,8 @@ def alpha_df(df: 'df of prices', lookback):
         if stock == 'SPY':
             index = 'IWM'
         beta_object = Beta(stock, index, 500, ScrubParams(.075, .0125, .8))
-        beta = beta_object.beta
-        #beta = 0
+        beta = beta_object.beta_value
+        #beta_value = 0
         beta = BestBetas.loc[stock]['Beta']
         index = BestBetas.loc[stock]['Index']
         if stock == 'SPY':

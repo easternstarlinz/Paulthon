@@ -12,7 +12,7 @@ import scipy.stats as ss
 
 
 #Take a list of (x,y) pairs and return a list of tuples containing (x, y, y_hat, error, error_squared)
-#Along the way, calculate correlation (corr), beta (beta1), alpha (beta0), error, and error_squared
+#Along the way, calculate correlation (corr), beta_value (beta1), alpha (beta0), error, and error_squared
 def ols_params(pairs: 'list of (x,y) tuples' = [], name = 'default') -> 'ols information as a list of tuples':
     x, y = [i[0] for i in pairs], [i[1] for i in pairs]
     x_bar, y_bar = (sum(x)/len(x)), (sum(y)/len(y))
@@ -53,7 +53,7 @@ d = ols_beta(c)
 #print("Beta: ", d, sep="")
 
 #Take a list of (x,y) pairs and return a list of tuples containing (x, y, y_hat, error, error_squared)
-#Along the way, calculate correlation (corr), beta (beta1), alpha (beta0), error, and error_squared
+#Along the way, calculate correlation (corr), beta_value (beta1), alpha (beta0), error, and error_squared
 
 class OLS(object):
     def __init__(self,

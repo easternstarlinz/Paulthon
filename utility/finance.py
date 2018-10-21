@@ -4,7 +4,7 @@ import math
 from collections import namedtuple
 
 import sys
-sys.path.append('/home/paul/Paulthon')
+sys.path.append('/Users/paulwainer/Paulthon')
 
 # Paul Data
 from data.finance import PriceTable
@@ -40,14 +40,14 @@ def calculate_SD_multiple_from_returns(returns_df, SD_multiplier):
     return SD_multiple
 
 
-# Get ETF beta to SPY from a pre-saved table
+# Get ETF beta_value to SPY from a pre-saved table
 def get_ETF_beta_to_SPY(ETF):
     try:
-        ETF_betas = pickle.load(open('/home/paul/Paulthon/DataFiles/Betas/ETF_betas.pkl', 'rb'))
+        ETF_betas = pickle.load(open('/Users/paulwainer/Paulthon/DataFiles/Betas/ETF_betas.pkl', 'rb'))
         beta = ETF_betas.loc[ETF, ('SPY', 'Beta')]
         return beta
     except:
-        print("{} is not in the ETF beta table".format(ETF))
+        print("{} is not in the ETF beta_value table".format(ETF))
         return 1.0
 
 

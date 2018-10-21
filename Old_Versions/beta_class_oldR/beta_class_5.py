@@ -1,21 +1,9 @@
-import numpy as np
-import datetime as dt
 import pandas as pd
-import pickle
-import copy
 import pprint
-import decimal
 import statsmodels.formula.api as sm
-from time_decorator import my_time_decorator
-from ols import OLS
-from collections import namedtuple
-import math
 import matplotlib.pyplot as plt
-import matplotlib.ticker as tkr
-import scipy.stats as ss
 import statsmodels.api as sm
-from sklearn.linear_model import LinearRegression
-from ols2 import OLS as MainOLS
+from beta_model.ols2 import OLS as MainOLS
 from paul_resources import PriceTable
 from paul_resources import daily_returns
 from pprint import pprint
@@ -278,7 +266,7 @@ if __name__ == '__main__':
     base = 100
     beta = Beta(stock, index, beta_lookback, ScrubParams(.075, .01, .8)).beta
     beta2 = Beta(stock2, index, beta_lookback, ScrubParams(.075, .01, .8)).beta
-#beta, beta2 = 0.0, 0.0
+#beta_value, beta2 = 0.0, 0.0
 
 # stock_lines to plot
     stock_line = StockLineSimple(stock, chart_lookback, base)

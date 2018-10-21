@@ -2,8 +2,7 @@ import sqlite3
 import pandas as pd
 import datetime as dt
 from datetime import timedelta
-from employee import Employee
-from Event_Module import Earnings
+from option_model.Event_Module import Earnings
 import random
 from paul_resources import HealthcareSymbols, Symbols
 from decorators import my_time_decorator

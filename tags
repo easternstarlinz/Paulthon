@@ -238,11 +238,11 @@ Option	Old_Versions/biotech_class_old/biotech_class_8.py	/^Option = namedtuple('
 Option	Old_Versions/get_best_betas_oldR/get_best_betas.py	/^Option = namedtuple('Option', ['Option_Type', 'Strike', 'Expiry'])$/;"	v
 Option	Old_Versions/get_best_betas_oldR/get_best_betas_general_multi_index_formula.py	/^Option = namedtuple('Option', ['Option_Type', 'Strike', 'Expiry'])$/;"	v
 Option	Option_Module.py	/^Option = namedtuple('Option', ['Option_Type', 'Strike', 'Expiry'])$/;"	v
-OptionPrice	Old_Versions/biotech_class_old/biotech_class_5.py	/^def OptionPrice(Distribution, Option):$/;"	f
-OptionPrice	Old_Versions/biotech_class_old/biotech_class_6.py	/^def OptionPrice(Distribution, Option):$/;"	f
-OptionPrice	Old_Versions/biotech_class_old/biotech_class_7.py	/^def OptionPrice(Distribution, Option):$/;"	f
-OptionPrice	Old_Versions/biotech_class_old/biotech_class_8.py	/^def OptionPrice(Option, Distribution):$/;"	f
-OptionPrice	Option_Module.py	/^def OptionPrice(Option, Distribution):$/;"	f
+OptionPriceDist	Old_Versions/biotech_class_old/biotech_class_5.py	/^def OptionPriceDist(Distribution, Option):$/;"	f
+OptionPriceDist	Old_Versions/biotech_class_old/biotech_class_6.py	/^def OptionPriceDist(Distribution, Option):$/;"	f
+OptionPriceDist	Old_Versions/biotech_class_old/biotech_class_7.py	/^def OptionPriceDist(Distribution, Option):$/;"	f
+OptionPriceDist	Old_Versions/biotech_class_old/biotech_class_8.py	/^def OptionPriceDist(Option, Distribution):$/;"	f
+OptionPriceDist	Option_Module.py	/^def OptionPriceDist(Option, Distribution):$/;"	f
 OptionPriceMC	Old_Versions/biotech_class_old/biotech_class_8.py	/^def OptionPriceMC(Option, MC_Results):$/;"	f
 OptionPriceMC	Option_Module.py	/^def OptionPriceMC(Option, MC_Results):$/;"	f
 PT_Operations	Old_Versions/old_vb_files/project_files/manipulate_table.py	/^class PT_Operations():	$/;"	c
@@ -520,21 +520,21 @@ __init__	Old_Versions/beta_class_oldR/beta_class_3.py	/^    def __init__(self,$/
 __init__	Old_Versions/beta_class_oldR/beta_class_3.py	/^    def __init__(self,$/;"	m	class:StockLine
 __init__	Old_Versions/beta_class_oldR/beta_class_4.py	/^    def __init__(self, stock: 'str', index: 'str', lookback: 'int', ScrubParams: 'obj'):$/;"	m	class:Beta
 __init__	Old_Versions/beta_class_oldR/beta_class_4.py	/^    def __init__(self, stock: 'str', lookback: 'int', base = None):$/;"	m	class:StockLineSimple
-__init__	Old_Versions/beta_class_oldR/beta_class_4.py	/^    def __init__(self, stock: 'str', lookback: 'int', beta: 'float', index: 'str', base = None):$/;"	m	class:StockLineBetaAdjusted
+__init__	Old_Versions/beta_class_oldR/beta_class_4.py	/^    def __init__(self, stock: 'str', lookback: 'int', beta_value: 'float', index: 'str', base = None):$/;"	m	class:StockLineBetaAdjusted
 __init__	Old_Versions/beta_class_oldR/beta_class_4.py	/^    def __init__(self, stock_lines: 'list of stock lines'):$/;"	m	class:StockChart
 __init__	Old_Versions/beta_class_oldR/beta_class_4.py	/^    def __init__(self,$/;"	m	class:ScrubParams
 __init__	Old_Versions/beta_class_oldR/beta_class_5.py	/^    def __init__(self, stock: 'str', index: 'str', lookback: 'int', ScrubParams: 'obj'):$/;"	m	class:Beta
 __init__	Old_Versions/beta_class_oldR/beta_class_5.py	/^    def __init__(self, stock: 'str', lookback: 'int', base = None):$/;"	m	class:StockLineSimple
-__init__	Old_Versions/beta_class_oldR/beta_class_5.py	/^    def __init__(self, stock: 'str', lookback: 'int', beta: 'float', index: 'str', base = None):$/;"	m	class:StockLineBetaAdjusted
+__init__	Old_Versions/beta_class_oldR/beta_class_5.py	/^    def __init__(self, stock: 'str', lookback: 'int', beta_value: 'float', index: 'str', base = None):$/;"	m	class:StockLineBetaAdjusted
 __init__	Old_Versions/beta_class_oldR/beta_class_5.py	/^    def __init__(self, stock_lines: 'list of stock lines'):$/;"	m	class:StockChart
 __init__	Old_Versions/beta_class_oldR/beta_class_5.py	/^    def __init__(self,$/;"	m	class:ScrubParams
 __init__	Old_Versions/beta_class_oldR/beta_class_6.py	/^    def __init__(self, stock: 'str', index: 'str', lookback: 'int', ScrubParams: 'obj'):$/;"	m	class:Beta
 __init__	Old_Versions/beta_class_oldR/beta_class_6.py	/^    def __init__(self, stock: 'str', lookback: 'int', base = None):$/;"	m	class:StockLineSimple
-__init__	Old_Versions/beta_class_oldR/beta_class_6.py	/^    def __init__(self, stock: 'str', lookback: 'int', beta: 'float', index: 'str', base = None):$/;"	m	class:StockLineBetaAdjusted
+__init__	Old_Versions/beta_class_oldR/beta_class_6.py	/^    def __init__(self, stock: 'str', lookback: 'int', beta_value: 'float', index: 'str', base = None):$/;"	m	class:StockLineBetaAdjusted
 __init__	Old_Versions/beta_class_oldR/beta_class_6.py	/^    def __init__(self, stock_lines: 'list of stock lines'):$/;"	m	class:StockChart
 __init__	Old_Versions/beta_class_oldR/beta_class_6.py	/^    def __init__(self,$/;"	m	class:ScrubParams
 __init__	Old_Versions/beta_class_oldR/beta_class_7.py	/^    def __init__(self, stock: 'str', lookback: 'int', base = None):$/;"	m	class:StockLineSimple
-__init__	Old_Versions/beta_class_oldR/beta_class_7.py	/^    def __init__(self, stock: 'str', lookback: 'int', beta: 'float', index: 'str', base = None):$/;"	m	class:StockLineBetaAdjusted
+__init__	Old_Versions/beta_class_oldR/beta_class_7.py	/^    def __init__(self, stock: 'str', lookback: 'int', beta_value: 'float', index: 'str', base = None):$/;"	m	class:StockLineBetaAdjusted
 __init__	Old_Versions/beta_class_oldR/beta_class_7.py	/^    def __init__(self, stock_lines: 'list of stock lines'):$/;"	m	class:StockChart
 __init__	Old_Versions/beta_class_oldR/beta_class_7.py	/^    def __init__(self,$/;"	m	class:Beta
 __init__	Old_Versions/beta_class_oldR/beta_class_7.py	/^    def __init__(self,$/;"	m	class:ScrubParams
@@ -608,17 +608,17 @@ __init__	Old_Versions/stock_graphs_oldR/stock_graphs_9.py	/^    def __init__(sel
 __init__	Option_Scraper/_barchart_options_scraper_.py	/^    def __init__(self, symbol):$/;"	m	class:barchart_options
 __init__	Option_Scraper/_barchart_options_scraper_original_.py	/^    def __init__(self, symbol):$/;"	m	class:barchart_options
 __init__	StockLine_Module.py	/^    def __init__(self, stock: 'str', lookback: 'int', base = None):$/;"	m	class:StockLineSimple
-__init__	StockLine_Module.py	/^    def __init__(self, stock: 'str', lookback: 'int', beta: 'float', index: 'str', base = None):$/;"	m	class:StockLineBetaAdjusted
+__init__	StockLine_Module.py	/^    def __init__(self, stock: 'str', lookback: 'int', beta_value: 'float', index: 'str', base = None):$/;"	m	class:StockLineBetaAdjusted
 __init__	StockLine_Module.py	/^    def __init__(self, stock_lines: 'list of stock lines'):$/;"	m	class:StockChart
 __init__	StockLine_Module.py	/^    def __init__(self,$/;"	m	class:ScrubParams
 __init__	Stock_Module.py	/^    def __init__(self, stock):$/;"	m	class:Stock
 __init__	Timing_Module.py	/^    def __init__(self, timing_descriptor: 'str or date'  = None, reference_date = dt.date.today()):$/;"	m	class:Timing
 __init__	beta_class.py	/^    def __init__(self, stock: 'str', lookback: 'int', base=None):$/;"	m	class:StockLineSimple
-__init__	beta_class.py	/^    def __init__(self, stock: 'str', lookback: 'int', beta: 'float', index: 'str', base = None):$/;"	m	class:StockLineBetaAdjusted
+__init__	beta_class.py	/^    def __init__(self, stock: 'str', lookback: 'int', beta_value: 'float', index: 'str', base = None):$/;"	m	class:StockLineBetaAdjusted
 __init__	beta_class.py	/^    def __init__(self, stock_lines: 'list of stock lines'):$/;"	m	class:StockChart
 __init__	beta_class.py	/^    def __init__(self,$/;"	m	class:Beta
 __init__	beta_class_original.py	/^    def __init__(self, stock: 'str', lookback: 'int', base = None):$/;"	m	class:StockLineSimple
-__init__	beta_class_original.py	/^    def __init__(self, stock: 'str', lookback: 'int', beta: 'float', index: 'str', base = None):$/;"	m	class:StockLineBetaAdjusted
+__init__	beta_class_original.py	/^    def __init__(self, stock: 'str', lookback: 'int', beta_value: 'float', index: 'str', base = None):$/;"	m	class:StockLineBetaAdjusted
 __init__	beta_class_original.py	/^    def __init__(self, stock_lines: 'list of stock lines'):$/;"	m	class:StockChart
 __init__	beta_class_original.py	/^    def __init__(self,$/;"	m	class:Beta
 __init__	beta_class_original.py	/^    def __init__(self,$/;"	m	class:ScrubParams
@@ -636,7 +636,7 @@ __init__	ols.py	/^    def __init__(self,$/;"	m	class:OLS
 __init__	ols2.py	/^    def __init__(self, item):$/;"	m	class:OLSPoint
 __init__	ols2.py	/^    def __init__(self,$/;"	m	class:OLS
 __init__	original_scrub_methods_beta_class.py	/^    def __init__(self, stock: 'str', lookback: 'int', base = None):$/;"	m	class:StockLineSimple
-__init__	original_scrub_methods_beta_class.py	/^    def __init__(self, stock: 'str', lookback: 'int', beta: 'float', index: 'str', base = None):$/;"	m	class:StockLineBetaAdjusted
+__init__	original_scrub_methods_beta_class.py	/^    def __init__(self, stock: 'str', lookback: 'int', beta_value: 'float', index: 'str', base = None):$/;"	m	class:StockLineBetaAdjusted
 __init__	original_scrub_methods_beta_class.py	/^    def __init__(self, stock_lines: 'list of stock lines'):$/;"	m	class:StockChart
 __init__	original_scrub_methods_beta_class.py	/^    def __init__(self,$/;"	m	class:Beta
 __init__	original_scrub_methods_beta_class.py	/^    def __init__(self,$/;"	m	class:ScrubParams
@@ -836,10 +836,10 @@ abbrev_name	scrap/pandas_multiindex.py	/^    abbrev_name = 'T.O.'$/;"	v	class:Ta
 adj_alpha_ratios	Old_Versions/alpha_oldR/alpha3.py	/^adj_alpha_ratios = alpha_df.loc[:, ['Adj_Alpha_Ratio']].values.tolist()$/;"	v
 adj_alpha_ratios	Old_Versions/alpha_oldR/alpha4.py	/^adj_alpha_ratios = alpha_df.loc[:, ['Adj_Alpha_Ratio']].values.tolist()$/;"	v
 adj_alpha_ratios	alpha.py	/^adj_alpha_ratios = alpha_df.loc[:, ['Adj_Alpha_Ratio']].values.tolist()$/;"	v
-adj_stock_line	Old_Versions/rolling_hvs_oldR/rolling_hvs_2.py	/^adj_stock_line = StockLineBetaAdjusted(stock, lookback, beta, index)$/;"	v
-adj_stock_line	Old_Versions/rolling_hvs_oldR/rolling_hvs_3.py	/^adj_stock_line = StockLineBetaAdjusted(stock, lookback, beta, index)$/;"	v
-adj_stock_line	Old_Versions/rolling_hvs_oldR/rolling_hvs_original.py	/^adj_stock_line = StockLineBetaAdjusted(stock, lookback, beta, index)$/;"	v
-adj_stock_line	rolling_hvs.py	/^adj_stock_line = StockLineBetaAdjusted(stock, lookback, beta, index)$/;"	v
+adj_stock_line	Old_Versions/rolling_hvs_oldR/rolling_hvs_2.py	/^adj_stock_line = StockLineBetaAdjusted(stock, lookback, beta_value, index)$/;"	v
+adj_stock_line	Old_Versions/rolling_hvs_oldR/rolling_hvs_3.py	/^adj_stock_line = StockLineBetaAdjusted(stock, lookback, beta_value, index)$/;"	v
+adj_stock_line	Old_Versions/rolling_hvs_oldR/rolling_hvs_original.py	/^adj_stock_line = StockLineBetaAdjusted(stock, lookback, beta_value, index)$/;"	v
+adj_stock_line	rolling_hvs.py	/^adj_stock_line = StockLineBetaAdjusted(stock, lookback, beta_value, index)$/;"	v
 adj_stock_returns_scatter_plot	Old_Versions/stock_graphs_oldR/stock_graphs_6_not100pctworking.py	/^    def adj_stock_returns_scatter_plot():$/;"	f	function:corr_pair
 adjusted_returns	Beta_StepTwo.py	/^    adjusted_returns = stock_line.adjusted_returns$/;"	v
 adjusted_returns	Old_Versions/beta_class_oldR/beta_class_4.py	/^    def adjusted_returns(self):$/;"	m	class:StockLineBetaAdjusted
@@ -977,31 +977,31 @@ best_fit_param	scrubbing_processes.py	/^best_fit_param = BEST_FIT_PERCENTILE$/;"
 best_fit_scrub_process	scrubbing_processes.py	/^def best_fit_scrub_process(returns_df_to_scrub: 'DataFrame of daily returns and OLS info. for the stock and index',$/;"	f
 best_index	Stock_Module.py	/^    def best_index(self):$/;"	m	class:Stock
 best_index	get_best_betas_run.py	/^best_index = find_best_index(stock, indices)$/;"	v
-beta	Beta_StepTwo.py	/^    beta = Beta(stock, index, beta_lookback, scrub_params).beta$/;"	v
-beta	Old_Versions/beta_class_oldR/beta_class_2.py	/^    def beta(self):$/;"	m	class:Beta
-beta	Old_Versions/beta_class_oldR/beta_class_3.py	/^    def beta(self):$/;"	m	class:Beta
-beta	Old_Versions/beta_class_oldR/beta_class_4.py	/^    def beta(self):$/;"	m	class:Beta
-beta	Old_Versions/beta_class_oldR/beta_class_4.py	/^beta = Beta(stock, index, lookback, ScrubParams(.075, .0125, .8)).beta$/;"	v
-beta	Old_Versions/beta_class_oldR/beta_class_5.py	/^    beta = Beta(stock, index, beta_lookback, ScrubParams(.075, .01, .8)).beta$/;"	v	class:StockChart
-beta	Old_Versions/beta_class_oldR/beta_class_5.py	/^    def beta(self):$/;"	m	class:Beta
-beta	Old_Versions/beta_class_oldR/beta_class_6.py	/^    beta = Beta(stock, index, beta_lookback, ScrubParams(.075, .01, .8)).beta$/;"	v	class:StockChart
-beta	Old_Versions/beta_class_oldR/beta_class_6.py	/^    def beta(self):$/;"	m	class:Beta
-beta	Old_Versions/beta_class_oldR/beta_class_7.py	/^    beta = Beta(stock, index, beta_lookback, ScrubParams(.075, .01, .8)).beta$/;"	v	class:StockChart
-beta	Old_Versions/beta_class_oldR/beta_class_7.py	/^    def beta(self):$/;"	m	class:Beta
-beta	Old_Versions/beta_class_oldR/beta_class_original.py	/^    def beta(self):$/;"	m	class:Beta
-beta	Old_Versions/rolling_hvs_oldR/rolling_hvs_2.py	/^beta = 0$/;"	v
-beta	Old_Versions/rolling_hvs_oldR/rolling_hvs_2.py	/^beta = beta_object.beta$/;"	v
-beta	Old_Versions/rolling_hvs_oldR/rolling_hvs_3.py	/^beta = beta_object.beta$/;"	v
-beta	Old_Versions/rolling_hvs_oldR/rolling_hvs_original.py	/^beta = 0$/;"	v
-beta	Old_Versions/rolling_hvs_oldR/rolling_hvs_original.py	/^beta = beta_object.beta$/;"	v
-beta	StockLine_Module.py	/^    beta = Beta(stock, index, beta_lookback, ScrubParams(.075, .01, .8)).beta$/;"	v	class:StockChart
-beta	beta_class.py	/^    def beta(self):$/;"	m	class:Beta
-beta	beta_class_original.py	/^    beta = Beta(stock, index, beta_lookback, ScrubParams(.075, .01, .8)).beta$/;"	v	class:StockChart
-beta	beta_class_original.py	/^    def beta(self):$/;"	m	class:Beta
-beta	beta_summary_stats.py	/^beta = get_ETF_beta_to_SPY(etf)$/;"	v
-beta	get_best_betas_run.py	/^beta = Beta('PFE', 'QQQ')$/;"	v
-beta	original_scrub_methods_beta_class.py	/^    def beta(self):$/;"	m	class:Beta
-beta	rolling_hvs.py	/^beta = beta_object.beta$/;"	v
+beta_value	Beta_StepTwo.py	/^    beta_value = Beta(stock, index, beta_lookback, scrub_params).beta_value$/;"	v
+beta_value	Old_Versions/beta_class_oldR/beta_class_2.py	/^    def beta_value(self):$/;"	m	class:Beta
+beta_value	Old_Versions/beta_class_oldR/beta_class_3.py	/^    def beta_value(self):$/;"	m	class:Beta
+beta_value	Old_Versions/beta_class_oldR/beta_class_4.py	/^    def beta_value(self):$/;"	m	class:Beta
+beta_value	Old_Versions/beta_class_oldR/beta_class_4.py	/^beta_value = Beta(stock, index, lookback, ScrubParams(.075, .0125, .8)).beta_value$/;"	v
+beta_value	Old_Versions/beta_class_oldR/beta_class_5.py	/^    beta_value = Beta(stock, index, beta_lookback, ScrubParams(.075, .01, .8)).beta_value$/;"	v	class:StockChart
+beta_value	Old_Versions/beta_class_oldR/beta_class_5.py	/^    def beta_value(self):$/;"	m	class:Beta
+beta_value	Old_Versions/beta_class_oldR/beta_class_6.py	/^    beta_value = Beta(stock, index, beta_lookback, ScrubParams(.075, .01, .8)).beta_value$/;"	v	class:StockChart
+beta_value	Old_Versions/beta_class_oldR/beta_class_6.py	/^    def beta_value(self):$/;"	m	class:Beta
+beta_value	Old_Versions/beta_class_oldR/beta_class_7.py	/^    beta_value = Beta(stock, index, beta_lookback, ScrubParams(.075, .01, .8)).beta_value$/;"	v	class:StockChart
+beta_value	Old_Versions/beta_class_oldR/beta_class_7.py	/^    def beta_value(self):$/;"	m	class:Beta
+beta_value	Old_Versions/beta_class_oldR/beta_class_original.py	/^    def beta_value(self):$/;"	m	class:Beta
+beta_value	Old_Versions/rolling_hvs_oldR/rolling_hvs_2.py	/^beta_value = 0$/;"	v
+beta_value	Old_Versions/rolling_hvs_oldR/rolling_hvs_2.py	/^beta_value = beta_object.beta_value$/;"	v
+beta_value	Old_Versions/rolling_hvs_oldR/rolling_hvs_3.py	/^beta_value = beta_object.beta_value$/;"	v
+beta_value	Old_Versions/rolling_hvs_oldR/rolling_hvs_original.py	/^beta_value = 0$/;"	v
+beta_value	Old_Versions/rolling_hvs_oldR/rolling_hvs_original.py	/^beta_value = beta_object.beta_value$/;"	v
+beta_value	StockLine_Module.py	/^    beta_value = Beta(stock, index, beta_lookback, ScrubParams(.075, .01, .8)).beta_value$/;"	v	class:StockChart
+beta_value	beta_class.py	/^    def beta_value(self):$/;"	m	class:Beta
+beta_value	beta_class_original.py	/^    beta_value = Beta(stock, index, beta_lookback, ScrubParams(.075, .01, .8)).beta_value$/;"	v	class:StockChart
+beta_value	beta_class_original.py	/^    def beta_value(self):$/;"	m	class:Beta
+beta_value	beta_summary_stats.py	/^beta_value = get_ETF_beta_to_SPY(etf)$/;"	v
+beta_value	get_best_betas_run.py	/^beta_value = Beta('PFE', 'QQQ')$/;"	v
+beta_value	original_scrub_methods_beta_class.py	/^    def beta_value(self):$/;"	m	class:Beta
+beta_value	rolling_hvs.py	/^beta_value = beta_object.beta_value$/;"	v
 beta0	ols.py	/^    def beta0(self):$/;"	m	class:OLS
 beta1	Old_Versions/beta_class_oldR/beta_class_3.py	/^    def beta1(self):$/;"	m	class:Beta
 beta1	Old_Versions/beta_class_oldR/beta_class_4.py	/^    def beta1(self):$/;"	m	class:Beta
@@ -1012,12 +1012,12 @@ beta1	beta_class.py	/^    def beta1(self):$/;"	m	class:Beta
 beta1	beta_class_original.py	/^    def beta1(self):$/;"	m	class:Beta
 beta1	ols.py	/^    def beta1(self):    $/;"	m	class:OLS
 beta1	original_scrub_methods_beta_class.py	/^    def beta1(self):$/;"	m	class:Beta
-beta2	Old_Versions/beta_class_oldR/beta_class_4.py	/^beta2 = Beta(stock2, index, lookback, ScrubParams(.075, .0125, .8)).beta$/;"	v
-beta2	Old_Versions/beta_class_oldR/beta_class_5.py	/^    beta2 = Beta(stock2, index, beta_lookback, ScrubParams(.075, .01, .8)).beta$/;"	v	class:StockChart
-beta2	Old_Versions/beta_class_oldR/beta_class_6.py	/^    beta2 = Beta(stock2, index, beta_lookback, ScrubParams(.075, .01, .8)).beta$/;"	v	class:StockChart
-beta2	Old_Versions/beta_class_oldR/beta_class_7.py	/^    beta2 = Beta(stock2, index, beta_lookback, ScrubParams(.075, .01, .8)).beta$/;"	v	class:StockChart
-beta2	StockLine_Module.py	/^    beta2 = Beta(stock2, index, beta_lookback, ScrubParams(.075, .01, .8)).beta$/;"	v	class:StockChart
-beta2	beta_class_original.py	/^    beta2 = Beta(stock2, index, beta_lookback, ScrubParams(.075, .01, .8)).beta$/;"	v	class:StockChart
+beta2	Old_Versions/beta_class_oldR/beta_class_4.py	/^beta2 = Beta(stock2, index, lookback, ScrubParams(.075, .0125, .8)).beta_value$/;"	v
+beta2	Old_Versions/beta_class_oldR/beta_class_5.py	/^    beta2 = Beta(stock2, index, beta_lookback, ScrubParams(.075, .01, .8)).beta_value$/;"	v	class:StockChart
+beta2	Old_Versions/beta_class_oldR/beta_class_6.py	/^    beta2 = Beta(stock2, index, beta_lookback, ScrubParams(.075, .01, .8)).beta_value$/;"	v	class:StockChart
+beta2	Old_Versions/beta_class_oldR/beta_class_7.py	/^    beta2 = Beta(stock2, index, beta_lookback, ScrubParams(.075, .01, .8)).beta_value$/;"	v	class:StockChart
+beta2	StockLine_Module.py	/^    beta2 = Beta(stock2, index, beta_lookback, ScrubParams(.075, .01, .8)).beta_value$/;"	v	class:StockChart
+beta2	beta_class_original.py	/^    beta2 = Beta(stock2, index, beta_lookback, ScrubParams(.075, .01, .8)).beta_value$/;"	v	class:StockChart
 beta_df	Old_Versions/get_best_betas_oldR/get_best_betas.py	/^beta_df = get_betas_df(stocks, betas, corrs, index)$/;"	v
 beta_df	Old_Versions/get_best_betas_oldR/get_best_betas_general_multi_index_formula.py	/^beta_df = get_beta_info(['AAPL', 'GOOG', 'FB'], 'SPY', 400, cutoff_params,percentile_cutoff)$/;"	v
 beta_df	Old_Versions/get_best_betas_oldR/get_best_betas_general_multi_index_formula.py	/^beta_df = get_betas_df(stocks, betas, corrs, index)$/;"	v
@@ -4010,7 +4010,7 @@ stock_futures_2	Old_Versions/simulation_formulas_oldR/sim_many_ways.py	/^stock_f
 stock_futures_3	Old_Versions/simulation_formulas_oldR/sim_many_ways.py	/^stock_futures_3 = bs_simulation_3(rand_numbers_4)$/;"	v
 stock_futures_nparray	Old_Versions/simulation_formulas_oldR/sim_many_ways.py	/^stock_futures_nparray = bs_simulation_nparray()$/;"	v
 stock_futures_nparray	Old_Versions/simulation_formulas_oldR/sim_refined_ways.py	/^stock_futures_nparray = bs_simulation_nparray()$/;"	v
-stock_line	Beta_StepTwo.py	/^    stock_line = StockLineBetaAdjusted(stock, lookback, beta, index)$/;"	v
+stock_line	Beta_StepTwo.py	/^    stock_line = StockLineBetaAdjusted(stock, lookback, beta_value, index)$/;"	v
 stock_line	Old_Versions/beta_class_oldR/beta_class_3.py	/^    def stock_line(self):$/;"	m	class:StockLine
 stock_line	Old_Versions/beta_class_oldR/beta_class_3.py	/^    def stock_line(self):$/;"	m	class:StockLineComplex
 stock_line	Old_Versions/beta_class_oldR/beta_class_3.py	/^    def stock_line(self):$/;"	m	class:StockLineSimple
@@ -4028,12 +4028,12 @@ stock_line	beta_class.py	/^    def stock_line(self, color, name = None):$/;"	m	c
 stock_line	beta_class_original.py	/^    def stock_line(self, color, name = None):$/;"	m	class:StockLineSimple
 stock_line	beta_class_original.py	/^    stock_line = StockLineSimple(stock, chart_lookback, base)$/;"	v	class:StockChart
 stock_line	original_scrub_methods_beta_class.py	/^    def stock_line(self, color, name = None):$/;"	m	class:StockLineSimple
-stock_line_adj	Old_Versions/beta_class_oldR/beta_class_4.py	/^stock_line_adj = StockLineBetaAdjusted(stock, lookback, beta, index, base)$/;"	v
-stock_line_adj	Old_Versions/beta_class_oldR/beta_class_5.py	/^    stock_line_adj = StockLineBetaAdjusted(stock, chart_lookback, beta, index, base)$/;"	v	class:StockChart
-stock_line_adj	Old_Versions/beta_class_oldR/beta_class_6.py	/^    stock_line_adj = StockLineBetaAdjusted(stock, chart_lookback, beta, index, base)$/;"	v	class:StockChart
-stock_line_adj	Old_Versions/beta_class_oldR/beta_class_7.py	/^    stock_line_adj = StockLineBetaAdjusted(stock, chart_lookback, beta, index, base)$/;"	v	class:StockChart
-stock_line_adj	StockLine_Module.py	/^    stock_line_adj = StockLineBetaAdjusted(stock, chart_lookback, beta, index, base)$/;"	v	class:StockChart
-stock_line_adj	beta_class_original.py	/^    stock_line_adj = StockLineBetaAdjusted(stock, chart_lookback, beta, index, base)$/;"	v	class:StockChart
+stock_line_adj	Old_Versions/beta_class_oldR/beta_class_4.py	/^stock_line_adj = StockLineBetaAdjusted(stock, lookback, beta_value, index, base)$/;"	v
+stock_line_adj	Old_Versions/beta_class_oldR/beta_class_5.py	/^    stock_line_adj = StockLineBetaAdjusted(stock, chart_lookback, beta_value, index, base)$/;"	v	class:StockChart
+stock_line_adj	Old_Versions/beta_class_oldR/beta_class_6.py	/^    stock_line_adj = StockLineBetaAdjusted(stock, chart_lookback, beta_value, index, base)$/;"	v	class:StockChart
+stock_line_adj	Old_Versions/beta_class_oldR/beta_class_7.py	/^    stock_line_adj = StockLineBetaAdjusted(stock, chart_lookback, beta_value, index, base)$/;"	v	class:StockChart
+stock_line_adj	StockLine_Module.py	/^    stock_line_adj = StockLineBetaAdjusted(stock, chart_lookback, beta_value, index, base)$/;"	v	class:StockChart
+stock_line_adj	beta_class_original.py	/^    stock_line_adj = StockLineBetaAdjusted(stock, chart_lookback, beta_value, index, base)$/;"	v	class:StockChart
 stock_line_adj2	Old_Versions/beta_class_oldR/beta_class_4.py	/^stock_line_adj2 = StockLineBetaAdjusted(stock2, lookback, beta2, index, base)$/;"	v
 stock_line_adj2	Old_Versions/beta_class_oldR/beta_class_5.py	/^    stock_line_adj2 = StockLineBetaAdjusted(stock2, chart_lookback, beta2, index, base)$/;"	v	class:StockChart
 stock_line_adj2	Old_Versions/beta_class_oldR/beta_class_6.py	/^    stock_line_adj2 = StockLineBetaAdjusted(stock2, chart_lookback, beta2, index, base)$/;"	v	class:StockChart

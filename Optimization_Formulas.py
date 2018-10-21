@@ -60,8 +60,7 @@ def find_maximum(f: 'function', Xguess, increment = .001, print_guesses=False, *
     return new_estimate
 
 def find_minimum(function, Xguess):
-    """I currently don't use this formula anywhere"""
-    #Xguess = 2.0
+    """I don't currently use this formula anywhere"""
     min_result = spo.minimize(function, Xguess, method='SLSQP', options={'disp':True})
     print("Minima found at:")
     print("X = {}, Y = {}".format(min_result.x, min_result.fun))

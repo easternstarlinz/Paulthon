@@ -172,7 +172,7 @@ def run3():
 def run():
     if __name__ == "__main__":
         #-------------------PresElection Setup-----------------#
-        PresElectionParams = pd.read_csv("/home/paul/Environments/finance_env/PresElectionParams.csv")
+        PresElectionParams = pd.read_csv("/Users/paulwainer/Environments/finance_env/PresElectionParams.csv")
         PresElectionParams.set_index('Stock', inplace=True)
 
         # Create PresElection Events Dict

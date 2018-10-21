@@ -9,7 +9,7 @@ It may be more clear to logically separate the scrubbing mechanism from their or
 
 deleted beta_run_other.py file, it had one function to show betas for different index_value inputs but can re-write it, not worth keeping for now.
 
-deleted beta_run_file.py -- same idea, old version of shocking the beta calculation based on the index_cutoff parameter.
+deleted beta_run_file.py -- same idea, old version of shocking the beta_value calculation based on the index_cutoff parameter.
 
 Beta Process:
     1) Determine scrub cutoffs

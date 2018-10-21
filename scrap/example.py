@@ -1,8 +1,6 @@
-from Event_Module import IdiosyncraticVol
+from option_model.Event_Module import IdiosyncraticVol
 import datetime as dt
-from Distribution_Module import Distribution, float_to_bs_distribution
-import numpy as np
-import pandas as pd
+from option_model.Distribution_Module import Distribution, float_to_bs_distribution
 
 event = IdiosyncraticVol('CLVS', .1)
 distribution = event.get_distribution(dt.date(2018,5,10))

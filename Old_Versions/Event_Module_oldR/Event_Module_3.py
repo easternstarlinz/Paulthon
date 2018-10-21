@@ -1,19 +1,13 @@
 import datetime as dt
 import pandas as pd
 import math
-import numpy as np
-import random
 import copy
-import matplotlib.pyplot as plt
-from collections import namedtuple
-from statistics import mean
-from py_vollib.black_scholes.implied_volatility import black_scholes, implied_volatility
 
-from decorators import my_time_decorator
-from paul_resources import InformationTable, tprint, rprint
-from Distribution_Module import Distribution, Distribution_MultiIndex, float_to_event_distribution, float_to_bs_distribution, float_to_volbeta_distribution
-from Option_Module import get_time_to_expiry
-from Timing_Module import event_prob_by_expiry
+from paul_resources import InformationTable
+from option_model.Distribution_Module import Distribution, Distribution_MultiIndex, float_to_event_distribution, \
+    float_to_volbeta_distribution
+from option_model.Option_Module import get_time_to_expiry
+from option_model.Timing_Module import event_prob_by_expiry
 import logging
 
 # Logging Setup

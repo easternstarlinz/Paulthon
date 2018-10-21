@@ -244,7 +244,7 @@ def graph_MC_distribution(results: 'numpy array of numbers'):
 # Option(option_type: 'str: C/P', strike: 'float', expiry: 'datetime')
 # Price(Distribution, Option)
 """
--OptionPrice
+-OptionPriceDist
     -Type: Function
     -Params:
         -Option: 'NamedTuple'
@@ -262,7 +262,7 @@ def graph_MC_distribution(results: 'numpy array of numbers'):
         -Strike: 'float'
         -Expiry: 'Datetime'
 
--OptionPrice: Function
+-OptionPriceDist: Function
     -Params:
         -Option: 'NamedTuple'
         -Distribution: 'Object'

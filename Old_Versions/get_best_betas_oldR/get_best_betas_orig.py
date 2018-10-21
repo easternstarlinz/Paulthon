@@ -24,7 +24,7 @@ def get_best_betas():
             index_cutoff = index_cutoffs[index]
             scrub_params = ScrubParams(stock_cutoff, index_cutoff, percentile_cutoff)
             beta = Beta(stock, index, lookback, scrub_params)
-            outcomes.append((index, beta.beta, beta.corr))
+            outcomes.append((index, beta.beta_value, beta.corr))
         max_corr = max([i[2] for i in outcomes])
         best_fit = [i for i in outcomes if i[2] == max_corr][0]
         best_indices.append(best_fit[0])

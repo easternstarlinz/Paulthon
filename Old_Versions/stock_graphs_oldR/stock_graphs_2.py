@@ -66,7 +66,7 @@ def corr_pair(sym1: 'str', sym2: 'str', index_cutoff = .01, stock_cutoff = .1) -
 
     print("orig. corr.: ", round(np.corrcoef(a,b)[1,0], 3), ", scrubbed corr: ", round(np.corrcoef(x,y)[1,0], 3), sep="")
     
-    #run regression to determine beta
+    #run regression to determine beta_value
     #xx, yy = pd.DataFrame(x), pd.DataFrame(y)
     #result = sm.OLS(yy, xx).fit()
     #print(result.summary())
@@ -79,14 +79,14 @@ def corr_pair(sym1: 'str', sym2: 'str', index_cutoff = .01, stock_cutoff = .1) -
     plt.legend()
     #plt.show()
 
-    #calculate original beta manually (raw pairs)
+    #calculate original beta_value manually (raw pairs)
     a_bar, b_bar = (sum(a)/len(a)), (sum(b)/len(b))
     beta1 = sum([(i[1] - b_bar)*(i[0] - a_bar) for i in raw_pairs]) / sum([(i[0] - a_bar)**2 for i in raw_pairs])
     beta0 = b_bar - beta1*a_bar
     corr = np.corrcoef(a, b)[1,0]
     print("raw pairs--- ", "beta1:", round(beta1, 3),", beta0:", round(beta0, 5), ", count: ", len(a), ", correlation: ", round(corr,3), sep="")
     
-    #calculate correlation (corr), beta (beta1), alpha (beta0) manually
+    #calculate correlation (corr), beta_value (beta1), alpha (beta0) manually
     x_bar, y_bar = (sum(x)/len(x)), (sum(y)/len(y))
     beta1 = sum([(i[1] - y_bar)*(i[0] - x_bar) for i in second_scrub]) / sum([(i[0] - x_bar)**2 for i in second_scrub])
     beta0 = y_bar - beta1*x_bar
@@ -117,7 +117,7 @@ def corr_pair(sym1: 'str', sym2: 'str', index_cutoff = .01, stock_cutoff = .1) -
     plt.legend()
     #plt.show()
     
-    #calculate beta manually
+    #calculate beta_value manually
     x3_bar, y3_bar = (sum(x3)/len(x3)), (sum(y3)/len(y3))
     beta1 = sum([(i[1] - y3_bar)*(i[0] - x3_bar) for i in third_scrub]) / sum([(i[0] - x3_bar)**2 for i in third_scrub])
     beta0 = y3_bar - beta1*x3_bar

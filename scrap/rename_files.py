@@ -1,6 +1,6 @@
 import os
 
-os.chdir('/home/paul/Paulthon/Scrap')
+os.chdir('/Users/paulwainer/Paulthon/Scrap')
 
 #print(os.getcwd())
 

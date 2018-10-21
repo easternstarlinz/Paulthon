@@ -1,8 +1,6 @@
 from scipy.interpolate import interp1d
 import numpy as np
-import matplotlib.pyplot as plt
-from Distribution_Module import float_to_volbeta_distribution
-from paul_resources import get_histogram_from_array
+from option_model.Distribution_Module import float_to_volbeta_distribution
 
 x = np.linspace(0, 10, num=10000, endpoint=True)
 y = np.sin(np.cos(-x**2/9.0)) + x**.3 - np.cos(x*10)**2

@@ -70,7 +70,7 @@ class TakeoutEvent(object):
 #-------------------PresElection Calculations-----------------#
 # Import PresElection Parameters from CSV File
 #PresElectionParams = pd.DataFrame([('SRPT', .05), ('BMRN', .03), ('GILD', .02)], columns = ['Stock', 'move_input'])
-PresElectionParams = pd.read_csv("/home/paul/Environments/finance_env/PresElectionParams.csv")
+PresElectionParams = pd.read_csv("/Users/paulwainer/Environments/finance_env/PresElectionParams.csv")
 PresElectionParams.set_index('Stock', inplace=True)
 
 # Create dictionary of PresElection Events where the key is the stock symbol

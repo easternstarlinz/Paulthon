@@ -229,7 +229,7 @@ def OptionPrice(Distribution, Option):
 # Option(option_type: 'str: C/P', strike: 'float', expiry: 'datetime')
 # Price(Distribution, Option)
 """
--OptionPrice
+-OptionPriceDist
     -Type: Function
     -Params:
         -Option: 'NamedTuple'
@@ -247,7 +247,7 @@ def OptionPrice(Distribution, Option):
         -Strike: 'float'
         -Expiry: 'Datetime'
 
--OptionPrice: Function
+-OptionPriceDist: Function
     -Params:
         -Option: 'NamedTuple'
         -Distribution: 'Object'
@@ -419,7 +419,7 @@ run4()
 def run():
     if __name__ == "__main__":
         #-------------------PresElection Setup-----------------#
-        PresElectionParams = pd.read_csv("/home/paul/Environments/finance_env/PresElectionParams.csv")
+        PresElectionParams = pd.read_csv("/Users/paulwainer/Environments/finance_env/PresElectionParams.csv")
         PresElectionParams.set_index('Stock', inplace=True)
 
         # Create PresElection Events Dict

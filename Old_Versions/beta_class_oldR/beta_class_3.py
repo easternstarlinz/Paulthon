@@ -1,19 +1,7 @@
-import numpy as np
-import datetime as dt
-import pandas as pd
-import pickle
-import copy
-import pprint
-import decimal
 import statsmodels.formula.api as sm
-from time_decorator import my_time_decorator
-from ols import OLS
 import math
-import matplotlib.pyplot as plt
-import scipy.stats as ss
 import statsmodels.api as sm
-from sklearn.linear_model import LinearRegression
-from ols2 import OLS as MainOLS
+from beta_model.ols2 import OLS as MainOLS
 from paul_resources import PriceTable
 from paul_resources import daily_returns
 
@@ -207,7 +195,7 @@ class StockLineComplex(StockLineSimple):
 
     def stock_line(self):
         pass
-        #self.adj_returns = (1 + self.daily_returns[self.stock]) / (1 + self.daily_returns[self.index]*self.beta) -1
+        #self.adj_returns = (1 + self.daily_returns[self.stock]) / (1 + self.daily_returns[self.index]*self.beta_value) -1
         #print(self.adj_returns.head(5))
 
 
@@ -247,7 +235,7 @@ class StockLine(object):
 
     def stock_line(self):
         pass
-        #self.adj_returns = (1 + self.daily_returns[self.stock]) / (1 + self.daily_returns[self.index]*self.beta) -1
+        #self.adj_returns = (1 + self.daily_returns[self.stock]) / (1 + self.daily_returns[self.index]*self.beta_value) -1
         #print(self.adj_returns.head(5))
 
 

@@ -7,9 +7,9 @@ from functools import reduce
 from scipy.interpolate import interp1d
 
 # Paul Modules
-from Option_Module import Option, OptionPriceMC, get_implied_volatility, get_time_to_expiry
-from Timing_Module import event_prob_by_expiry
-from Event_Module import IdiosyncraticVol, Earnings, Event 
+from option_model.Option_Module import Option, OptionPriceMC, get_implied_volatility, get_time_to_expiry
+from option_model.Timing_Module import event_prob_by_expiry
+from option_model.Event_Module import IdiosyncraticVol, Earnings
 
 # Paul Utility Functions
 from utility.decorators import my_time_decorator

@@ -114,7 +114,7 @@ def fetch_price_table():
         #symbols = indices
         symbols = ['XBI', 'IBB', 'SPY', 'QQQ', 'SRPT', 'CRBP', 'NBIX', 'BIIB', 'ALNY', 'PFE']
         symbols = AllSymbols
-        file_name = '/home/paul/Paulthon/DataFiles/StockPrices/sp500_prices_paul'
+        file_name = '/Users/paulwainer/Paulthon/DataFiles/StockPrices/sp500_prices_paul'
         price_table = make_price_table(symbols,
                                        start = dt.datetime(2015,1,1),
                                        end = dt.datetime.today(),

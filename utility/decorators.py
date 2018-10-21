@@ -4,6 +4,7 @@ import time
 import cProfile
 import pstats
 import io
+import functools
 
 def my_time_decorator(original_function):
     def wrapper(*args, **kwargs):
@@ -14,6 +15,23 @@ def my_time_decorator(original_function):
         print("{}-> Time (secs): {}".format(original_function.__name__, diff))
         return result
     return wrapper
+
+
+def cache(func):
+    cached = {}
+
+    @functools.wraps(func)
+    def wrapped_func(*args, **kwargs):
+        key = args + tuple(sorted(kwargs.items(), key=lambda x: x[0]))
+        if key in cached:
+            return cached[key]
+        result = func(*args, **kwargs)
+        cached[key] = result
+        return result
+
+    wrapped_func.cached = cached
+    return wrapped_func
+
 
 #Decorator that automatically assigns the parameters in the init function
 #def initializer(func):

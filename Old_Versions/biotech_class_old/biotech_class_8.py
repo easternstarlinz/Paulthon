@@ -269,7 +269,7 @@ class Distribution(object):
 # Option(option_type: 'str: C/P', strike: 'float', expiry: 'datetime')
 # Price(Distribution, Option)
 """
--OptionPrice
+-OptionPriceDist
     -Type: Function
     -Params:
         -Option: 'NamedTuple'
@@ -287,7 +287,7 @@ class Distribution(object):
         -Strike: 'float'
         -Expiry: 'Datetime'
 
--OptionPrice: Function
+-OptionPriceDist: Function
     -Params:
         -Option: 'NamedTuple'
         -Distribution: 'Object'

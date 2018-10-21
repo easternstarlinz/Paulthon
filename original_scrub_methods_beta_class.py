@@ -4,14 +4,12 @@ from pprint import pprint
 import statsmodels.formula.api as sm
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
-from ols import OLS
-from ols2 import OLS as MainOLS
+from beta_model.ols2 import OLS as MainOLS
 
-from utility.general import tprint
 from data.finance import PriceTable
 from utility.finance import daily_returns
+from cached_property import cached_property
 
-from scrubbing_processes import stock_ceiling_scrub_process, index_floor_scrub_process, best_fit_scrub_process
 
 class ScrubParams(object):
     """Three Parameters for Scrubbing Process:

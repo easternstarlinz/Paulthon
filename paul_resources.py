@@ -46,6 +46,10 @@ VolBeta = pd.read_csv('VolbetaDistribution.csv')
 
 TakeoutParams = pd.read_csv('TakeoutParams.csv').set_index('Stock')
 
+Best_Betas = pickle.load(open('Best_Betas.pkl', 'rb'))
+SPY_Betas_Raw = pickle.load(open('SPY_Betas_Raw.pkl', 'rb'))
+SPY_Betas_Scrubbed = pickle.load(open('SPY_Betas_Scrubbed.pkl', 'rb'))
+
 def to_pickle(content, file_name):
     pickle_file = open('{}.pkl'.format(file_name), 'wb')
     pickle.dump(content, pickle_file, pickle.HIGHEST_PROTOCOL)
@@ -77,12 +81,8 @@ def get_ETF_beta_to_SPY(ETF):
         beta = ETF_betas.loc[ETF, ('SPY', 'Beta')]
         return beta
     except:
-        print("{} is not in the ETF beta table".format(ETF))
+        print("{} is not in the ETF beta_value table".format(ETF))
         return 1.0
-
-Best_Betas = pickle.load(open('Best_Betas.pkl', 'rb'))
-SPY_Betas_Raw = pickle.load(open('SPY_Betas_Raw.pkl', 'rb'))
-SPY_Betas_Scrubbed = pickle.load(open('SPY_Betas_Scrubbed.pkl', 'rb'))
 
 def get_total_return(stock, lookback):
     stock_prices = PriceTable.loc[:, stock].head(lookback)

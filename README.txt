@@ -7,7 +7,7 @@ Methods:
     - best_index (index with the highest R-squared, taken from a pre-made table)
     - beta_to_best_index
     - beta_to_SPY
-    - get_beta_to_index (takes the index of interest as a paramters and performs beta calculations)
+    - get_beta_to_index (takes the index of interest as a paramters and performs beta_value calculations)
     
     Stock Events:
     - idio_vol

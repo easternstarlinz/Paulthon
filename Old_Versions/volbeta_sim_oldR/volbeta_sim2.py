@@ -2,19 +2,13 @@
 formula for black scholes distribution:
 S_t = S_o*exp(r*t - vol^2/2 + z*vol*sqrt(t)"""
 
-import math
 import random
 import pandas as pd
 import numpy as np
-import itertools
-import tkinter as tk
 import matplotlib.pyplot as plt
-from scipy.stats import norm
 from decorators import my_time_decorator
-from paul_resources import tprint, rprint
-from pprint import pprint
-from Distribution_Module import Distribution, mc_distribution_to_distribution, get_mc_histogram_from_array
-from statistics import mean
+from option_model.Distribution_Module import mc_distribution_to_distribution
+
 
 @my_time_decorator
 def create_rand_nums(iterations: 'int' = 10**5) -> 'np_array':

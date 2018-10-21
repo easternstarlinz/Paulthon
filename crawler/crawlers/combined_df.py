@@ -1,7 +1,7 @@
 import pickle
 
 import sys
-sys.path.append('/home/paul/Paulthon')
+sys.path.append('/Users/paulwainer/Paulthon')
 
 from utility.general import tprint, merge_dfs_horizontally, append_dfs_vertically, to_pickle_and_CSV
 

@@ -41,7 +41,7 @@ def ols_beta(pairs: 'list of (x,y) pairs as tuples' = []) -> 'float':
 
 
 #take a list of (x,y) pairs and return a list of tuples containing (x, y, y_hat, error, error_squared)
-#along the way, calculate correlation (corr), beta (beta1), alpha (beta0), error, and error_squared
+#along the way, calculate correlation (corr), beta_value (beta1), alpha (beta0), error, and error_squared
 def ols_params(pairs: 'list of (x,y) pairs as tuples' = [], name = 'default') -> 'ols information as a list of tuples':
     x, y = [i[0] for i in pairs], [i[1] for i in pairs]
     x_bar, y_bar = (sum(x)/len(x)), (sum(y)/len(y))
@@ -55,7 +55,7 @@ def ols_params(pairs: 'list of (x,y) pairs as tuples' = [], name = 'default') ->
     error_squared = [round(i**2, 5) for i in error]
     
     print(name, " <=> ",
-            "beta = ", round(beta1, 2), ", ",
+            "beta_value = ", round(beta1, 2), ", ",
             "corr = ", round(corr, 2), ", ",
             "n = ", len(x), ", ",
             sep="")
@@ -293,11 +293,11 @@ class OLSPair(object):
 #                sep="")
 #    
 #    def stock_chart():
-#        #Create Stock Chart for stock based on beta to index -> Line Graphs
+#        #Create Stock Chart for stock based on beta_value to index -> Line Graphs
 #        if base100 == True:
 #            plt.plot(dates, raw_index_prices_base100, color='black', label=(str(sym1) + " (base100)"))
 #            plt.plot(dates, raw_stock_prices_base100, color='red', label = (str(sym2) + " (base100)"))
-#            plt.plot(dates, adj_stock_prices_base100, color='gold', label= (str(sym2) + " beta-adjusted (base100)"))
+#            plt.plot(dates, adj_stock_prices_base100, color='gold', label= (str(sym2) + " beta_value-adjusted (base100)"))
 #        else:
 #            plt.plot(dates, raw_stock_prices, color='red', label=str(sym2)+ " Raw Prices")
 #            plt.plot(dates, raw_index_prices_baseStock, color='black', label=str(sym1) + " (base: " + str(sym2) + ")")

@@ -12,7 +12,7 @@ import re
 import requests
 
 import sys
-sys.path.append('/home/paul/Paulthon')
+sys.path.append('/Users/paulwainer/Paulthon')
 from utility.general import to_pickle
 from crawler.crawlers.barchart_expiries_spider import Barchart_Expiries
 

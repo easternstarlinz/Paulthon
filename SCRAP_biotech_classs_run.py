@@ -1,19 +1,8 @@
-import datetime as dt
 import pandas as pd
-import math
 import numpy as np
-import random
-from collections import namedtuple
-from paul_resources import InformationTable, tprint, rprint, get_histogram_from_array
-from utility.decorators import my_time_decorator
-from Distribution_Module import Distribution, float_to_event_distribution, float_to_bs_distribution
-from Option_Module import Option, OptionPrice, OptionPriceMC, get_implied_volatility
-from Event_Module import IdiosyncraticVol, Event, SysEvt_PresElection, TakeoutEvent
+from option_model.Option_Module import Option, OptionPriceMC, get_implied_volatility
 from functools import reduce
-import copy
-import pylab
-from scipy.interpolate import interp1d, UnivariateSpline
-
+from scipy.interpolate import interp1d
 
 """------------------------------Calculations----------------------------------------"""
 #@my_time_decorator

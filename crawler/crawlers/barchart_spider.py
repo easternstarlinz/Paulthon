@@ -6,7 +6,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 import sys
-sys.path.append('/home/paul/Paulthon')
+sys.path.append('/Users/paulwainer/Paulthon')
 from utility.general import tprint, merge_dfs_horizontally, append_dfs_vertically, to_pickle_and_CSV, to_pickle
 from decorators import profile
 
@@ -25,7 +25,7 @@ class Chrome_Crawler():
                 self.display = Display(visible=0, size=(800, 600))
                 self.display.start()
             
-            self.driver = webdriver.Chrome("/home/paul/Paulthon/crawler/chromedriver235/chromedriver")
+            self.driver = webdriver.Chrome("/Users/paulwainer/Paulthon/crawler/chromedriver235/chromedriver")
             if SLEEP_TOGGLE:
                 sleep(4)
 

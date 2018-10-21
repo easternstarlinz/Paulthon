@@ -14,7 +14,7 @@ from py_vollib.black_scholes.implied_volatility import black_scholes, implied_vo
 """ALL OF THE CONTENT HERE HAS BEEN DISTRIBUTED TO OTHER MODULES: Option_Module, Event_Module, Distribution_Module"""
 
 """
--OptionPrice
+-OptionPriceDist
     -Type: Function
     -Params:
         -Option: 'NamedTuple'
@@ -32,7 +32,7 @@ from py_vollib.black_scholes.implied_volatility import black_scholes, implied_vo
         -Strike: 'float'
         -Expiry: 'Datetime'
 
--OptionPrice: Function
+-OptionPriceDist: Function
     -Params:
         -Option: 'NamedTuple'
         -Distribution: 'Object'

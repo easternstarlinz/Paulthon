@@ -1,20 +1,9 @@
-import numpy as np
-import datetime as dt
 import pandas as pd
-import pickle
-import copy
-import pprint
-import decimal
 import statsmodels.formula.api as sm
-from time_decorator import my_time_decorator
-from ols import OLS
 import math
 import matplotlib.pyplot as plt
-import matplotlib.ticker as tkr
-import scipy.stats as ss
 import statsmodels.api as sm
-from sklearn.linear_model import LinearRegression
-from ols2 import OLS as MainOLS
+from beta_model.ols2 import OLS as MainOLS
 from paul_resources import PriceTable
 from paul_resources import daily_returns
 
@@ -271,7 +260,7 @@ lookback = 30
 base = 100
 beta = Beta(stock, index, lookback, ScrubParams(.075, .0125, .8)).beta
 beta2 = Beta(stock2, index, lookback, ScrubParams(.075, .0125, .8)).beta
-#beta, beta2 = 0.0, 0.0
+#beta_value, beta2 = 0.0, 0.0
 
 # stock_lines to plot
 stock_line = StockLineSimple(stock, lookback, base)
@@ -293,11 +282,11 @@ StockChart(stock_lines).run()
 
 
 """
-Create Adjusted Stock Chart based on beta to index -> Line Graphs
+Create Adjusted Stock Chart based on beta_value to index -> Line Graphs
         if base100 == True:
              plt.plot(self.dates_reversed, self.raw_index_prices_base100, color='black', label=(str(self.index) + " (base100)"))
             plt.plot(self.dates_reversed, self.raw_stock_prices_base100, color='red', label = (str(self.stock) + " (base100)"))
-            plt.plot(self.dates_reversed, self.adj_stock_prices_base100, color='gold', label= (str(self.stock) + " beta-adjusted (base100)"))
+            plt.plot(self.dates_reversed, self.adj_stock_prices_base100, color='gold', label= (str(self.stock) + " beta_value-adjusted (base100)"))
         else:
             plt.plot(self.dates_reversed, self.raw_stock_prices, color='red', label=str(self.stock)+ " Raw Prices")
             plt.plot(self.dates_reversed, self.raw_index_prices_baseStock, color='black', label=str(self.index) + " (base: " + str(self.index) + ")")

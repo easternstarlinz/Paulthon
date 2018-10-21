@@ -1,13 +1,10 @@
 import pandas as pd
 import numpy as np
 import math
-from paul_resources import HealthcareSymbols, tprint, PriceTable, daily_returns, setup_standard_logger
-from beta_class import ScrubParams, Beta
+from paul_resources import HealthcareSymbols, PriceTable, daily_returns, setup_standard_logger
+from beta_model.beta_class import ScrubParams, Beta
 from decorators import my_time_decorator, empty_decorator
-import pickle
 from collections import namedtuple
-from multiprocessing import Pool
-from multiprocessing.dummy import Pool as ThreadPool
 
 # Standard Module Setup
 NO_USE_TIMING_DECORATOR = True
@@ -89,12 +86,12 @@ def get_beta(stock,
              percentile_cutoff = .80):
     scrub_params =  get_scrub_params_from_cutoff_params(stock, index, lookback, cutoff_params, percentile_cutoff) 
     beta = Beta(stock, index, lookback, scrub_params)
-    beta_value = beta.beta
+    beta_value = beta.beta_value
     corr = beta.corr
     
     #logger.info(stock, index, lookback)
     #logger.info('Symbol: {}, Beta: {:.2f}, Corr: {:.2f}'.format(stock, beta_value, corr))
-    return Beta(stock, index, lookback, scrub_params).beta
+    return Beta(stock, index, lookback, scrub_params).beta_value
 
 @my_time_decorator
 def get_corr(stock,
@@ -104,7 +101,7 @@ def get_corr(stock,
              percentile_cutoff = .80):
     scrub_params =  get_scrub_params_from_cutoff_params(stock, index, lookback, cutoff_params, percentile_cutoff) 
     beta = Beta(stock, index, lookback, scrub_params)
-    beta_value = beta.beta
+    beta_value = beta.beta_value
     corr = beta.corr
     return Beta(stock, index, lookback, scrub_params).corr
 
@@ -178,7 +175,7 @@ def get_best_betas():
             index_cutoff = index_cutoffs[index]
             scrub_params = ScrubParams(stock_cutoff, index_cutoff, percentile_cutoff)
             beta = Beta(stock, index, lookback, scrub_params)
-            outcomes.append((index, beta.beta, beta.corr))
+            outcomes.append((index, beta.beta_value, beta.corr))
         max_corr = max([i[2] for i in outcomes])
         best_fit = [i for i in outcomes if i[2] == max_corr][0]
         best_indices.append(best_fit[0])

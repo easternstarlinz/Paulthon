@@ -39,7 +39,7 @@ def alpha_df(df: 'df of prices', lookback):
 
         # Calculate Adjusted Returns
         index = 'SPY'
-        beta = Beta(stock, index, lookback, ScrubParams(.075, .0125, .8)).beta
+        beta = Beta(stock, index, lookback, ScrubParams(.075, .0125, .8)).beta_value
         beta = 0
         adj_stock_line = StockLineBetaAdjusted(stock, lookback, beta, index)
         

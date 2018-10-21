@@ -2,18 +2,10 @@ import numpy as np
 import pandas as pd
 import seaborn
 import pickle
-import copy
-import pprint
-import decimal
-import statsmodels.formula.api as sm
-from time_decorator import my_time_decorator
-from ols import OLS
 import math
 import datetime as dt
 import matplotlib.pyplot as plt
-import scipy.stats as ss
 import statsmodels.api as sm
-from sklearn.linear_model import LinearRegression
 from beta_class_6 import StockLineBetaAdjusted, Beta, ScrubParams
 
 """OLS model from statsmodels.api as sm
@@ -51,7 +43,7 @@ scrub_params = ScrubParams(.1, .0125, .8)
 beta_lookback = 2000
 
 beta_object = Beta(stock, index, beta_lookback, scrub_params)
-beta = beta_object.beta
+beta = beta_object.beta_value
 beta = 0
 adj_stock_line = StockLineBetaAdjusted(stock, lookback, beta, index)
 adjusted_returns = adj_stock_line.adjusted_returns

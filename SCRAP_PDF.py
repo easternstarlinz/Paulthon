@@ -1,13 +1,12 @@
-from Distribution_Module import float_to_volbeta_distribution
-from paul_resources import show_mc_distributions_as_line_chart
+from option_model.Distribution_Module import float_to_volbeta_distribution
 import numpy as np
-from scipy.interpolate import interp1d, UnivariateSpline, InterpolatedUnivariateSpline
+from scipy.interpolate import interp1d, InterpolatedUnivariateSpline
 import matplotlib.pyplot as plt
 from utility.decorators import my_time_decorator
 from statistics import mean
 import pandas as pd
 import datetime as dt
-from Option_Module import Option, OptionPriceMC
+from option_model.Option_Module import Option, OptionPriceMC
 
 mc_iterations = 10**1
 dist = float_to_volbeta_distribution(.10)

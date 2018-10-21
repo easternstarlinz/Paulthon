@@ -1,20 +1,10 @@
 import numpy as np
 import pandas as pd
 import seaborn
-import pickle
-import copy
-import pprint
-import decimal
-import statsmodels.formula.api as sm
-from time_decorator import my_time_decorator
-from paul_resources import tprint, rprint
-from ols import OLS
 import math
 import datetime as dt
 import matplotlib.pyplot as plt
-import scipy.stats as ss
 import statsmodels.api as sm
-from sklearn.linear_model import LinearRegression
 from beta_class_6 import StockLineBetaAdjusted, Beta, ScrubParams
 from functools import reduce
 
@@ -58,7 +48,7 @@ lookback = 2000
 beta_lookback = 2000
 scrub_params = ScrubParams(.1, .0125, .8)
 beta_object = Beta(stock, index, beta_lookback, scrub_params)
-beta = beta_object.beta
+beta = beta_object.beta_value
 beta = 0
 
 # Rolling Parameters

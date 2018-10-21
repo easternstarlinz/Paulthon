@@ -1,12 +1,9 @@
 import pickle
 import copy
 import pprint
-import decimal
-import pandas as pd
 import numpy as np
-import statsmodels.formula.api as sm
 from time_decorator import my_time_decorator
-from ols import OLS
+from beta_model.ols import OLS
 import math
 import matplotlib.pyplot as plt
 import scipy.stats as ss
@@ -272,11 +269,11 @@ class Stock(object):
             self.raw_index_prices_baseStock.append(self.raw_index_prices_baseStock[i-1]*(1+raw_index_pct_move))
             self.adj_stock_prices.append(self.adj_stock_prices[i-1]*(1 + adj_stock_pct_move))
         
-        #Create Adjusted Stock Chart based on beta to index -> Line Graphs
+        #Create Adjusted Stock Chart based on beta_value to index -> Line Graphs
         if base100 == True:
             plt.plot(self.dates_reversed, self.raw_index_prices_base100, color='black', label=(str(self.index) + " (base100)"))
             plt.plot(self.dates_reversed, self.raw_stock_prices_base100, color='red', label = (str(self.stock) + " (base100)"))
-            plt.plot(self.dates_reversed, self.adj_stock_prices_base100, color='gold', label= (str(self.stock) + " beta-adjusted (base100)"))
+            plt.plot(self.dates_reversed, self.adj_stock_prices_base100, color='gold', label= (str(self.stock) + " beta_value-adjusted (base100)"))
         else:
             plt.plot(self.dates_reversed, self.raw_stock_prices, color='red', label=str(self.stock)+ " Raw Prices")
             plt.plot(self.dates_reversed, self.raw_index_prices_baseStock, color='black', label=str(self.index) + " (base: " + str(self.index) + ")")

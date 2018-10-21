@@ -81,7 +81,7 @@ class TakeoutEvent(Event):
     mult = 1.0
     instances = []
     
-    takeout_buckets = pd.read_csv('/home/paul/Environments/finance_env/TakeoutBuckets.csv')
+    takeout_buckets = pd.read_csv('/Users/paulwainer/Environments/finance_env/TakeoutBuckets.csv')
     takeout_buckets.set_index('Rank', inplace=True)
 
     base_takeout_premium = .40
@@ -122,7 +122,7 @@ class TakeoutEvent(Event):
 
 if __name__ == "__main__":
     #-------------------PresElection Setup-----------------#
-    PresElectionParams = pd.read_csv("/home/paul/Environments/finance_env/PresElectionParams.csv")
+    PresElectionParams = pd.read_csv("/Users/paulwainer/Environments/finance_env/PresElectionParams.csv")
     PresElectionParams.set_index('Stock', inplace=True)
 
     # Create PresElection Events Dict

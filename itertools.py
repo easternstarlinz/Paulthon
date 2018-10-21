@@ -2,7 +2,7 @@ import itertools
 import inspect
 from data.symbols import symbols
 
-from get_best_betas_2 import get_betas_over_iterable
+from beta_model.get_best_betas_2 import get_betas_over_iterable
 import matplotlib.pyplot as plt
 from pandas.tools.plotting import table
 

@@ -7,7 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 
 import sys
-sys.path.append('/home/paul/Paulthon')
+sys.path.append('/Users/paulwainer/Paulthon')
 from utility.general import tprint, merge_dfs_horizontally
 
 class Chrome_Crawler():
@@ -21,7 +21,7 @@ class Chrome_Crawler():
                 self.display = Display(visible=0, size=(800, 600))
                 self.display.start()
             
-            self.driver = webdriver.Chrome("/home/paul/Paulthon/crawler/chromedriver235/chromedriver")
+            self.driver = webdriver.Chrome("/Users/paulwainer/Paulthon/crawler/chromedriver235/chromedriver")
             #self.driver.set_page_load_timeout(30)
             sleep(4)
 

@@ -12,7 +12,7 @@ class Barchart_Expiries():
                 print('starting driver...')
                 self.display = Display(visible=0, size=(800, 600))
                 self.display.start()
-                self.driver = webdriver.Chrome("/home/paul/Paulthon/crawler/chromedriver235/chromedriver")
+                self.driver = webdriver.Chrome("/Users/paulwainer/Paulthon/crawler/chromedriver235/chromedriver")
                 sleep(4)
 
         # Close chromedriver

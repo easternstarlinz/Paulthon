@@ -1,18 +1,9 @@
-import numpy as np
-import datetime as dt
 import pandas as pd
 import pickle
-import copy
-import pprint
-import decimal
 import statsmodels.formula.api as sm
-from time_decorator import my_time_decorator
-from ols import OLS
-import math
-import matplotlib.pyplot as plt
-import scipy.stats as ss
+from beta_model.ols import OLS
 import statsmodels.api as sm
-from sklearn.linear_model import LinearRegression
+
 
 def OLS(df: 'DataFrame of resturns)') -> 'DataFrame of returns with y_hat, error, error_squared':
     df = df

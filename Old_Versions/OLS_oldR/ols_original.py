@@ -25,7 +25,7 @@ class OLSPoint(object):
         self.error_squared = item[5]
 
 #Take a list of (x,y) pairs.
-#Calculate beta (beta1), alpha (beta0), and correlation (corr)
+#Calculate beta_value (beta1), alpha (beta0), and correlation (corr)
 #Calculate y_hat, error, error_squared terms for each pair
 class OLS(object):
     def __init__(self,

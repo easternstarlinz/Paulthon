@@ -118,7 +118,7 @@ def fetch_price_table():
     #from data.finance import PriceTable as previous_price_table
     #symbols = ['XBI']
 
-    file_name = '/home/paul/Paulthon/DataFiles/StockPrices/stock_prices'
+    file_name = '/Users/paulwainer/Paulthon/DataFiles/StockPrices/stock_prices'
     
     price_table = make_price_table(symbols,
                                    start = dt.datetime(2014,1,1),

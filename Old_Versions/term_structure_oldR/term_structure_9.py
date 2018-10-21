@@ -2,13 +2,13 @@ import pandas as pd
 import datetime as dt
 from functools import reduce
 from pprint import pprint
-from biotech_class_run_9 import get_total_mc_distribution, get_option_sheet_from_mc_distribution, option_sheet
-from Event_Module import Event, IdiosyncraticVol, Earnings, TakeoutEvent, ComplexEvent, SysEvt_PresElection
-from Distribution_Module import Distribution, Distribution_MultiIndex
+from biotech_class_run_9 import get_total_mc_distribution, get_option_sheet_from_mc_distribution
+from option_model.Event_Module import Event, IdiosyncraticVol, Earnings, TakeoutEvent, ComplexEvent, SysEvt_PresElection
+from option_model.Distribution_Module import Distribution, Distribution_MultiIndex
 from paul_resources import show_mc_distributions_as_line_chart
-from Option_Module import Option, OptionPriceMC
+from option_model.Option_Module import Option, OptionPriceMC
 from decorators import my_time_decorator
-from Timing_Module import Timing
+from option_model.Timing_Module import Timing
 
 import logging
 pd.options.mode.chained_assignment = None

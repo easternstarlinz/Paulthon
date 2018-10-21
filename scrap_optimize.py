@@ -4,14 +4,13 @@ import numpy as np
 import scipy.optimize as spo
 import math
 import datetime as dt
-from statistics import mean
 import sympy as sym
-from Stock_Module import Stock
+from option_model.Stock_Module import Stock
 from utility.decorators import my_time_decorator
 from CreateMC import get_total_mc_distribution_from_events
-from Event_Module import IdiosyncraticVol
-from Distribution_Module import Distribution, mc_distribution_to_distribution
-from Option_Module import get_time_to_expiry
+from option_model.Event_Module import IdiosyncraticVol
+from option_model.Distribution_Module import Distribution, mc_distribution_to_distribution
+from option_model.Option_Module import get_time_to_expiry
 
 def f(X):
     """Given a scalar X, return some value (a real number)."""

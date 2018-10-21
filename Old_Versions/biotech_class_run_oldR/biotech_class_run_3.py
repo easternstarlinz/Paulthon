@@ -1,14 +1,12 @@
 import datetime as dt
 import pandas as pd
-import math
 import numpy as np
 import random
-from collections import namedtuple
-from paul_resources import InformationTable, tprint, rprint
+from paul_resources import rprint
 from decorators import my_time_decorator
-from Option_Module import Option, OptionPrice, OptionPriceMC, get_implied_volatility, graph_MC_distribution
-from Distribution_Module import Distribution
-from Event_Module import Event, Event, SysEvt_PresElection, TakeoutEvent
+from option_model.Option_Module import Option, OptionPriceDist, OptionPriceMC, get_implied_volatility, graph_MC_distribution
+from option_model.Distribution_Module import Distribution
+from option_model.Event_Module import Event, SysEvt_PresElection, TakeoutEvent
 #float_to_Distribution_object
 
 """--------------------------Calculations----------------------------------------"""
@@ -131,8 +129,8 @@ def run_takeout_by_expiry():
 
         distribution = event.get_distribution(expiry)
 
-        price = OptionPrice(distribution, option)
-        price2 = OptionPrice(distribution, option2)
+        price = OptionPriceDist(distribution, option)
+        price2 = OptionPriceDist(distribution, option2)
         
         straddle = price + price2
         print("T.O. by {:%m/%d/%Y}: {:.1f}%".format(expiry, distribution.distribution_df.loc["Takeout", "Prob"]*100), "\n"*0)
@@ -181,7 +179,7 @@ def run3():
 def run():
     if __name__ == "__main__":
         #-------------------PresElection Setup-----------------#
-        PresElectionParams = pd.read_csv("/home/paul/Environments/finance_env/PresElectionParams.csv")
+        PresElectionParams = pd.read_csv("/Users/paulwainer/Environments/finance_env/PresElectionParams.csv")
         PresElectionParams.set_index('Stock', inplace=True)
 
         # Create PresElection Events Dict
